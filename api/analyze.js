@@ -1,7 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 export default async function handler(req, res) {
+  // =========================
   // ✅ 只允许 POST
+  // =========================
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -10,17 +12,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { imageBase64, mediaType } = req.body;
+    const { imageBase64, mediaType } = req.body || {};
 
-    // ✅ 基础校验
+    // =========================
+    // ✅ 参数校验
+    // =========================
     if (!imageBase64) {
-      return res.status(400).json({
+      return res.status(200).json({
         success: false,
         error: "缺少图片数据",
       });
     }
 
-    // ✅ 支持多格式（默认 jpeg）
+    // =========================
+    // ✅ 图片格式支持
+    // =========================
     const allowedTypes = [
       "image/jpeg",
       "image/png",
@@ -33,42 +39,80 @@ export default async function handler(req, res) {
       ? mediaType
       : "image/jpeg";
 
+    // =========================
+    // ✅ API Key 校验（防崩）
+    // =========================
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(200).json({
+        success: false,
+        error: "未配置 ANTHROPIC_API_KEY",
+      });
+    }
+
+    // =========================
     // ✅ 初始化 Claude
+    // =========================
     const client = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
-    // ✅ Prompt（工业级：强制JSON输出）
+    // =========================
+    // ✅ 工业级 Prompt（无语法风险）
+    // =========================
     const prompt = `
-你是中药材鉴定专家，请分析图片中的中药饮片。
+你是一名专业中药材鉴定专家，请根据图片对中药饮片进行分析。
 
-⚠️ 必须严格返回 JSON：
-- 不要解释
-- 不要 markdown
-- 不要 ```json
-- 只能返回 JSON
+【重要要求】
+你必须严格返回 JSON 格式：
+- 不要任何解释
+- 不要添加说明文字
+- 不要使用 markdown
+- 不要使用代码块符号
+- 只返回 JSON
 
-格式如下：
+【返回格式如下】
 
 {
   "name": "药材名称",
-  "confidence": 0.0-1.0,
+  "confidence": 0.0,
   "features": {
-    "shape": "",
-    "color": "",
-    "texture": "",
-    "size": ""
+    "shape": "形状描述",
+    "color": "颜色描述",
+    "texture": "质地描述",
+    "size": "大小描述"
   },
   "quality": {
     "is_normal": true,
-    "score": 0-100,
+    "score": 0,
     "problems": [],
-    "reason": ""
+    "reason": "质量判断说明"
+  }
+}
+
+【要求】
+- confidence 范围 0-1
+- score 范围 0-100
+- problems 必须是数组
+- 所有字段必须存在
+
+如果无法识别，请返回：
+
+{
+  "name": "未知",
+  "confidence": 0,
+  "features": {},
+  "quality": {
+    "is_normal": false,
+    "score": 0,
+    "problems": ["无法识别"],
+    "reason": "图片信息不足或不清晰"
   }
 }
 `;
 
+    // =========================
     // ✅ 调用模型
+    // =========================
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 800,
@@ -93,19 +137,19 @@ export default async function handler(req, res) {
       ],
     });
 
-    // ✅ 原始文本
+    // =========================
+    // ✅ 获取返回文本
+    // =========================
     let text = response.content?.[0]?.text || "";
 
     // =========================
-    // 🔥 工业级清洗（关键）
+    // 🔥 清洗 JSON（工业级关键）
     // =========================
-
     text = text
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    // 有些模型会多说一句 → 截取 JSON
     const firstBrace = text.indexOf("{");
     const lastBrace = text.lastIndexOf("}");
 
@@ -118,7 +162,9 @@ export default async function handler(req, res) {
     try {
       parsed = JSON.parse(text);
     } catch (err) {
-      // ❗兜底（绝不崩）
+      // =========================
+      // ❗解析失败兜底（绝不崩）
+      // =========================
       return res.status(200).json({
         success: true,
         data: {
@@ -137,9 +183,8 @@ export default async function handler(req, res) {
     }
 
     // =========================
-    // ✅ 最终输出（稳定结构）
+    // ✅ 标准化输出（防 undefined）
     // =========================
-
     return res.status(200).json({
       success: true,
       data: {
@@ -157,7 +202,9 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error("❌ analyze error:", err);
 
-    // ❗绝对不崩（核心设计）
+    // =========================
+    // ❗最终兜底（永不崩）
+    // =========================
     return res.status(200).json({
       success: false,
       error: "服务异常",
