@@ -18,28 +18,44 @@
 
 <script>
 async function upload() {
-  const file = document.getElementById("file").files[0];
-  if (!file) return;
+  const input = document.getElementById("file");
+  const file = input.files[0];
+
+  if (!file) {
+    alert("请先选择图片");
+    return;
+  }
+
+  console.log("开始上传...");
 
   const reader = new FileReader();
   reader.onload = async () => {
-    const base64 = reader.result.split(",")[1];
+    try {
+      const base64 = reader.result.split(",")[1];
 
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        imageBase64: base64,
-        mediaType: file.type
-      })
-    });
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          imageBase64: base64,
+          mediaType: file.type
+        })
+      });
 
-    const data = await res.json();
-    document.getElementById("result").innerText =
-      JSON.stringify(data, null, 2);
+      const data = await res.json();
+      console.log(data);
+
+      document.getElementById("result").innerText =
+        JSON.stringify(data, null, 2);
+
+    } catch (err) {
+      console.error(err);
+      alert("请求失败：" + err.message);
+    }
   };
+
   reader.readAsDataURL(file);
 }
 </script>
