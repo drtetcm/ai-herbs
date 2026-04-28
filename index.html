@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中药识别</title>
+</head>
+<body style="font-family: Arial; padding: 20px">
+
+<h2>📸 中药饮片识别</h2>
+
+<input type="file" accept="image/*" id="file" />
+
+<br/><br/>
+
+<button onclick="upload()">开始识别</button>
+
+<pre id="result"></pre>
+
+<script>
+async function upload() {
+  const file = document.getElementById("file").files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const base64 = reader.result.split(",")[1];
+
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        imageBase64: base64,
+        mediaType: file.type
+      })
+    });
+
+    const data = await res.json();
+    document.getElementById("result").innerText =
+      JSON.stringify(data, null, 2);
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
