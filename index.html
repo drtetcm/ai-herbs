@@ -217,10 +217,46 @@ function compress(file) {
 
 function downloadPDF() {
 
-  if (!canDownloadPDF()) {
-    alert("请升级后下载");
+  if (canDownloadPDF()) {
+    html2pdf()
+      .from(document.getElementById("report"))
+      .save("中药检测报告.pdf");
+
+    localStorage.removeItem("pdf_paid"); // 单次消费
     return;
   }
+
+  const choice = prompt(`
+📄 下载报告需付费：
+
+1️⃣ 单次PDF RM1（推荐）
+2️⃣ Executive 3天 RM3.99（无限识别+PDF）
+3️⃣ Pro 月 RM29（全部功能）
+
+请输入 1 / 2 / 3
+`);
+
+  if (choice === "1") {
+    const code = prompt("支付 RM1 后输入激活码：");
+
+    if (code === "PDF2026") {
+      localStorage.setItem("pdf_paid", "true");
+      alert("✅ 已解锁PDF，请再次点击下载");
+    }
+  }
+
+  if (choice === "2") {
+    const expire = Date.now() + 3 * 24 * 3600 * 1000;
+    localStorage.setItem("exec_expire", expire);
+    alert("✅ Executive 已开通，请重新下载");
+  }
+
+  if (choice === "3") {
+    const expire = Date.now() + 30 * 24 * 3600 * 1000;
+    localStorage.setItem("pro_expire", expire);
+    alert("✅ Pro 已开通，请重新下载");
+  }
+
 
   html2pdf().from(document.getElementById("report")).save("报告.pdf");
 }
