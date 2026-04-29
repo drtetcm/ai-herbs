@@ -18,10 +18,6 @@ body {
   padding: 16px;
 }
 
-h1 {
-  font-size: 22px;
-}
-
 .card {
   background: #fff;
   padding: 16px;
@@ -56,8 +52,6 @@ img {
   height: 8px;
   background: #eee;
   border-radius: 4px;
-  overflow: hidden;
-  margin-top: 6px;
 }
 
 .bar {
@@ -67,31 +61,32 @@ img {
 .loading {
   text-align: center;
   padding: 20px;
-  font-size: 16px;
-}
-
-.error {
-  color: red;
 }
 </style>
 </head>
 
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <div class="container">
   <h1>📸 中药饮片识别</h1>
 
   <input type="file" id="file" accept="image/*" capture="environment" />
-  <br /><br />
+  <br><br>
 
-  <button id="btn" onclick="analyze()">开始识别</button>
+  <button id="btn">开始识别</button>
 
   <div id="preview"></div>
   <div id="result"></div>
 </div>
 
+<!-- PDF库（必须在这里） -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <script>
+//////////////////////////////////////////////////
+// 🔒 收费系统
+//////////////////////////////////////////////////
+
 function getUser() {
   return {
     usage: JSON.parse(localStorage.getItem("usage") || "{}"),
@@ -122,7 +117,7 @@ function checkUsage() {
   }
 
   if (usage.count >= 3 && !isExecutive() && !isPro()) {
-    showUpgradeDialog();
+    alert("今日免费次数已用完");
     return false;
   }
 
@@ -131,61 +126,9 @@ function checkUsage() {
   return true;
 }
 
-function showPayOptions() {
-  const choice = prompt(`
-请选择购买：
-
-1️⃣ 单次报告 RM1
-2️⃣ Executive 3天 RM3.99
-3️⃣ Pro 月 RM29
-`);
-
-  if (choice === "1") activatePDF();
-  if (choice === "2") activateExecutive();
-  if (choice === "3") activatePro();
-}
-
-function activatePDF() {
-  const code = prompt("支付 RM1 后输入激活码：");
-
-  if (code === "PDF2026") {
-    localStorage.setItem("pdf_paid", "true");
-    alert("✅ 已解锁单次PDF");
-  }
-}
-
-function activateExecutive() {
-  const code = prompt("支付 RM3.99 后输入激活码：");
-
-  if (code === "EXEC2026") {
-    const expire = Date.now() + 3 * 24 * 3600 * 1000;
-    localStorage.setItem("exec_expire", expire);
-    alert("✅ Executive 已激活（3天）");
-  }
-}
-
-function activatePro() {
-  const code = prompt("支付 RM29 后输入激活码：");
-
-  if (code === "PRO2026") {
-    const expire = Date.now() + 30 * 24 * 3600 * 1000;
-    localStorage.setItem("pro_expire", expire);
-    alert("✅ Pro 已激活（30天）");
-  }
-}
-
-function showUpgradeDialog() {
-  alert(`
-🎯 今日免费次数已用完
-
-升级获得：
-✔ 无限识别
-✔ PDF报告
-
-Executive RM3.99（3天）
-Pro RM29（月）
-`);
-}
+//////////////////////////////////////////////////
+// 📸 主逻辑
+//////////////////////////////////////////////////
 
 const fileInput = document.getElementById("file");
 const preview = document.getElementById("preview");
@@ -194,39 +137,72 @@ const btn = document.getElementById("btn");
 
 let currentFile = null;
 
-// ===== 预览 =====
 fileInput.onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
   currentFile = file;
-
-  const url = URL.createObjectURL(file);
-  preview.innerHTML = `<img src="${url}" />`;
+  preview.innerHTML = `<img src="${URL.createObjectURL(file)}" />`;
 };
 
-// ===== 压缩（更稳）=====
-function compressImage(file) {
-  return new Promise((resolve) => {
+btn.onclick = async () => {
+
+  if (!checkUsage()) return;
+
+  if (!currentFile) {
+    alert("请选择图片");
+    return;
+  }
+
+  btn.disabled = true;
+  resultDiv.innerHTML = `<div class="loading">⏳ 识别中...</div>`;
+
+  try {
+    const base64 = await compress(currentFile);
+
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        imageBase64: base64.split(",")[1],
+        mediaType: "image/jpeg"
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      throw new Error(data.error);
+    }
+
+    render(data.data);
+
+  } catch (err) {
+    resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+//////////////////////////////////////////////////
+// 📦 图片压缩
+//////////////////////////////////////////////////
+
+function compress(file) {
+  return new Promise(resolve => {
     const img = new Image();
     const reader = new FileReader();
 
-    reader.onload = (e) => {
-      img.src = e.target.result;
-    };
+    reader.onload = e => img.src = e.target.result;
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      const maxWidth = 800;
-
-      const scale = Math.min(1, maxWidth / img.width);
+      const scale = Math.min(1, 800 / img.width);
 
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
 
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
 
       resolve(canvas.toDataURL("image/jpeg", 0.7));
     };
@@ -235,91 +211,25 @@ function compressImage(file) {
   });
 }
 
-// ===== 主逻辑 =====
-async function analyze() {
-
-  if (!checkUsage()) return;
-
-  if (!currentFile) {
-    alert("请先选择图片");
-    return;
-  }
-
-  btn.disabled = true;
-  resultDiv.innerHTML = `<div class="loading">⏳ 识别中...</div>`;
-
-  try {
-    const compressed = await compressImage(currentFile);
-
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        imageBase64: compressed.split(",")[1],
-        mediaType: "image/jpeg"
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.success) {
-      resultDiv.innerHTML = `<div class="card error">❌ ${data.error}</div>`;
-      return;
-    }
-
-    renderResult(data.data);
-
-  } catch (err) {
-    resultDiv.innerHTML = `<div class="card error">❌ ${err.message}</div>`;
-  } finally {
-    btn.disabled = false;
-  }
-}
+//////////////////////////////////////////////////
+// 📄 PDF
+//////////////////////////////////////////////////
 
 function downloadPDF() {
 
   if (!canDownloadPDF()) {
-    showPayOptions();
+    alert("请升级后下载");
     return;
   }
 
-  const element = document.getElementById("report");
-
-  html2pdf().from(element).save("中药检测报告.pdf");
-
-  localStorage.removeItem("pdf_paid");
+  html2pdf().from(document.getElementById("report")).save("报告.pdf");
 }
 
-    // 🔥 防止 JSON 崩溃
-    let data;
-    try {
-      data = await res.json();
-    } catch {
-      throw new Error("接口返回非JSON");
-    }
+//////////////////////////////////////////////////
+// 🎨 UI
+//////////////////////////////////////////////////
 
-    if (!data.success) {
-      resultDiv.innerHTML = `
-        <div class="card error">
-          ❌ ${data.error || "识别失败"}
-        </div>`;
-      return;
-    }
-
-    renderResult(data.data);
-
-  } catch (err) {
-    resultDiv.innerHTML = `
-      <div class="card error">
-        ❌ ${err.message}
-      </div>`;
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-// ===== UI 渲染 =====
-function renderResult(d) {
+function render(d) {
 
   const score = d.quality?.score || 0;
 
@@ -331,38 +241,22 @@ function renderResult(d) {
   resultDiv.innerHTML = `
     <div id="report" class="card">
 
-      <h2>📋 中药检测报告</h2>
+      <h2>📋 识别报告</h2>
 
-      <h3>📌 ${d.name}</h3>
-      <p>置信度：${(d.confidence * 100).toFixed(1)}%</p>
+      <h3>${d.name}</h3>
+      <p>置信度 ${(d.confidence * 100).toFixed(1)}%</p>
 
-      <p>质量评分：${score}</p>
+      <p>评分 ${score}</p>
       <div class="progress">
         <div class="bar" style="width:${score}%;background:${color}"></div>
       </div>
 
-      <h3>⚖️ 质量评估</h3>
-      <p>${d.quality?.reason || ""}</p>
+      <button onclick="downloadPDF()">📄 下载PDF</button>
 
-      <h3>🔍 特征</h3>
-      <ul>
-        <li>形状：${d.features?.shape || "-"}</li>
-        <li>颜色：${d.features?.color || "-"}</li>
-      </ul>
-
-      <button onclick="downloadPDF()" style="margin-top:15px;">
-        📄 下载PDF报告
-      </button>
-
-      <button onclick="showPayOptions()" style="margin-top:10px;background:#22c55e;">
-        💰 升级专业版
-      </button>
-
-      <div style="margin-top:15px;font-size:12px;color:#888;">
-        ⚠️ 本结果仅供参考，不作为医疗依据
-      </div>
+    </div>
   `;
 }
 </script>
+
 </body>
 </html>
