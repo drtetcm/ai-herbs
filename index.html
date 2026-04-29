@@ -1,117 +1,95 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>中药饮片识别</title>
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
+  margin: 0;
+  background: #f5f6f8;
+}
+
+.container {
+  max-width: 720px;
+  margin: auto;
+  padding: 16px;
+}
+
+h1 {
+  font-size: 22px;
+}
+
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  background: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #aaa;
+}
+
+img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.progress {
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.bar {
+  height: 100%;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+}
+
+.error {
+  color: red;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>📸 中药饮片识别</h1>
+
+  <input type="file" id="file" accept="image/*" capture="environment" />
+  <br /><br />
+
+  <button id="btn" onclick="analyze()">开始识别</button>
+
+  <div id="preview"></div>
+  <div id="result"></div>
+</div>
 
 <script>
-//////////////////////////////////////////////////
-// 💰 收费系统（放最上面）
-//////////////////////////////////////////////////
-
-function getUser() {
-  return {
-    usage: JSON.parse(localStorage.getItem("usage") || "{}"),
-    pdfPaid: localStorage.getItem("pdf_paid") === "true",
-    execExpire: Number(localStorage.getItem("exec_expire") || 0),
-    proExpire: Number(localStorage.getItem("pro_expire") || 0),
-  };
-}
-
-function isPro() {
-  return Date.now() < getUser().proExpire;
-}
-
-function isExecutive() {
-  return Date.now() < getUser().execExpire;
-}
-
-function canDownloadPDF() {
-  return isPro() || isExecutive() || getUser().pdfPaid;
-}
-
-//////////////////////////////////////////////////
-// 📊 免费次数控制
-//////////////////////////////////////////////////
-
-function checkUsage() {
-  const today = new Date().toDateString();
-  let usage = JSON.parse(localStorage.getItem("usage") || "{}");
-
-  if (usage.date !== today) {
-    usage = { date: today, count: 0 };
-  }
-
-  if (usage.count >= 3 && !isExecutive() && !isPro()) {
-    showUpgradeDialog();
-    return false;
-  }
-
-  usage.count++;
-  localStorage.setItem("usage", JSON.stringify(usage));
-  return true;
-}
-
-//////////////////////////////////////////////////
-// 💰 支付弹窗
-//////////////////////////////////////////////////
-
-function showPayOptions() {
-  const choice = prompt(`
-请选择购买：
-
-1️⃣ 单次报告 RM1
-2️⃣ Executive 3天 RM3.99
-3️⃣ Pro 月 RM29
-`);
-
-  if (choice === "1") activatePDF();
-  if (choice === "2") activateExecutive();
-  if (choice === "3") activatePro();
-}
-
-function activatePDF() {
-  const code = prompt("支付 RM1 后输入激活码：");
-
-  if (code === "PDF2026") {
-    localStorage.setItem("pdf_paid", "true");
-    alert("✅ 已解锁单次PDF");
-  }
-}
-
-function activateExecutive() {
-  const code = prompt("支付 RM3.99 后输入激活码：");
-
-  if (code === "EXEC2026") {
-    const expire = Date.now() + 3 * 24 * 3600 * 1000;
-    localStorage.setItem("exec_expire", expire);
-    alert("✅ Executive 已激活（3天）");
-  }
-}
-
-function activatePro() {
-  const code = prompt("支付 RM29 后输入激活码：");
-
-  if (code === "PRO2026") {
-    const expire = Date.now() + 30 * 24 * 3600 * 1000;
-    localStorage.setItem("pro_expire", expire);
-    alert("✅ Pro 已激活（30天）");
-  }
-}
-
-function showUpgradeDialog() {
-  alert(`
-🎯 今日免费次数已用完
-
-升级获得：
-✔ 无限识别
-✔ PDF报告
-
-Executive RM3.99（3天）
-Pro RM29（月）
-`);
-}
-
-//////////////////////////////////////////////////
-// 📸 原有功能
-//////////////////////////////////////////////////
-
 const fileInput = document.getElementById("file");
 const preview = document.getElementById("preview");
 const resultDiv = document.getElementById("result");
@@ -119,27 +97,34 @@ const btn = document.getElementById("btn");
 
 let currentFile = null;
 
+// ===== 预览 =====
 fileInput.onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
   currentFile = file;
+
   const url = URL.createObjectURL(file);
   preview.innerHTML = `<img src="${url}" />`;
 };
 
+// ===== 压缩（更稳）=====
 function compressImage(file) {
   return new Promise((resolve) => {
     const img = new Image();
     const reader = new FileReader();
 
-    reader.onload = (e) => img.src = e.target.result;
+    reader.onload = (e) => {
+      img.src = e.target.result;
+    };
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
 
-      const scale = Math.min(1, 800 / img.width);
+      const maxWidth = 800;
+
+      const scale = Math.min(1, maxWidth / img.width);
 
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
@@ -153,14 +138,8 @@ function compressImage(file) {
   });
 }
 
-//////////////////////////////////////////////////
-// 🔥 主逻辑（加入收费控制）
-//////////////////////////////////////////////////
-
+// ===== 主逻辑 =====
 async function analyze() {
-
-  if (!checkUsage()) return;
-
   if (!currentFile) {
     alert("请先选择图片");
     return;
@@ -174,51 +153,44 @@ async function analyze() {
 
     const res = await fetch("/api/analyze", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         imageBase64: compressed.split(",")[1],
         mediaType: "image/jpeg"
       })
     });
 
-    const data = await res.json();
+    // 🔥 防止 JSON 崩溃
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("接口返回非JSON");
+    }
 
     if (!data.success) {
-      resultDiv.innerHTML = `<div class="card error">❌ ${data.error}</div>`;
+      resultDiv.innerHTML = `
+        <div class="card error">
+          ❌ ${data.error || "识别失败"}
+        </div>`;
       return;
     }
 
     renderResult(data.data);
 
   } catch (err) {
-    resultDiv.innerHTML = `<div class="card error">❌ ${err.message}</div>`;
+    resultDiv.innerHTML = `
+      <div class="card error">
+        ❌ ${err.message}
+      </div>`;
   } finally {
     btn.disabled = false;
   }
 }
 
-//////////////////////////////////////////////////
-// 📄 PDF下载
-//////////////////////////////////////////////////
-
-function downloadPDF() {
-
-  if (!canDownloadPDF()) {
-    showPayOptions();
-    return;
-  }
-
-  const element = document.getElementById("report");
-
-  html2pdf().from(element).save("中药检测报告.pdf");
-
-  localStorage.removeItem("pdf_paid");
-}
-
-//////////////////////////////////////////////////
-// 🎨 UI 渲染（升级版）
-//////////////////////////////////////////////////
-
+// ===== UI 渲染 =====
 function renderResult(d) {
 
   const score = d.quality?.score || 0;
@@ -229,41 +201,51 @@ function renderResult(d) {
     "#ef4444";
 
   resultDiv.innerHTML = `
-    <div id="report" class="card">
+    <div class="card">
+      <h2>📋 识别报告</h2>
 
-      <h2>📋 中药检测报告</h2>
-
-      <h3>📌 ${d.name}</h3>
-      <p>置信度：${(d.confidence * 100).toFixed(1)}%</p>
+      <h3>📌 ${d.name || "未知"}</h3>
+      <p>置信度：${((d.confidence || 0) * 100).toFixed(1)}%</p>
 
       <p>质量评分：${score}</p>
       <div class="progress">
         <div class="bar" style="width:${score}%;background:${color}"></div>
       </div>
 
-      <h3>⚖️ 质量评估</h3>
-      <p>${d.quality?.reason || ""}</p>
-
-      <h3>🔍 特征</h3>
+      <h3>🔍 特征分析</h3>
       <ul>
         <li>形状：${d.features?.shape || "-"}</li>
         <li>颜色：${d.features?.color || "-"}</li>
+        <li>质地：${d.features?.texture || "-"}</li>
+        <li>大小：${d.features?.size || "-"}</li>
       </ul>
 
-      <button onclick="downloadPDF()" style="margin-top:15px;">
-        📄 下载PDF报告
-      </button>
+      <h3>⚖️ 质量评估</h3>
+      <p>
+        是否正常：
+        <b style="color:${d.quality?.is_normal ? 'green' : 'red'}">
+          ${d.quality?.is_normal ? "正常" : "异常"}
+        </b>
+      </p>
 
-      <button onclick="showPayOptions()" style="margin-top:10px;background:#22c55e;">
-        💰 升级专业版
-      </button>
+      ${
+        (d.quality?.problems || []).length > 0
+        ? `
+        <p>问题：</p>
+        <ul>
+          ${d.quality.problems.map(p => `<li>${p}</li>`).join("")}
+        </ul>
+        `
+        : "<p>无明显问题</p>"
+      }
 
-      <div style="margin-top:15px;font-size:12px;color:#888;">
-        ⚠️ 本结果仅供参考，不作为医疗依据
-      </div>
-
+      <details>
+        <summary>📄 查看详细说明</summary>
+        <p>${d.quality?.reason || ""}</p>
+      </details>
     </div>
   `;
 }
-
 </script>
+</body>
+</html>
