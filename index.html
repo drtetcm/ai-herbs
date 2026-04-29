@@ -1,90 +1,103 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>中药饮片识别</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>中药饮片识别</title>
 
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
-      margin: 0;
-      background: #f5f6f8;
-    }
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
+  margin: 0;
+  background: #f5f6f8;
+}
 
-    .container {
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
+.container {
+  max-width: 720px;
+  margin: auto;
+  padding: 16px;
+}
 
-    h1 {
-      font-size: 24px;
-    }
+h1 {
+  font-size: 22px;
+}
 
-    .card {
-      background: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      margin-top: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
 
-    button {
-      padding: 10px 18px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background: #007bff;
-      color: #fff;
-      cursor: pointer;
-    }
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  background: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
 
-    img {
-      width: 100%;
-      max-width: 400px;
-      border-radius: 10px;
-      margin-top: 15px;
-    }
+button:disabled {
+  background: #aaa;
+}
 
-    .progress {
-      height: 8px;
-      background: #eee;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-top: 6px;
-    }
+img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
 
-    .bar {
-      height: 100%;
-    }
+.progress {
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
 
-    ul {
-      line-height: 1.6;
-    }
-  </style>
+.bar {
+  height: 100%;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+}
+
+.error {
+  color: red;
+}
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>📸 中药饮片识别</h1>
+<div class="container">
+  <h1>📸 中药饮片识别</h1>
 
-    <input type="file" id="file" accept="image/*" capture="environment" />
-    <br /><br />
-    <button onclick="analyze()">开始识别</button>
+  <input type="file" id="file" accept="image/*" capture="environment" />
+  <br /><br />
 
-    <div id="preview"></div>
-    <div id="result"></div>
-  </div>
+  <button id="btn" onclick="analyze()">开始识别</button>
+
+  <div id="preview"></div>
+  <div id="result"></div>
+</div>
 
 <script>
 const fileInput = document.getElementById("file");
 const preview = document.getElementById("preview");
 const resultDiv = document.getElementById("result");
+const btn = document.getElementById("btn");
 
 let currentFile = null;
 
-// ===== 预览图片 =====
+// ===== 预览 =====
 fileInput.onchange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -95,7 +108,7 @@ fileInput.onchange = (e) => {
   preview.innerHTML = `<img src="${url}" />`;
 };
 
-// ===== 压缩图片（关键）=====
+// ===== 压缩（更稳）=====
 function compressImage(file) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -110,15 +123,15 @@ function compressImage(file) {
       const ctx = canvas.getContext("2d");
 
       const maxWidth = 800;
-      const scale = maxWidth / img.width;
 
-      canvas.width = maxWidth;
+      const scale = Math.min(1, maxWidth / img.width);
+
+      canvas.width = img.width * scale;
       canvas.height = img.height * scale;
 
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      const base64 = canvas.toDataURL("image/jpeg", 0.7);
-      resolve(base64);
+      resolve(canvas.toDataURL("image/jpeg", 0.7));
     };
 
     reader.readAsDataURL(file);
@@ -132,7 +145,8 @@ async function analyze() {
     return;
   }
 
-  resultDiv.innerHTML = "识别中...";
+  btn.disabled = true;
+  resultDiv.innerHTML = `<div class="loading">⏳ 识别中...</div>`;
 
   try {
     const compressed = await compressImage(currentFile);
@@ -148,21 +162,35 @@ async function analyze() {
       })
     });
 
-    const data = await res.json();
+    // 🔥 防止 JSON 崩溃
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("接口返回非JSON");
+    }
 
     if (!data.success) {
-      resultDiv.innerHTML = `<div class="card">❌ ${data.error}</div>`;
+      resultDiv.innerHTML = `
+        <div class="card error">
+          ❌ ${data.error || "识别失败"}
+        </div>`;
       return;
     }
 
     renderResult(data.data);
 
   } catch (err) {
-    resultDiv.innerHTML = `<div class="card">❌ 请求失败</div>`;
+    resultDiv.innerHTML = `
+      <div class="card error">
+        ❌ ${err.message}
+      </div>`;
+  } finally {
+    btn.disabled = false;
   }
 }
 
-// ===== UI渲染（核心）=====
+// ===== UI 渲染 =====
 function renderResult(d) {
 
   const score = d.quality?.score || 0;
@@ -208,11 +236,11 @@ function renderResult(d) {
           ${d.quality.problems.map(p => `<li>${p}</li>`).join("")}
         </ul>
         `
-        : ""
+        : "<p>无明显问题</p>"
       }
 
       <details>
-        <summary>📄 详细说明</summary>
+        <summary>📄 查看详细说明</summary>
         <p>${d.quality?.reason || ""}</p>
       </details>
     </div>
