@@ -171,9 +171,7 @@ btn.onclick = async () => {
 
     const data = await res.json();
 
-    if (!data.success) {
-      throw new Error(data.error);
-    }
+    if (!data.success) throw new Error(data.error);
 
     render(data.data);
 
@@ -212,10 +210,8 @@ function compress(file) {
 }
 
 //////////////////////////////////////////////////
-// 📄 PDF
+// 📄 PDF（唯一正确版本）
 //////////////////////////////////////////////////
-
-function downloadPDF() {
 
 function generatePDF(data) {
 
@@ -256,7 +252,6 @@ function generatePDF(data) {
     .save();
 }
 
-
 function downloadPDF() {
 
   if (!window.latestData) {
@@ -270,31 +265,25 @@ function downloadPDF() {
     return;
   }
 
-  const choice = prompt(`
-📄 下载报告需付费：
-
-1️⃣ 单次PDF RM1
-2️⃣ Executive 3天 RM3.99
-3️⃣ Pro 月 RM29
-`);
+  const choice = prompt(`下载PDF需付费：
+1=RM1 单次
+2=RM3.99 三天
+3=RM29 月卡`);
 
   if (choice === "1") {
-    const code = prompt("支付 RM1 后输入激活码：");
-
+    const code = prompt("输入激活码：");
     if (code === "PDF2026") {
       localStorage.setItem("pdf_paid", "true");
-      alert("✅ 已解锁，请再次点击下载");
+      alert("已解锁，请再点一次");
     }
   }
 
   if (choice === "2") {
     localStorage.setItem("exec_expire", Date.now() + 3*24*3600*1000);
-    alert("✅ Executive 已开通");
   }
 
   if (choice === "3") {
     localStorage.setItem("pro_expire", Date.now() + 30*24*3600*1000);
-    alert("✅ Pro 已开通");
   }
 }
 
@@ -305,6 +294,7 @@ function downloadPDF() {
 function render(d) {
 
   window.latestData = d;
+
   const score = d.quality?.score || 0;
 
   const color =
@@ -313,7 +303,7 @@ function render(d) {
     "#ef4444";
 
   resultDiv.innerHTML = `
-    <div id="report" class="card">
+    <div class="card">
 
       <h2>📋 识别报告</h2>
 
@@ -326,21 +316,6 @@ function render(d) {
       </div>
 
       <button onclick="downloadPDF()">📄 下载PDF</button>
-      
-  
-      function downloadPDF() {
-      if (!window.latestData) {
-      alert("请先识别");
-      return;
-      }
-      
-      if (canDownloadPDF()) {
-      generatePDF(window.latestData);
-      return;
-      }
-      
-      pay("pdf"); // 👉 Stripe
-      }
 
     </div>
   `;
