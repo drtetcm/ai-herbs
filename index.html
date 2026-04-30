@@ -79,6 +79,8 @@ img {
   <div id="result"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
 <!-- PDF库（必须在这里） -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -213,67 +215,108 @@ function compress(file) {
 // 📄 PDF（唯一正确版本）
 //////////////////////////////////////////////////
 
-function generatePDF(data) {
+function generatePDF() {
 
-  // ✅ 创建一个“临时容器”（关键）
+  const report = document.getElementById("report");
+
+  // ✅ 克隆UI（关键）
+  const clone = report.cloneNode(true);
+  const logo = document.createElement("img");
+  logo.src = "https://drte.io/logo.png"; // 换成你真实logo
+  logo.style.height = "50px";
+  logo.style.display = "block";
+  logo.style.margin = "0 auto 10px auto"; // 居中
+  
+  clone.insertBefore(logo, clone.firstChild);
+
+  const title = document.createElement("h1");
+  title.innerText = "中药材检测报告";
+  title.style.textAlign = "center";
+  title.style.marginBottom = "20px";
+  
+  clone.insertBefore(title, clone.children[1]);
+
+  const id = document.createElement("p");
+  id.innerText = "报告编号：DRTE-" + Date.now();
+  id.style.fontSize = "12px";
+  id.style.color = "#666";
+  id.style.textAlign = "center";
+  clone.insertBefore(id, clone.children[2]);
+
+  const date = document.createElement("p");
+  date.innerText = "检测日期：" + new Date().toLocaleDateString();
+  date.style.fontSize = "12px";
+  date.style.color = "#666";
+  date.style.textAlign = "center";
+  
+  clone.insertBefore(date, clone.children[3]);
+
+  const qrContainer = document.createElement("div");
+  qrContainer.style.textAlign = "center";
+  qrContainer.style.marginTop = "20px";
+  
+  const qr = document.createElement("canvas");
+  // ⚠️ 这里是你未来的验证地址
+  const verifyUrl = "https://drte.io/report?id=" + Date.now();
+  
+  QRCode.toCanvas(qr, verifyUrl);
+  
+  const qrText = document.createElement("p");
+  qrText.innerText = "扫码验证报告";
+  qrText.style.fontSize = "12px";
+  qrText.style.color = "#666";
+  
+  qrContainer.appendChild(qr);
+  qrContainer.appendChild(qrText);
+  
+  clone.appendChild(qrContainer);
+
+  // ✅ 去掉按钮（不需要出现在PDF）
+  const buttons = clone.querySelectorAll("button");
+  buttons.forEach(btn => btn.remove());
+
+  // ✅ 加标题（更专业）
+  const title = document.createElement("h1");
+  title.innerText = "中药材检测报告";
+  title.style.textAlign = "center";
+  title.style.marginBottom = "20px";
+
+  clone.insertBefore(title, clone.firstChild);
+
+  // ✅ 加报告编号
+  const id = document.createElement("p");
+  id.innerText = "报告编号：DRTE-" + Date.now();
+  id.style.fontSize = "12px";
+  id.style.color = "#666";
+
+  clone.insertBefore(id, clone.children[1]);
+
+  // ✅ 加日期
+  const date = document.createElement("p");
+  date.innerText = "检测日期：" + new Date().toLocaleDateString();
+  date.style.fontSize = "12px";
+  date.style.color = "#666";
+
+  clone.insertBefore(date, clone.children[2]);
+
+  // ✅ 放入临时容器（关键）
   const container = document.createElement("div");
-
-  container.style.width = "800px";
-  container.style.padding = "40px";
-  container.style.background = "#fff";
-  container.style.fontFamily = "Arial";
-
-  container.innerHTML = `
-    <h1 style="text-align:center;">中药材检测报告</h1>
-    <hr/>
-
-    <h2>${data.name}</h2>
-
-    <p><b>置信度：</b>${(data.confidence * 100).toFixed(1)}%</p>
-    <p><b>质量评分：</b>${data.quality.score}</p>
-
-    <h3>特征分析</h3>
-    <ul>
-      <li>形状：${data.features.shape}</li>
-      <li>颜色：${data.features.color}</li>
-      <li>质地：${data.features.texture}</li>
-      <li>大小：${data.features.size}</li>
-    </ul>
-
-    <h3>质量评估</h3>
-    <p>是否正常：${data.quality.is_normal ? "正常" : "异常"}</p>
-    <p>问题：${(data.quality.problems || []).join("，")}</p>
-
-    <h3>详细说明</h3>
-    <p>${data.quality.reason}</p>
-
-    <hr/>
-    <p style="text-align:center;font-size:12px;color:#999;">
-      DRTE AI 中药检测系统
-    </p>
-  `;
-
-  // ✅ 插入页面（必须）
+  container.appendChild(clone);
   document.body.appendChild(container);
 
-  // ✅ 强制浏览器渲染（关键）
-  requestAnimationFrame(() => {
-
-    html2pdf()
-      .set({
-        margin: 10,
-        filename: "中药检测报告.pdf",
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4" }
-      })
-      .from(container)
-      .save()
-      .then(() => {
-        // ✅ 删除临时DOM（干净）
-        document.body.removeChild(container);
-      });
-
-  });
+  // ✅ 生成PDF
+  html2pdf()
+    .set({
+      margin: 10,
+      filename: "DRTE-中药检测报告.pdf",
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4" }
+    })
+    .from(container)
+    .save()
+    .then(() => {
+      document.body.removeChild(container);
+    });
 }
 
 function downloadPDF() {
@@ -284,31 +327,12 @@ function downloadPDF() {
   }
 
   if (canDownloadPDF()) {
-    generatePDF(window.latestData);
+    generatePDF(); // ✅ 不再传data
     localStorage.removeItem("pdf_paid");
     return;
   }
 
-  const choice = prompt(`下载PDF需付费：
-1=RM1 单次
-2=RM3.99 三天
-3=RM29 月卡`);
-
-  if (choice === "1") {
-    const code = prompt("输入激活码：");
-    if (code === "PDF2026") {
-      localStorage.setItem("pdf_paid", "true");
-      alert("已解锁，请再点一次");
-    }
-  }
-
-  if (choice === "2") {
-    localStorage.setItem("exec_expire", Date.now() + 3*24*3600*1000);
-  }
-
-  if (choice === "3") {
-    localStorage.setItem("pro_expire", Date.now() + 30*24*3600*1000);
-  }
+  pay("pdf"); // 如果你已接Stripe
 }
 
 //////////////////////////////////////////////////
@@ -326,20 +350,109 @@ function render(d) {
     score > 60 ? "#f59e0b" :
     "#ef4444";
 
+  const level =
+    score > 80 ? "优质" :
+    score > 60 ? "合格" :
+    "风险";
+
   resultDiv.innerHTML = `
-    <div class="card">
+    <div id="report" class="card" style="background:#fff;">
 
-      <h2>📋 识别报告</h2>
+      <h2>📋 中药检测报告</h2>
 
-      <h3>${d.name}</h3>
-      <p>置信度 ${(d.confidence * 100).toFixed(1)}%</p>
-
-      <p>评分 ${score}</p>
-      <div class="progress">
-        <div class="bar" style="width:${score}%;background:${color}"></div>
+      <!-- 基本信息 -->
+      <div style="margin-bottom:16px;">
+        <h3>📌 药材名称：${d.name}</h3>
+        <p>置信度：<b>${(d.confidence * 100).toFixed(1)}%</b></p>
       </div>
 
-      <button onclick="downloadPDF()">📄 下载PDF</button>
+      <!-- 评分模块 -->
+      <div style="margin-bottom:16px;">
+        <p>质量评分：<b>${score}</b>（${level}）</p>
+
+        <div class="progress">
+          <div class="bar" style="width:${score}%;background:${color}"></div>
+        </div>
+      </div>
+
+      <!-- 状态标签 -->
+      <div style="
+        padding:10px;
+        border-radius:8px;
+        background:${d.quality?.is_normal ? "#e6ffed" : "#ffe6e6"};
+        margin-bottom:16px;
+      ">
+        <b style="
+          color:${d.quality?.is_normal ? "green" : "red"};
+          font-size:16px;
+        ">
+          ${d.quality?.is_normal ? "✔ 正常药材" : "⚠ 存在风险"}
+        </b>
+      </div>
+
+      <!-- 特征分析 -->
+      <div style="margin-bottom:16px;">
+        <h3>🔍 特征分析</h3>
+        <ul>
+          <li>形状：${d.features?.shape || "-"}</li>
+          <li>颜色：${d.features?.color || "-"}</li>
+          <li>质地：${d.features?.texture || "-"}</li>
+          <li>大小：${d.features?.size || "-"}</li>
+        </ul>
+      </div>
+
+      <!-- 问题列表 -->
+      ${
+        (d.quality?.problems || []).length > 0
+        ? `
+        <div style="margin-bottom:16px;">
+          <h3>⚠ 发现问题</h3>
+          <ul>
+            ${d.quality.problems.map(p => `<li>${p}</li>`).join("")}
+          </ul>
+        </div>
+        `
+        : ""
+      }
+
+      <!-- 专业说明 -->
+      <div style="margin-bottom:16px;">
+        <h3>📄 AI分析说明</h3>
+        <p style="line-height:1.6;">
+          ${d.quality?.reason || "暂无详细说明"}
+        </p>
+      </div>
+
+      <!-- 建议（商业关键） -->
+      <div style="
+        padding:12px;
+        border-radius:8px;
+        background:#f0f9ff;
+        margin-bottom:16px;
+      ">
+        <h3>💡 使用建议</h3>
+        <p>
+          ${
+            d.quality?.is_normal
+            ? "该药材外观符合常规标准，可正常使用。"
+            : "建议谨慎使用，可能存在质量问题，必要时咨询专业人士。"
+          }
+        </p>
+      </div>
+
+      <!-- 操作按钮 -->
+      <button onclick="downloadPDF()" style="margin-bottom:10px;">
+        📄 下载PDF报告
+      </button>
+
+      <button onclick="location.reload()" style="background:#6b7280;">
+        🔄 重新识别
+      </button>
+
+      <!-- 免责声明 -->
+      <div style="margin-top:15px;font-size:12px;color:#888;">
+        ⚠ 本报告由AI生成，仅供参考，不作为医疗依据
+      </div>
 
     </div>
   `;
