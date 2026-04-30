@@ -113,7 +113,7 @@ function checkUsage() {
   let usage = JSON.parse(localStorage.getItem("usage") || "{}");
 
   if (usage.date !== today) {
-    usage = { date: today, count: 0 } + 1;
+    usage = { date: today, count: 0 };
   }
 
   if (usage.count >= 30 && !isExecutive() && !isPro()) {
@@ -215,6 +215,14 @@ function compress(file) {
 
 function generatePDF(data) {
 
+  const el = document.getElementById("pdfReport");
+
+  // ✅ 临时显示（关键）
+  el.style.position = "static";
+  el.style.left = "0";
+  el.style.display = "block";
+
+  // 填数据
   document.getElementById("pdf-name").innerText = data.name;
   document.getElementById("pdf-confidence").innerText =
     (data.confidence * 100).toFixed(1) + "%";
@@ -241,7 +249,7 @@ function generatePDF(data) {
   document.getElementById("pdf-reason").innerText =
     data.quality.reason;
 
-  // ✅ 等DOM更新
+  // 等DOM更新
   setTimeout(() => {
     html2pdf()
       .set({
@@ -250,8 +258,14 @@ function generatePDF(data) {
         html2canvas: { scale: 2 },
         jsPDF: { unit: "mm", format: "a4" }
       })
-      .from(document.getElementById("pdfReport"))
-      .save();
+      .from(el)
+      .save()
+      .then(() => {
+        // ✅ 生成完再隐藏
+        el.style.position = "fixed";
+        el.style.left = "-9999px";
+      });
+
   }, 300);
 }
 
