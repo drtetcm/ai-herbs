@@ -224,110 +224,120 @@ async function generatePDF() {
     return;
   }
 
-  // ===== 1️⃣ 克隆 =====
+  // ✅ 克隆UI
   const clone = report.cloneNode(true);
+
+  // ✅ 删除按钮
   clone.querySelectorAll("button").forEach(btn => btn.remove());
 
-  // ===== 2️⃣ LOGO（关键修复）=====
+  // ===== ✅ HEADER =====
+
+  // Logo
   const logo = document.createElement("img");
-
   logo.src = "https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png";
-
-  // ✅ 关键：允许跨域
-  logo.crossOrigin = "anonymous";
-
-  logo.style.height = "24px";
+  logo.style.height = "20px";
   logo.style.display = "block";
-  logo.style.margin = "0 auto 12px";
+  logo.style.margin = "0 auto 6px";
 
-  // ✅ 等待图片加载
-  await new Promise((resolve, reject) => {
-    logo.onload = resolve;
-    logo.onerror = reject;
-  });
-
-  // ===== 3️⃣ 标题 =====
+  // 标题
   const title = document.createElement("h1");
   title.innerText = "中药材检测报告";
   title.style.textAlign = "center";
+  title.style.marginBottom = "10px";
 
+  // 编号
   const reportId = document.createElement("p");
   reportId.innerText = "报告编号：DRTE-" + Date.now();
   reportId.style.fontSize = "12px";
+  reportId.style.color = "#666";
   reportId.style.textAlign = "center";
 
+  // 日期
   const reportDate = document.createElement("p");
   reportDate.innerText = "检测日期：" + new Date().toLocaleDateString();
   reportDate.style.fontSize = "12px";
+  reportDate.style.color = "#666";
   reportDate.style.textAlign = "center";
 
+  // 插入顶部
   clone.prepend(reportDate);
   clone.prepend(reportId);
   clone.prepend(title);
   clone.prepend(logo);
+  clone.style.margin = "0";
+  clone.style.padding = "10px";
+  clone.style.maxHeight = "270mm";
+  clone.style.overflow = "hidden";
+  clone.querySelector("h2")?.style.marginTop = "0";
 
-  clone.style.padding = "20px";
+  // ===== ✅ 二维码 =====
 
-  // ===== 4️⃣ 二维码 =====
+  const qrContainer = document.createElement("div");
+  qrContainer.style.textAlign = "center";
+  qrContainer.style.marginTop = "20px";
+
   const qrCanvas = document.createElement("canvas");
 
-  await new Promise((resolve, reject) => {
-    QRCode.toCanvas(qrCanvas, "https://drte.io/report?id=" + Date.now(), (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
+  const verifyUrl = "https://drte.io/report?id=" + Date.now();
 
-  const qrWrap = document.createElement("div");
-  qrWrap.style.textAlign = "center";
-  qrWrap.style.marginTop = "20px";
+  await new Promise((resolve, reject) => {
+  QRCode.toCanvas(qrCanvas, verifyUrl, function (error) {
+    if (error) reject(error);
+    else resolve();
+  });
+});
 
   const qrText = document.createElement("p");
   qrText.innerText = "扫码验证报告";
   qrText.style.fontSize = "12px";
+  qrText.style.color = "#666";
 
-  qrWrap.appendChild(qrCanvas);
-  qrWrap.appendChild(qrText);
+  qrContainer.appendChild(qrCanvas);
+  qrContainer.appendChild(qrText);
 
-  clone.appendChild(qrWrap);
+  clone.appendChild(qrContainer);
 
-  // ===== 5️⃣ 放入DOM =====
+  // ===== ✅ 放入DOM =====
+
   const container = document.createElement("div");
   container.style.background = "#fff";
-  container.style.width = "800px";
   container.appendChild(clone);
 
   document.body.appendChild(container);
 
-  // ===== 6️⃣ PDF（核心修复）=====
-  try {
+  // ===== ✅ 生成PDF =====
 
-    await html2pdf()
-      .set({
-        margin: 10,
-        filename: "DRTE-中药检测报告.pdf",
+  setTimeout(() => {
+await html2pdf()
+  .set({
 
-        html2canvas: {
-          scale: 2,
-          useCORS: true,   // ✅ 关键
-          allowTaint: false
-        },
+    margin: [5, 5, 5, 5],   // ✅ 缩小边距
 
-        jsPDF: {
-          unit: "mm",
-          format: "a4"
-        }
-      })
-      .from(container)
-      .save();
+    filename: "DRTE-中药检测报告.pdf",
 
-  } catch (err) {
-    console.error(err);
-    alert("PDF生成失败");
-  }
+    html2canvas: {
+      scale: 1.2,           // ✅ 降低缩放（关键）
+      useCORS: true,
+      scrollY: 0
+    },
 
-  // ===== 7️⃣ 清理 =====
-  document.body.removeChild(container);
+    jsPDF: {
+      unit: "mm",
+      format: "a4",
+      orientation: "portrait"
+    },
+
+    pagebreak: {
+      mode: ["avoid-all"]   // ✅ 强制不分页
+    }
+
+  })
+  .from(container)
+  .save();
+      .then(() => {
+        document.body.removeChild(container);
+      });
+  }, 300);
 }
 
 function downloadPDF() {
@@ -485,7 +495,7 @@ function render(d) {
   position: fixed;
   left: -9999px;
   top: 0;
-  width: 800px;
+  width: 210mm;
   background: #fff;
   padding: 40px;
   font-family: Arial;
