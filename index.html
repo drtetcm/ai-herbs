@@ -322,20 +322,19 @@ async function generatePDF() {
 
   const container = document.createElement("div");
   container.style.background = "#fff";
-  container.appendChild(clone);
+  container.style.width = "210mm";
 
+  container.appendChild(clone);
   document.body.appendChild(container);
 
   // ===== ✅ 生成PDF =====
 
-  setTimeout(() => {
-await html2pdf()
+ try {
+
+  await html2pdf()
   .set({
-
     margin: [5, 5, 5, 5],   // ✅ 缩小边距
-
     filename: "DRTE-中药检测报告.pdf",
-
     html2canvas: {
       scale: 1.2,           // ✅ 降低缩放（关键）
       useCORS: true,
@@ -345,7 +344,6 @@ await html2pdf()
     jsPDF: {
       unit: "mm",
       format: "a4",
-      orientation: "portrait"
     },
 
     pagebreak: {
@@ -355,8 +353,13 @@ await html2pdf()
   })
   .from(container)
   .save();
+} catch (err) {
+    console.error(err);
+    alert("PDF生成失败");
+  }
+  document.body.removeChild(container);
+}
 
-document.body.removeChild(container);
 
 function downloadPDF() {
 
