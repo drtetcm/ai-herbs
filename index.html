@@ -245,121 +245,120 @@ async function generatePDF() {
     return;
   }
 
-  // ✅ 克隆UI
+  // ===== 克隆 =====
   const clone = report.cloneNode(true);
-
-  // ✅ 删除按钮
   clone.querySelectorAll("button").forEach(btn => btn.remove());
 
-  // ===== ✅ HEADER =====
-
-  // Logo
+  // ===== LOGO（稳定版）=====
   const logo = document.createElement("img");
   logo.src = "https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png";
+  logo.crossOrigin = "anonymous";
   logo.style.height = "20px";
   logo.style.display = "block";
   logo.style.margin = "0 auto 6px";
 
-  // 标题
+  // 等待加载（关键）
+  await new Promise((resolve, reject) => {
+    logo.onload = resolve;
+    logo.onerror = reject;
+  });
+
+  // ===== 标题 =====
   const title = document.createElement("h1");
   title.innerText = "中药材检测报告";
   title.style.textAlign = "center";
-  title.style.marginBottom = "10px";
+  title.style.margin = "4px 0";
 
-  // 编号
+  // ===== 报告编号 =====
   const reportId = document.createElement("p");
   reportId.innerText = "报告编号：DRTE-" + Date.now();
   reportId.style.fontSize = "12px";
-  reportId.style.color = "#666";
   reportId.style.textAlign = "center";
+  reportId.style.margin = "2px 0";
 
-  // 日期
+  // ===== 日期 =====
   const reportDate = document.createElement("p");
   reportDate.innerText = "检测日期：" + new Date().toLocaleDateString();
   reportDate.style.fontSize = "12px";
-  reportDate.style.color = "#666";
   reportDate.style.textAlign = "center";
+  reportDate.style.margin = "2px 0 10px";
 
   // 插入顶部
   clone.prepend(reportDate);
   clone.prepend(reportId);
   clone.prepend(title);
   clone.prepend(logo);
-  clone.style.margin = "0";
+
+  // ===== 压缩布局（防分页）=====
   clone.style.padding = "10px";
+  clone.style.margin = "0";
   clone.style.maxHeight = "270mm";
   clone.style.overflow = "hidden";
-  clone.querySelector("h2")?.style.marginTop = "0";
 
-  // ===== ✅ 二维码 =====
-
-  const qrContainer = document.createElement("div");
-  qrContainer.style.textAlign = "center";
-  qrContainer.style.marginTop = "20px";
-
+  // ===== 二维码 =====
   const qrCanvas = document.createElement("canvas");
 
-  const verifyUrl = "https://drte.io/report?id=" + Date.now();
-
   await new Promise((resolve, reject) => {
-  QRCode.toCanvas(qrCanvas, verifyUrl, function (error) {
-    if (error) reject(error);
-    else resolve();
+    QRCode.toCanvas(qrCanvas, "https://drte.io/report?id=" + Date.now(), (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
   });
-});
+
+  const qrWrap = document.createElement("div");
+  qrWrap.style.textAlign = "center";
+  qrWrap.style.marginTop = "12px";
 
   const qrText = document.createElement("p");
   qrText.innerText = "扫码验证报告";
   qrText.style.fontSize = "12px";
-  qrText.style.color = "#666";
+  qrText.style.margin = "4px 0";
 
-  qrContainer.appendChild(qrCanvas);
-  qrContainer.appendChild(qrText);
+  qrWrap.appendChild(qrCanvas);
+  qrWrap.appendChild(qrText);
 
-  clone.appendChild(qrContainer);
+  clone.appendChild(qrWrap);
 
-  // ===== ✅ 放入DOM =====
-
+  // ===== 容器 =====
   const container = document.createElement("div");
   container.style.background = "#fff";
-  container.style.width = "210mm";
-
+  container.style.width = "210mm";   // ✅ A4宽度
   container.appendChild(clone);
+
   document.body.appendChild(container);
 
-  // ===== ✅ 生成PDF =====
+  // ===== 生成PDF =====
+  try {
 
- try {
+    await html2pdf()
+      .set({
+        margin: [5, 5, 5, 5],
+        filename: "DRTE-中药检测报告.pdf",
 
-  await html2pdf()
-  .set({
-    margin: [5, 5, 5, 5],   // ✅ 缩小边距
-    filename: "DRTE-中药检测报告.pdf",
-    html2canvas: {
-      scale: 1.2,           // ✅ 降低缩放（关键）
-      useCORS: true,
-      scrollY: 0
-    },
+        html2canvas: {
+          scale: 1.2,
+          useCORS: true
+        },
 
-    jsPDF: {
-      unit: "mm",
-      format: "a4",
-    },
+        jsPDF: {
+          unit: "mm",
+          format: "a4"
+        },
 
-    pagebreak: {
-      mode: ["avoid-all"]   // ✅ 强制不分页
-    }
+        pagebreak: {
+          mode: ["avoid-all"]
+        }
+      })
+      .from(container)
+      .save();
 
-  })
-  .from(container)
-  .save();
-} catch (err) {
+  } catch (err) {
     console.error(err);
     alert("PDF生成失败");
   }
+
   document.body.removeChild(container);
 }
-
 
 function downloadPDF() {
 
