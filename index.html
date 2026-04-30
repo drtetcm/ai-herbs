@@ -224,101 +224,110 @@ async function generatePDF() {
     return;
   }
 
-  // ✅ 克隆UI
+  // ===== 1️⃣ 克隆 =====
   const clone = report.cloneNode(true);
-
-  // ✅ 删除按钮
   clone.querySelectorAll("button").forEach(btn => btn.remove());
 
-  // ===== ✅ HEADER =====
-
-  // Logo
+  // ===== 2️⃣ LOGO（关键修复）=====
   const logo = document.createElement("img");
-  logo.src = "https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png";
-  logo.style.height = "20px";
-  logo.style.display = "block";
-  logo.style.margin = "0 auto 10px auto";
 
-  // 标题
+  logo.src = "https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png";
+
+  // ✅ 关键：允许跨域
+  logo.crossOrigin = "anonymous";
+
+  logo.style.height = "24px";
+  logo.style.display = "block";
+  logo.style.margin = "0 auto 12px";
+
+  // ✅ 等待图片加载
+  await new Promise((resolve, reject) => {
+    logo.onload = resolve;
+    logo.onerror = reject;
+  });
+
+  // ===== 3️⃣ 标题 =====
   const title = document.createElement("h1");
   title.innerText = "中药材检测报告";
   title.style.textAlign = "center";
-  title.style.marginBottom = "10px";
 
-  // 编号
   const reportId = document.createElement("p");
   reportId.innerText = "报告编号：DRTE-" + Date.now();
   reportId.style.fontSize = "12px";
-  reportId.style.color = "#666";
   reportId.style.textAlign = "center";
 
-  // 日期
   const reportDate = document.createElement("p");
   reportDate.innerText = "检测日期：" + new Date().toLocaleDateString();
   reportDate.style.fontSize = "12px";
-  reportDate.style.color = "#666";
   reportDate.style.textAlign = "center";
 
-  // 插入顶部
   clone.prepend(reportDate);
   clone.prepend(reportId);
   clone.prepend(title);
   clone.prepend(logo);
-  clone.style.margin = "0";
+
   clone.style.padding = "20px";
-  clone.querySelector("h2")?.style.marginTop = "0";
 
-  // ===== ✅ 二维码 =====
-
-  const qrContainer = document.createElement("div");
-  qrContainer.style.textAlign = "center";
-  qrContainer.style.marginTop = "20px";
-
+  // ===== 4️⃣ 二维码 =====
   const qrCanvas = document.createElement("canvas");
 
-  const verifyUrl = "https://drte.io/report?id=" + Date.now();
-
   await new Promise((resolve, reject) => {
-  QRCode.toCanvas(qrCanvas, verifyUrl, function (error) {
-    if (error) reject(error);
-    else resolve();
+    QRCode.toCanvas(qrCanvas, "https://drte.io/report?id=" + Date.now(), (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
   });
-});
+
+  const qrWrap = document.createElement("div");
+  qrWrap.style.textAlign = "center";
+  qrWrap.style.marginTop = "20px";
 
   const qrText = document.createElement("p");
   qrText.innerText = "扫码验证报告";
   qrText.style.fontSize = "12px";
-  qrText.style.color = "#666";
 
-  qrContainer.appendChild(qrCanvas);
-  qrContainer.appendChild(qrText);
+  qrWrap.appendChild(qrCanvas);
+  qrWrap.appendChild(qrText);
 
-  clone.appendChild(qrContainer);
+  clone.appendChild(qrWrap);
 
-  // ===== ✅ 放入DOM =====
-
+  // ===== 5️⃣ 放入DOM =====
   const container = document.createElement("div");
   container.style.background = "#fff";
+  container.style.width = "800px";
   container.appendChild(clone);
 
   document.body.appendChild(container);
 
-  // ===== ✅ 生成PDF =====
+  // ===== 6️⃣ PDF（核心修复）=====
+  try {
 
-  setTimeout(() => {
-    html2pdf()
+    await html2pdf()
       .set({
         margin: 10,
         filename: "DRTE-中药检测报告.pdf",
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4" }
+
+        html2canvas: {
+          scale: 2,
+          useCORS: true,   // ✅ 关键
+          allowTaint: false
+        },
+
+        jsPDF: {
+          unit: "mm",
+          format: "a4"
+        }
       })
       .from(container)
-      .save()
-      .then(() => {
-        document.body.removeChild(container);
-      });
-  }, 300);
+      .save();
+
+  } catch (err) {
+    console.error(err);
+    alert("PDF生成失败");
+  }
+
+  // ===== 7️⃣ 清理 =====
+  document.body.removeChild(container);
 }
 
 function downloadPDF() {
