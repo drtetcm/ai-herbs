@@ -234,8 +234,8 @@ function generatePDF() {
 
   // Logo
   const logo = document.createElement("img");
-  logo.src = "https://drte.io/logo.png";
-  logo.style.height = "50px";
+  logo.src = "https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png";
+  logo.style.height = "20px";
   logo.style.display = "block";
   logo.style.margin = "0 auto 10px auto";
 
@@ -264,6 +264,9 @@ function generatePDF() {
   clone.prepend(reportId);
   clone.prepend(title);
   clone.prepend(logo);
+  clone.style.margin = "0";
+  clone.style.padding = "20px";
+  clone.querySelector("h2")?.style.marginTop = "0";
 
   // ===== ✅ 二维码 =====
 
@@ -275,7 +278,9 @@ function generatePDF() {
 
   const verifyUrl = "https://drte.io/report?id=" + Date.now();
 
-  QRCode.toCanvas(qrCanvas, verifyUrl);
+  QRCode.toCanvas(qrCanvas, verifyUrl, function (error) {
+  if (error) console.error(error);
+  });
 
   const qrText = document.createElement("p");
   qrText.innerText = "扫码验证报告";
