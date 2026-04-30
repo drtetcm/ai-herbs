@@ -241,15 +241,18 @@ function generatePDF(data) {
   document.getElementById("pdf-reason").innerText =
     data.quality.reason;
 
-  html2pdf()
-    .set({
-      margin: 10,
-      filename: "中药检测报告.pdf",
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4" }
-    })
-    .from(document.getElementById("pdfReport"))
-    .save();
+  // ✅ 等DOM更新
+  setTimeout(() => {
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: "中药检测报告.pdf",
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4" }
+      })
+      .from(document.getElementById("pdfReport"))
+      .save();
+  }, 300);
 }
 
 function downloadPDF() {
@@ -322,7 +325,15 @@ function render(d) {
 }
 </script>
 
-<div id="pdfReport" style="display:none; padding:40px; font-family:Arial;">
+<div id="pdfReport" style="
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  width: 800px;
+  background: #fff;
+  padding: 40px;
+  font-family: Arial;
+">
 
   <h1 style="text-align:center;">中药材检测报告</h1>
   <hr />
