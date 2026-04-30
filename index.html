@@ -226,10 +226,13 @@ function generatePDF(data) {
 
   document.getElementById("pdf-shape").innerText =
     "形状：" + data.features.shape;
+
   document.getElementById("pdf-color").innerText =
     "颜色：" + data.features.color;
+
   document.getElementById("pdf-texture").innerText =
     "质地：" + data.features.texture;
+
   document.getElementById("pdf-size").innerText =
     "大小：" + data.features.size;
 
@@ -247,25 +250,32 @@ function generatePDF(data) {
       margin: 10,
       filename: "中药检测报告.pdf",
       html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      jsPDF: { unit: "mm", format: "a4" }
     })
     .from(document.getElementById("pdfReport"))
     .save();
 }
 
 
-    localStorage.removeItem("pdf_paid"); // 单次消费
+function downloadPDF() {
+
+  if (!window.latestData) {
+    alert("请先识别");
     return;
-  
+  }
+
+  if (canDownloadPDF()) {
+    generatePDF(window.latestData);
+    localStorage.removeItem("pdf_paid");
+    return;
+  }
 
   const choice = prompt(`
 📄 下载报告需付费：
 
-1️⃣ 单次PDF RM1（推荐）
-2️⃣ Executive 3天 RM3.99（无限识别+PDF）
-3️⃣ Pro 月 RM29（全部功能）
-
-请输入 1 / 2 / 3
+1️⃣ 单次PDF RM1
+2️⃣ Executive 3天 RM3.99
+3️⃣ Pro 月 RM29
 `);
 
   if (choice === "1") {
@@ -273,24 +283,19 @@ function generatePDF(data) {
 
     if (code === "PDF2026") {
       localStorage.setItem("pdf_paid", "true");
-      alert("✅ 已解锁PDF，请再次点击下载");
+      alert("✅ 已解锁，请再次点击下载");
     }
   }
 
   if (choice === "2") {
-    const expire = Date.now() + 3 * 24 * 3600 * 1000;
-    localStorage.setItem("exec_expire", expire);
-    alert("✅ Executive 已开通，请重新下载");
+    localStorage.setItem("exec_expire", Date.now() + 3*24*3600*1000);
+    alert("✅ Executive 已开通");
   }
 
   if (choice === "3") {
-    const expire = Date.now() + 30 * 24 * 3600 * 1000;
-    localStorage.setItem("pro_expire", expire);
-    alert("✅ Pro 已开通，请重新下载");
+    localStorage.setItem("pro_expire", Date.now() + 30*24*3600*1000);
+    alert("✅ Pro 已开通");
   }
-
-
-  html2pdf().from(document.getElementById("report")).save("报告.pdf");
 }
 
 //////////////////////////////////////////////////
@@ -299,6 +304,7 @@ function generatePDF(data) {
 
 function render(d) {
 
+  window.latestData = d;
   const score = d.quality?.score || 0;
 
   const color =
@@ -336,7 +342,6 @@ function render(d) {
       pay("pdf"); // 👉 Stripe
       }
 
-      window.latestData = d;
     </div>
   `;
 }
