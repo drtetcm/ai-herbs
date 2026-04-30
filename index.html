@@ -113,7 +113,7 @@ function checkUsage() {
   let usage = JSON.parse(localStorage.getItem("usage") || "{}");
 
   if (usage.date !== today) {
-    usage = { date: today, count: 0 };
+    usage = { date: today, count: 0 } + 1;
   }
 
   if (usage.count >= 30 && !isExecutive() && !isPro()) {
