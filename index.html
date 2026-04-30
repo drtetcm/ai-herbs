@@ -215,7 +215,7 @@ function compress(file) {
 // 📄 PDF（唯一正确版本）
 //////////////////////////////////////////////////
 
-function generatePDF() {
+async function generatePDF() {
 
   const report = document.getElementById("report");
 
@@ -278,9 +278,12 @@ function generatePDF() {
 
   const verifyUrl = "https://drte.io/report?id=" + Date.now();
 
+  await new Promise((resolve, reject) => {
   QRCode.toCanvas(qrCanvas, verifyUrl, function (error) {
-  if (error) console.error(error);
+    if (error) reject(error);
+    else resolve();
   });
+});
 
   const qrText = document.createElement("p");
   qrText.innerText = "扫码验证报告";
