@@ -215,42 +215,50 @@ function compress(file) {
 
 function generatePDF(data) {
 
-  const el = document.getElementById("pdfReport");
+  // ✅ 创建一个“临时容器”（关键）
+  const container = document.createElement("div");
 
-  // ✅ 临时显示（关键）
-  el.style.position = "static";
-  el.style.left = "0";
-  el.style.display = "block";
+  container.style.width = "800px";
+  container.style.padding = "40px";
+  container.style.background = "#fff";
+  container.style.fontFamily = "Arial";
 
-  // 填数据
-  document.getElementById("pdf-name").innerText = data.name;
-  document.getElementById("pdf-confidence").innerText =
-    (data.confidence * 100).toFixed(1) + "%";
-  document.getElementById("pdf-score").innerText = data.quality.score;
+  container.innerHTML = `
+    <h1 style="text-align:center;">中药材检测报告</h1>
+    <hr/>
 
-  document.getElementById("pdf-shape").innerText =
-    "形状：" + data.features.shape;
+    <h2>${data.name}</h2>
 
-  document.getElementById("pdf-color").innerText =
-    "颜色：" + data.features.color;
+    <p><b>置信度：</b>${(data.confidence * 100).toFixed(1)}%</p>
+    <p><b>质量评分：</b>${data.quality.score}</p>
 
-  document.getElementById("pdf-texture").innerText =
-    "质地：" + data.features.texture;
+    <h3>特征分析</h3>
+    <ul>
+      <li>形状：${data.features.shape}</li>
+      <li>颜色：${data.features.color}</li>
+      <li>质地：${data.features.texture}</li>
+      <li>大小：${data.features.size}</li>
+    </ul>
 
-  document.getElementById("pdf-size").innerText =
-    "大小：" + data.features.size;
+    <h3>质量评估</h3>
+    <p>是否正常：${data.quality.is_normal ? "正常" : "异常"}</p>
+    <p>问题：${(data.quality.problems || []).join("，")}</p>
 
-  document.getElementById("pdf-normal").innerText =
-    "是否正常：" + (data.quality.is_normal ? "正常" : "异常");
+    <h3>详细说明</h3>
+    <p>${data.quality.reason}</p>
 
-  document.getElementById("pdf-problems").innerText =
-    "问题：" + (data.quality.problems || []).join("，");
+    <hr/>
+    <p style="text-align:center;font-size:12px;color:#999;">
+      DRTE AI 中药检测系统
+    </p>
+  `;
 
-  document.getElementById("pdf-reason").innerText =
-    data.quality.reason;
+  // ✅ 插入页面（必须）
+  document.body.appendChild(container);
 
-  // 等DOM更新
-  setTimeout(() => {
+  // ✅ 强制浏览器渲染（关键）
+  requestAnimationFrame(() => {
+
     html2pdf()
       .set({
         margin: 10,
@@ -258,15 +266,14 @@ function generatePDF(data) {
         html2canvas: { scale: 2 },
         jsPDF: { unit: "mm", format: "a4" }
       })
-      .from(el)
+      .from(container)
       .save()
       .then(() => {
-        // ✅ 生成完再隐藏
-        el.style.position = "fixed";
-        el.style.left = "-9999px";
+        // ✅ 删除临时DOM（干净）
+        document.body.removeChild(container);
       });
 
-  }, 300);
+  });
 }
 
 function downloadPDF() {
