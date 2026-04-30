@@ -249,14 +249,6 @@ async function generatePDF() {
   const clone = report.cloneNode(true);
   clone.querySelectorAll("button").forEach(btn => btn.remove());
 
-  // ===== LOGO（稳定版）=====
-  const logo = document.createElement("img");
-  logo.src = "https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png";
-  logo.crossOrigin = "anonymous";
-  logo.style.height = "20px";
-  logo.style.display = "block";
-  logo.style.margin = "0 auto 6px";
-
   // 等待加载（关键）
   await new Promise((resolve, reject) => {
     logo.onload = resolve;
@@ -323,11 +315,12 @@ async function generatePDF() {
   const container = document.createElement("div");
   container.style.background = "#fff";
   container.style.width = "210mm";   // ✅ A4宽度
+  
   container.style.position = "fixed";
   container.style.top = "0";
   container.style.left = "0";
   container.style.zIndex = "-1";
-  
+
   container.appendChild(clone);
   document.body.appendChild(container);
 
