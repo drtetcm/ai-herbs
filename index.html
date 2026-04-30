@@ -116,7 +116,7 @@ function checkUsage() {
     usage = { date: today, count: 0 };
   }
 
-  if (usage.count >= 3 && !isExecutive() && !isPro()) {
+  if (usage.count >= 30 && !isExecutive() && !isPro()) {
     alert("今日免费次数已用完");
     return false;
   }
