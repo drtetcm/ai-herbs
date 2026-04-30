@@ -334,8 +334,8 @@ async function generatePDF() {
 
         html2canvas: {
           scale: 1.2,
-          useCORS: true
-          scrollY: -window.scrollY,
+          useCORS: true,
+          scrollY: -(window.scrollY || window.pageYOffset || 0),
           windowHeight: document.body.scrollHeight
         },
 
