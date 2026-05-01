@@ -188,6 +188,75 @@ input[type="file"] {
   padding: 20px 10px;
 }
 
+/* ===== SaaS Footer ===== */
+
+.footer {
+  background: #0f172a;
+  color: #cbd5f5;
+  margin-top: 40px;
+  padding: 30px 15px;
+}
+
+.footer-inner {
+  max-width: 720px;
+  margin: auto;
+  text-align: center;
+}
+
+/* 品牌区 */
+.footer-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.footer-logo {
+  width: 28px;
+  height: 28px;
+}
+
+.footer-title {
+  font-weight: 600;
+  color: #fff;
+}
+
+.footer-desc {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* 链接 */
+.footer-links {
+  margin: 15px 0;
+}
+
+.footer-links a {
+  color: #94a3b8;
+  text-decoration: none;
+  margin: 0 10px;
+  font-size: 13px;
+}
+
+.footer-links a:hover {
+  color: #fff;
+}
+
+/* 分割线 */
+.footer-divider {
+  height: 1px;
+  background: #1e293b;
+  margin: 15px 0;
+}
+
+/* 底部 */
+.footer-bottom {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
 </style>
 </head>
 
@@ -707,10 +776,37 @@ function stopLoadingAnimation() {
 
 </div>
 
-  <div class="footer">
-  © 2026 DRTE HerbAI™ — All Rights Reserved <br>
-  Powered by AI Recognition Technology
+<footer class="footer">
+  <div class="footer-inner">
+
+    <div class="footer-brand">
+      <img 
+        src="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png"
+        class="footer-logo"
+      >
+      <div>
+        <div class="footer-title">DRTE HerbAI™</div>
+        <div class="footer-desc">AI 中药智能识别系统</div>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <a href="#">关于我们</a>
+      <a href="#">隐私政策</a>
+      <a href="#">使用条款</a>
+      <a href="#">联系我们</a>
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom">
+      © 2026 DRTE HerbAI™ · All Rights Reserved · Powered by AI Recognition Technology 
+      <br>
+      ⚠ 本系统基于 AI 分析，仅供参考，不作为医疗依据
+    </div>
+
   </div>
+</footer>
 
 </body>
 </html>
