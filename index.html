@@ -249,12 +249,6 @@ async function generatePDF() {
   const clone = report.cloneNode(true);
   clone.querySelectorAll("button").forEach(btn => btn.remove());
 
-  // 等待加载（关键）
-  await new Promise((resolve, reject) => {
-    logo.onload = resolve;
-    logo.onerror = reject;
-  });
-
   // ===== 标题 =====
   const title = document.createElement("h1");
   title.innerText = "中药材检测报告";
@@ -282,10 +276,10 @@ async function generatePDF() {
   clone.prepend(logo);
 
   // ===== 压缩布局（防分页）=====
-  clone.style.padding = "10px";
-  clone.style.margin = "0";
-  clone.style.maxHeight = "270mm";
-  clone.style.overflow = "hidden";
+   clone.style.padding = "10px";
+   clone.style.margin = "0";
+   clone.style.maxHeight = "270mm";
+   clone.style.overflow = "hidden";
 
   // ===== 二维码 =====
   const qrCanvas = document.createElement("canvas");
@@ -327,7 +321,7 @@ async function generatePDF() {
   // ===== 生成PDF =====
   try {
 
-    await html2pdf()
+    const worker = html2pdf()
       .set({
         margin: [5, 5, 5, 5],
         filename: "DRTE-中药检测报告.pdf",
@@ -335,7 +329,7 @@ async function generatePDF() {
         html2canvas: {
           scale: 1.2,
           useCORS: true,
-          scrollY: -(window.scrollY || window.pageYOffset || 0),
+          scrollY: -(window.scrollY || 0),
           windowHeight: document.body.scrollHeight
         },
 
@@ -344,12 +338,20 @@ async function generatePDF() {
           format: "a4"
         },
 
-        pagebreak: {
-          mode: ["avoid-all"]
-        }
       })
       .from(container)
       .save();
+
+      const pdf = await worker.outputPdf("blob");
+      
+      const url = URL.createObjectURL(pdf);
+      
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "DRTE-中药检测报告.pdf";
+      a.click();
+      
+      URL.revokeObjectURL(url);
 
   } catch (err) {
     console.error(err);
@@ -361,30 +363,22 @@ async function generatePDF() {
 
 function downloadPDF() {
 
-  try {
-
-    if (!window.latestData) {
-      alert("请先识别");
-      return;
-    }
-
-    if (canDownloadPDF()) {
-      generatePDF();
-      localStorage.removeItem("pdf_paid");
-      return;
-    }
-
-    // 👉 未付费逻辑
-    if (confirm("下载PDF需支付 RM1，是否继续？")) {
-      localStorage.setItem("pdf_paid", "true");
-      alert("已解锁，请再次点击下载");
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("PDF生成失败");
+   if (!window.latestData) {
+    alert("请先识别");
+    return;
   }
-}
+
+  if (canDownloadPDF()) {
+    generatePDF();
+    localStorage.removeItem("pdf_paid");
+    return;
+  }
+
+  if (confirm("下载PDF需支付 RM1，是否继续？")) {
+    localStorage.setItem("pdf_paid", "true");
+    alert("已解锁，请再次点击下载");
+  }
+} 
 
 //////////////////////////////////////////////////
 // 🎨 UI
