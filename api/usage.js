@@ -20,7 +20,10 @@ export default async function handler(req, res) {
       "unknown";
 
     const ua = req.headers["user-agent"] || "unknown";
-    const userKey = `${ip}_${ua}`;
+    
+    const { userId } = req.body || {};
+    
+    const userKey = userId || `${ip}_${ua}`;
 
     // ===== 3. Key =====
     const today = new Date().toISOString().slice(0, 10);
@@ -50,28 +53,6 @@ export default async function handler(req, res) {
         allowed: false,
         count,
         isPro: false
-      });
-    }
-
-    // ===== 7. 允许 → 写入 +1 =====
-    if (!isPro) {
-      count += 1;
-
-      const expireSeconds = Math.floor(
-        (new Date(today + "T23:59:59").getTime() - Date.now()) / 1000
-      );
-
-      // 👉 关键：正确写入（带TTL）
-      await fetch(`${KV_REST_API_URL}/set/${usageKey}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${KV_REST_API_TOKEN}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          value: count,
-          ex: expireSeconds
-        })
       });
     }
 
