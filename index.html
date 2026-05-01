@@ -79,6 +79,8 @@ img {
   <div id="result"></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
 <!-- PDF库（必须在这里） -->
@@ -293,6 +295,17 @@ async function generatePDF() {
   }
 } 
 
+function downloadPDF() {
+
+  if (!window.latestData) {
+    alert("请先识别");
+    return;
+  }
+
+  // 👉 直接调用生成
+  generatePDF();
+}
+
 //////////////////////////////////////////////////
 // 🎨 UI
 //////////////////////////////////////////////////
@@ -323,32 +336,29 @@ function render(d) {
         <p style="margin:0;font-size:12px;color:#666;">
           检测日期：${new Date().toLocaleDateString()}
         </p>
-      </div>
 
-      <h2>📋 中药材检测报告</h2>
-
-      <!-- 基本信息 -->
-      <div style="margin-bottom:16px;">
+        <!-- 基本信息 -->
+        <div style="margin-bottom:16px;">
         <h3>📌 药材名称：${d.name}</h3>
         <p>置信度：<b>${(d.confidence * 100).toFixed(1)}%</b></p>
-      </div>
+        </div>
 
-      <!-- 评分模块 -->
-      <div style="margin-bottom:16px;">
+        <!-- 评分模块 -->
+        <div style="margin-bottom:16px;">
         <p>质量评分：<b>${score}</b>（${level}）</p>
 
         <div class="progress">
           <div class="bar" style="width:${score}%;background:${color}"></div>
         </div>
-      </div>
 
-      <!-- 状态标签 -->
-      <div style="
+        <!-- 状态标签 -->
+        <div style="
         padding:10px;
         border-radius:8px;
         background:${d.quality?.is_normal ? "#e6ffed" : "#ffe6e6"};
         margin-bottom:16px;
-      ">
+        ">
+        
         <b style="
           color:${d.quality?.is_normal ? "green" : "red"};
           font-size:16px;
@@ -407,6 +417,9 @@ function render(d) {
         </p>
       </div>
 
+      <h2>📋 中药材检测报告</h2>
+
+    
       <!-- 操作按钮 -->
       <button onclick="downloadPDF()" style="margin-bottom:10px;">
         📄 下载PDF报告
