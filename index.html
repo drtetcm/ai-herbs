@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <title>DRTE HerbAI</title>
 
-<!-- ✅ Favicon -->
-<link rel="icon" href="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png">
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
 
@@ -15,9 +12,10 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
   background: linear-gradient(135deg, #0f172a, #0f766e);
+  color: #111;
 }
 
-/* 主容器 */
+/* 主卡片 */
 .app {
   max-width: 860px;
   margin: 40px auto;
@@ -27,7 +25,7 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,0.25);
 }
 
-/* Header */
+/* 顶部 */
 .header {
   background: #0f766e;
   color: white;
@@ -40,6 +38,11 @@ body {
   gap: 12px;
 }
 
+.logo svg {
+  background: white;
+  border-radius: 50%;
+}
+
 .brand-title {
   font-size: 20px;
   font-weight: bold;
@@ -47,7 +50,7 @@ body {
 
 .brand-sub {
   font-size: 12px;
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
 /* 内容 */
@@ -62,6 +65,7 @@ body {
   padding: 30px;
   text-align: center;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .upload:hover {
@@ -104,7 +108,7 @@ button:hover {
   font-weight: bold;
 }
 
-/* 网格 */
+/* 数据卡片 */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -119,18 +123,19 @@ button:hover {
 }
 
 .card strong {
+  display: block;
   font-size: 12px;
   color: #888;
-  display: block;
 }
 
+/* 高亮 */
 .highlight {
   font-size: 18px;
   font-weight: bold;
   color: #0f766e;
 }
 
-/* footer */
+/* 底部 */
 .footer {
   text-align: center;
   padding: 16px;
@@ -148,7 +153,10 @@ button:hover {
   <!-- Header -->
   <div class="header">
     <div class="logo">
-      <img src="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png" width="40" height="40">
+      <svg width="36" height="36" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="#0f766e"/>
+        <text x="50" y="60" text-anchor="middle" font-size="40" fill="white">D</text>
+      </svg>
       <div>
         <div class="brand-title">DRTE HerbAI™</div>
         <div class="brand-sub">AI 中药智能识别系统</div>
@@ -159,6 +167,7 @@ button:hover {
   <!-- 内容 -->
   <div class="content">
 
+    <!-- 上传 -->
     <input type="file" id="file" hidden>
 
     <div class="upload" onclick="file.click()">
@@ -172,13 +181,7 @@ button:hover {
     <!-- 报告 -->
     <div class="report" id="report" style="display:none">
 
-      <!-- ✅ 报告头（含 logo） -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <img src="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png" width="28">
-        <strong>DRTE HerbAI™ 检测报告</strong>
-      </div>
-
-      <div class="report-title">检测结果</div>
+      <div class="report-title">检测报告</div>
 
       <div class="grid">
 
@@ -223,7 +226,6 @@ button:hover {
 </div>
 
 <script>
-
 function generateReportId(){
   return "DRTE-" + Date.now();
 }
@@ -232,7 +234,7 @@ async function analyze(){
 
   document.getElementById("status").innerText = "识别中，请稍候...";
 
-  // 👉 替换为你的 API
+  // 👉 模拟API（替换成你的真实接口）
   const result = {
     name: "人参",
     confidence: 96,
@@ -256,23 +258,14 @@ async function downloadPDF(){
 
   const element = document.getElementById("report");
 
-  const canvas = await html2canvas(element, {
-    scale: 2,
-    useCORS: true   // ✅ 关键（确保 logo 显示）
-  });
-
+  const canvas = await html2canvas(element, {scale:2});
   const img = canvas.toDataURL("image/png");
 
-  const pdf = new jspdf.jsPDF("p", "mm", "a4");
-
-  const width = 190;
-  const height = canvas.height * width / canvas.width;
-
-  pdf.addImage(img, "PNG", 10, 10, width, height);
+  const pdf = new jspdf.jsPDF();
+  pdf.addImage(img, "PNG", 10, 10, 190, 0);
 
   pdf.save("DRTE-Report.pdf");
 }
-
 </script>
 
 </body>
