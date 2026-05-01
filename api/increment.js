@@ -27,17 +27,21 @@ export default async function handler(req, res) {
   );
 
   // ===== 写入 =====
-  await fetch(`${KV_REST_API_URL}/set/${usageKey}`, {
+  const setRes = await fetch(`${KV_REST_API_URL}/set/${usageKey}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${KV_REST_API_TOKEN}`,
       "Content-Type": "application/json"
-    },
+  },
     body: JSON.stringify({
       value: count,
       ex: expireSeconds
     })
   });
+
+if (!setRes.ok) {
+  throw new Error("KV写入失败");
+}
 
   return res.json({ success: true, count });
 }

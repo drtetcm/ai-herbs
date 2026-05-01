@@ -47,7 +47,16 @@ export default async function handler(req, res) {
     const usageJson = await usageRes.json();
     let count = Number(usageJson.result || 0);
 
-    // ===== 6. 判断是否允许（已开放无限识别）=====
+    // ===== 6. 判断是否允许 =====
+    if (!isPro && count >= 1) {
+      return res.json({
+        allowed: false,
+        count,
+        isPro: false
+      });
+    }
+
+    // ===== 7. 允许 =====
     return res.json({
       allowed: true,
       count,
