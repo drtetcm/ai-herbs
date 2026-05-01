@@ -361,7 +361,7 @@ function showUpgradeModal() {
       max-width:320px;
       text-align:center;
     ">
-      <h3>🔒 免费次数已用完</h3>
+      <h3>🔒 今天的2次免费次数已用完</h3>
       <p style="font-size:13px;color:#666;">
         升级后解锁无限识别 + 完整分析报告
       </p>
@@ -456,8 +456,8 @@ btn.onclick = async () => {
     localUsage = { date: today, count: 0 };
   }
 
-  // 👉 免费1次
-  if (localUsage.count >= 1 && !usageData.isPro) {
+  // 👉 免费2次
+  if (localUsage.count >= 2 && !usageData.isPro) {
     showUpgradeModal();
     isProcessing = false;
     return;
