@@ -429,24 +429,25 @@ fileInput.onchange = (e) => {
 
 btn.onclick = async () => {
 
-  // ✅ 1. 先检查是否选图（优先）
-  if (!currentFile) {
-    alert("请选择图片");
-    return;
-  }
+  // ❗防止重复点击
+  if (isProcessing) return;
+  isProcessing = true;
 
-  // ✅ 2. 再做 usage 检查（防卡死版）
   let usageData;
 
   try {
+
+    // ===== 1. 检查图片 =====
+    if (!currentFile) {
+      alert("请选择图片");
+      return;
+    }
+
+    // ===== 2. usage检查 =====
     const usageRes = await fetch("/api/usage", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        userId: getUserId()
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: getUserId() })
     });
 
     if (!usageRes.ok) {
@@ -462,21 +463,24 @@ btn.onclick = async () => {
     usageData = { allowed: true };
   }
 
-  // ✅ 3. 判断是否超限
+  // ✅ 判断是否超限
   if (!usageData.allowed) {
     showUpgradeModal();
+    isProcessing = false;
     return;
   }
 
+  // ===== UI loading =====
   btn.disabled = true;
   startLoadingAnimation();
+
   resultDiv.innerHTML = `
   <div class="loading-box">
     <div class="spinner"></div>
-     <div class="loading-title">AI 正在识别中</div>
-     <div class="loading-sub" id="loadingText">准备中...</div>
-    
-     <div class="loading-progress">
+    <div class="loading-title">AI 正在识别中</div>
+    <div class="loading-sub" id="loadingText">准备中...</div>
+
+    <div class="loading-progress">
       <div class="loading-bar" id="loadingBar"></div>
     </div>
 
@@ -487,13 +491,14 @@ btn.onclick = async () => {
       <div class="loading-step" id="s4">📊 质量评估</div>
       <div class="loading-step" id="s5">📄 生成报告</div>
     </div>
-
   </div>
   `;
 
   try {
+    // ===== 压缩图片 =====
     const base64 = await compress(currentFile);
 
+    // ===== 识别 =====
     const res = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -505,42 +510,39 @@ btn.onclick = async () => {
 
     const text = await res.text();
     console.log("API返回:", text);
-    
+
     let data;
     try {
       data = JSON.parse(text);
     } catch {
-    throw new Error("API返回不是JSON");
-  }
+      throw new Error("API返回不是JSON");
+    }
 
     if (!data.success) throw new Error(data.error);
 
     stopLoadingAnimation();
 
-    // ✅ 识别成功后才计数（带日志）
+    // ===== increment（修复点：正确调用）=====
     try {
-      const incRes = await fetch("/api/increment", {
+      await fetch("/api/increment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: getUserId()
-      })
-    });
-
-    const incData = await incRes.json();
-    console.log("increment成功:", incData);
-
+        body: JSON.stringify({ userId: getUserId() })
+      });
     } catch (e) {
-    console.error("increment失败:", e);
+      console.error("increment失败:", e);
     }
 
+    // ===== 渲染 =====
     render(data.data);
 
   } catch (err) {
+    console.error(err);
     stopLoadingAnimation();
-    resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
+    resultDiv.innerHTML = `<div class="card">[ERROR] ${err.message}</div>`;
   } finally {
     btn.disabled = false;
+    isProcessing = false;
   }
 };
 
