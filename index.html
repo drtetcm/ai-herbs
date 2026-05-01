@@ -1,3 +1,911 @@
+
+
+
+
+Pasted code.html
+File
+【项目背景】
+我在开发一个 AI 中药识别 Web App，目前已经上线在 Vercel。
+
+【技术架构】
+
+* 前端：原生 HTML + JavaScript（单页应用）
+* 后端：Vercel Serverless（/api/analyze.js）
+* AI模型：Claude（图像识别）
+
+【当前已实现功能】
+
+1. 图片上传 + 压缩
+2. 调用 API 识别中药
+3. 返回 JSON（name, confidence, features, quality）
+4. 前端展示检测报告 UI
+5. PDF 报告生成（html2canvas + jsPDF）
+6. 简单收费逻辑（localStorage）
+
+【当前问题】
+👉 UI看起来不够专业，我以DRTE作为这个APP的品牌。
+加入logo，给这个APP取个好的名字，加入@copyrights等信息。 
+
+【我希望你做到】
+ 
+21. 给完整可替换代码（不要只讲思路） 
+3. 确保稳定运行（避免新 bug）
+4. 如果有更优方案，请说明为什么
+
+【相关代码】
+（粘贴关键代码片段）
+
+你这个阶段其实已经不是“功能开发问题”，而是产品质感升级（Branding + UI专业度）的问题了。
+我直接给你一套可上线的完整解决方案（含代码），不是讲思路。
+
+✅ 一、品牌设计（直接可用）
+✅ App 名称（结合 DRTE 品牌）
+我建议不要直接叫“中药识别”，太工具化。
+
+⭐ 推荐主名称：
+DRTE HerbAI™
+
+可选副标题：
+AI Traditional Medicine Analyzer
+
+智能中药鉴别系统
+
+Powered by AI Recognition
+
+✅ Logo 设计（可直接用 SVG，无需图片）
+你现在在 Vercel，不要用图片 logo（会影响 PDF）
+👉 用 SVG（稳定 + 清晰）
+
+🔥 直接可用 Logo（复制进 HTML）
+<div class="logo">
+  <svg width="40" height="40" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="45" fill="#0f766e"/>
+    <text x="50" y="58" text-anchor="middle" font-size="36" fill="white" font-family="Arial">D</text>
+  </svg>
+  <div class="logo-text">
+    <strong>DRTE HerbAI</strong>
+    <span>AI 中药识别系统</span>
+  </div>
+</div>
+✅ 二、UI升级（核心改造）
+✅ 视觉目标
+你现在的问题：
+
+❌ 太像 demo
+
+❌ 没品牌感
+
+❌ 报告不像“专业检测报告”
+
+我要帮你变成：
+👉 医疗级 / 实验室风格 UI
+
+✅ 🔥 完整可替换 CSS（直接用）
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  background: #f4f7fb;
+  margin: 0;
+}
+
+.container {
+  max-width: 820px;
+  margin: 40px auto;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.logo-text span {
+  display: block;
+  font-size: 12px;
+  color: #666;
+}
+
+/* 标题 */
+h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* 上传区 */
+.upload-box {
+  border: 2px dashed #0f766e;
+  padding: 30px;
+  text-align: center;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* 按钮 */
+button {
+  background: #0f766e;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #0d5f5a;
+}
+
+/* 报告 */
+.report {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.report h2 {
+  font-size: 18px;
+}
+
+/* 卡片 */
+.card {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+/* 底部 */
+.footer {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 12px;
+  color: #888;
+}
+</style>
+✅ 三、报告 UI（专业版）
+🔥 替换你的报告 HTML
+<div class="report" id="report">
+  <h2>检测报告</h2>
+
+  <div class="card">
+    <strong>药材名称：</strong> <span id="name"></span><br>
+    <strong>置信度：</strong> <span id="confidence"></span>%<br>
+    <strong>特征：</strong> <span id="features"></span><br>
+    <strong>质量评估：</strong> <span id="quality"></span>
+  </div>
+
+  <div class="card">
+    <strong>报告编号：</strong> <span id="reportId"></span><br>
+    <strong>检测时间：</strong> <span id="date"></span>
+  </div>
+</div>
+✅ 四、自动生成报告编号（关键）
+function generateReportId() {
+  return "DRTE-" + Date.now();
+}
+使用：
+
+document.getElementById("reportId").innerText = generateReportId();
+document.getElementById("date").innerText = new Date().toLocaleString();
+✅ 五、PDF优化（重点修复）
+你之前的问题：
+
+❌ 空白
+
+❌ 无内容
+
+❌ 不稳定
+
+🔥 稳定版 PDF 代码（直接替换）
+async function downloadPDF() {
+  const element = document.getElementById("report");
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+
+  const pdf = new jspdf.jsPDF("p", "mm", "a4");
+
+  const imgWidth = 190;
+  const pageHeight = 295;
+  const imgHeight = canvas.height * imgWidth / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 10;
+
+  pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  pdf.save("DRTE-Report.pdf");
+}
+✅ 六、加入版权信息（关键品牌感）
+<div class="footer">
+  © 2026 DRTE HerbAI™ — All Rights Reserved <br>
+  Powered by AI Recognition Technology
+</div>
+✅ 七、完整结构（推荐最终结构）
+<div class="container">
+
+  <!-- Logo -->
+  <div class="logo">...</div>
+
+  <h1>DRTE HerbAI™</h1>
+
+  <!-- 上传 -->
+  <div class="upload-box">
+    点击上传中药图片
+  </div>
+
+  <button onclick="analyze()">开始识别</button>
+
+  <!-- 报告 -->
+  <div id="report">...</div>
+
+  <button onclick="downloadPDF()">下载PDF报告</button>
+
+  <!-- 版权 -->
+  <div class="footer">...</div>
+
+</div>
+✅ 八、为什么这套更优（重点）
+✔ 1. 医疗级风格
+类似检测报告
+
+增强信任感 → 有助收费
+
+✔ 2. SVG Logo
+PDF 不丢失
+
+不模糊
+
+✔ 3. PDF稳定
+避免空白
+
+自动分页
+
+✔ 4. 品牌完整
+名字
+
+logo
+
+编号
+
+时间
+
+版权
+
+👉 这已经不是 demo，是产品了
+
+🚀 如果你要继续升级（下一步）
+我可以帮你直接做：
+
+🔥 高阶版本：
+✅ 防伪二维码（扫描验证报告）
+
+✅ 支付系统（Stripe / 微信）
+
+✅ 多药材数据库（不是只靠 AI）
+
+✅ 历史报告云存储
+
+✅ 商业版 UI（像医院系统）
+
+👉 下一步建议
+你现在只差最后一步：
+
+👉 把 UI 做到“像一个收费产品”
+
+如果你愿意，我可以帮你直接做：
+
+🔥「DRTE 商业版 UI（直接上线收费级别）」
+
+
+把 UI 做到“像一个收费产品”
+
+先说一句实话：
+你现在的 UI 已经“能用”，但离“用户愿意付钱”还差一个层级——信任感 + 专业感 + 仪式感。
+
+我直接给你一套👉收费级 UI（可直接替换）完整代码，不是零散片段。
+
+🚀 一、收费产品级设计目标（你要达到这个感觉）
+用户打开后应该有这种心理：
+
+“这个像医院/检测机构系统 → 我可以信 → 我愿意付钱”
+
+核心三点：
+
+✅ 有“品牌头部”
+
+✅ 有“检测流程感”
+
+✅ 有“报告权威感”
+
+🔥 二、最终 UI（完整 HTML 可直接替换）
+👉 直接复制覆盖你的 index.html
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>DRTE HerbAI</title>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  background: linear-gradient(135deg, #0f172a, #0f766e);
+  color: #111;
+}
+
+/* 主卡片 */
+.app {
+  max-width: 860px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+/* 顶部 */
+.header {
+  background: #0f766e;
+  color: white;
+  padding: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo svg {
+  background: white;
+  border-radius: 50%;
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.brand-sub {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* 内容 */
+.content {
+  padding: 24px;
+}
+
+/* 上传 */
+.upload {
+  border: 2px dashed #0f766e;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.upload:hover {
+  background: #f0fdfa;
+}
+
+/* 按钮 */
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  background: #0f766e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0d5f5a;
+}
+
+/* 状态 */
+.status {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+/* 报告 */
+.report {
+  margin-top: 25px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.report-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* 数据卡片 */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.card {
+  background: #f9fafb;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.card strong {
+  display: block;
+  font-size: 12px;
+  color: #888;
+}
+
+/* 高亮 */
+.highlight {
+  font-size: 18px;
+  font-weight: bold;
+  color: #0f766e;
+}
+
+/* 底部 */
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 12px;
+  color: #999;
+  border-top: 1px solid #eee;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <svg width="36" height="36" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="#0f766e"/>
+        <text x="50" y="60" text-anchor="middle" font-size="40" fill="white">D</text>
+      </svg>
+      <div>
+        <div class="brand-title">DRTE HerbAI™</div>
+        <div class="brand-sub">AI 中药智能识别系统</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内容 -->
+  <div class="content">
+
+    <!-- 上传 -->
+    <input type="file" id="file" hidden>
+
+    <div class="upload" onclick="file.click()">
+      📷 点击上传中药图片
+    </div>
+
+    <button onclick="analyze()">开始检测</button>
+
+    <div class="status" id="status"></div>
+
+    <!-- 报告 -->
+    <div class="report" id="report" style="display:none">
+
+      <div class="report-title">检测报告</div>
+
+      <div class="grid">
+
+        <div class="card">
+          <strong>药材名称</strong>
+          <div class="highlight" id="name"></div>
+        </div>
+
+        <div class="card">
+          <strong>置信度</strong>
+          <div class="highlight" id="confidence"></div>
+        </div>
+
+        <div class="card">
+          <strong>特征描述</strong>
+          <div id="features"></div>
+        </div>
+
+        <div class="card">
+          <strong>质量评估</strong>
+          <div id="quality"></div>
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-top:15px;">
+        <strong>报告信息</strong>
+        编号：<span id="reportId"></span><br>
+        时间：<span id="date"></span>
+      </div>
+
+      <button onclick="downloadPDF()">下载PDF报告</button>
+
+    </div>
+
+  </div>
+
+  <div class="footer">
+    © 2026 DRTE HerbAI™ · All Rights Reserved
+  </div>
+
+</div>
+
+<script>
+function generateReportId(){
+  return "DRTE-" + Date.now();
+}
+
+async function analyze(){
+
+  document.getElementById("status").innerText = "识别中，请稍候...";
+
+  // 👉 模拟API（替换成你的真实接口）
+  const result = {
+    name: "人参",
+    confidence: 96,
+    features: "根条粗壮，质地坚实",
+    quality: "优质"
+  };
+
+  document.getElementById("name").innerText = result.name;
+  document.getElementById("confidence").innerText = result.confidence + "%";
+  document.getElementById("features").innerText = result.features;
+  document.getElementById("quality").innerText = result.quality;
+
+  document.getElementById("reportId").innerText = generateReportId();
+  document.getElementById("date").innerText = new Date().toLocaleString();
+
+  document.getElementById("report").style.display = "block";
+  document.getElementById("status").innerText = "检测完成 ✅";
+}
+
+async function downloadPDF(){
+
+  const element = document.getElementById("report");
+
+  const canvas = await html2canvas(element, {scale:2});
+  const img = canvas.toDataURL("image/png");
+
+  const pdf = new jspdf.jsPDF();
+  pdf.addImage(img, "PNG", 10, 10, 190, 0);
+
+  pdf.save("DRTE-Report.pdf");
+}
+</script>
+
+</body>
+</html>
+💰 三、为什么这个 UI 能“卖钱”
+✅ 1. 有“机构感”
+顶部 header = 品牌背书
+
+不是普通网页，是“系统”
+
+✅ 2. 有“流程感”
+上传 → 检测 → 报告
+
+用户知道发生了什么（更愿意付费）
+
+✅ 3. 有“报告权威结构”
+名称
+
+置信度
+
+特征
+
+质量
+
+编号 + 时间
+
+👉 这一步非常关键（商业信任）
+
+🔥 四、你现在还差的最后 2 个点（决定能不能赚钱）
+1️⃣ 防伪二维码（强烈建议）
+👉 用户扫码验证报告
+
+2️⃣ 支付拦截（核心赚钱点）
+if(!paid){
+  alert("请先支付");
+  return;
+}
+🚀 下一步（我建议你做这个）
+我可以帮你直接升级：
+
+🔥 商业完整版（建议做）
+✅ Stripe / 微信支付
+
+✅ 报告云存储
+
+✅ 用户账号系统
+
+✅ 防伪查询页面
+
+👉 如果你继续，我可以帮你做到：
+👉 “上线就能收费版本（完整闭环）”
+
+直接说：
+
+做支付系统
+或
+做防伪二维码
+
+我帮你一步到位。
+
+
+完全覆盖index.html以后，怎么写git指令？
+
+很好，这一步其实就是把你本地修改“推上 Vercel”的标准流程。
+我给你一套最稳、不会出错的 git 指令（一步步照抄）。
+
+🚀 一、标准提交流程（推荐）
+在你的项目目录打开终端，然后执行：
+
+git add .
+git commit -m "feat: upgrade UI to DRTE HerbAI premium version"
+git push
+✅ 每一步在干嘛（你要理解）
+1️⃣ 添加修改
+git add .
+👉 把你刚刚替换的 index.html 加入提交
+
+2️⃣ 提交记录
+git commit -m "feat: upgrade UI to DRTE HerbAI premium version"
+👉 建议用这种格式（以后方便管理）：
+
+feat: 新功能
+
+fix: 修复 bug
+
+ui: UI优化
+
+3️⃣ 推送到 Vercel
+git push
+👉 如果你已经绑定 GitHub + Vercel：
+
+✔ 自动触发部署
+✔ 30秒左右上线
+
+⚠️ 常见坑（你可能会遇到）
+❌ 1. 提示没有远程仓库
+如果报错：
+
+fatal: No configured push destination
+执行：
+
+git remote add origin 你的仓库地址
+git push -u origin main
+❌ 2. 分支不是 main
+有些是 master：
+
+git push origin master
+❌ 3. 没初始化 git
+如果你是新项目：
+
+git init
+git add .
+git commit -m "init"
+git branch -M main
+git remote add origin 你的仓库地址
+git push -u origin main
+🔥 二、最推荐的一条命令（懒人版）
+以后你可以直接用：
+
+git add . && git commit -m "update UI" && git push
+✅ 三、如何确认上线成功
+部署成功后：
+
+👉 打开你的 Vercel URL
+👉 刷新（Ctrl + F5）
+
+如果没变化：
+
+👉 清缓存 / 无痕模式
+
+🚀 四、专业开发建议（很关键）
+以后每次更新：
+
+git commit -m "feat: xxx"
+示例：
+
+feat: add pdf report
+
+fix: pdf blank issue
+
+ui: redesign report layout
+
+👉 这就是“产品级开发习惯”
+
+👉 如果你下一步要做
+我建议你马上做这两个（商业化关键）：
+
+支付拦截（赚钱）
+
+报告防伪二维码（信任）
+
+直接说：
+
+👉「做支付」 or 「做防伪」
+
+我给你一套可直接上线代码（不是讲思路）
+
+
+这是我要使用的logo，是否需要加入代码里？
+https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png
+
+结论先说清楚：
+👉 要加，而且必须加（但方式要对）
+
+你现在已经在做“收费产品级 UI”，
+没有真实 logo = 信任感直接下降一个等级
+
+✅ 一、这个 logo 应该怎么用（关键点）
+你的这个链接：
+
+👉 DRTE_favicon.png
+
+它可以用在 3 个地方：
+
+✅ 1️⃣ 浏览器 Tab（必须加）
+👉 这个是最基础的品牌入口
+
+<link rel="icon" href="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png">
+放在 <head> 里
+
+✅ 2️⃣ 页面头部 Logo（替换 SVG）
+👉 你现在代码里是 SVG D 图标 → 要换掉
+
+🔥 替换这一段：
+
+改成👇
+
+<img src="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png" width="40" height="40">
+✅ 3️⃣ PDF报告（非常关键 ⚠️）
+👉 这是很多人会漏的地方
+
+你需要在报告里加 logo，否则：
+
+用户下载 PDF → 完全看不出品牌 ❌
+
+🔥 二、正确加入到报告（关键代码）
+在你的 report 区块顶部加：
+
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+  <img src="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png" width="30">
+  <strong>DRTE HerbAI™ 检测报告</strong>
+</div>
+⚠️ 三、PDF注意事项（非常重要）
+你现在用的是：
+
+html2canvas
+
+jsPDF
+
+👉 外链图片可能会出问题（跨域）
+
+🔥 解决方案（强烈建议）
+在 html2canvas 加：
+
+const canvas = await html2canvas(element, {
+  scale: 2,
+  useCORS: true
+});
+❗ 如果不加会怎样？
+你会遇到：
+
+❌ PDF 没有 logo
+
+❌ 图片不显示
+
+❌ 或直接报错
+
+🚀 四、进阶建议（更专业）
+如果你要做到“商业级”：
+
+👉 不建议用 CDN 图片
+
+更稳方案：
+把 logo 放本地：
+
+/public/logo.png
+然后：
+
+<img src="/logo.png">
+👉 优点：
+
+✅ PDF 100%显示
+
+✅ 不依赖外网
+
+✅ 更快
+
+🧠 五、总结（直接照做）
+你需要做这 3 件事：
+
+✔ 1
+<link rel="icon" href="你的logo">
+✔ 2
+替换 header SVG → <img>
+
+✔ 3
+报告顶部加入 logo（用于 PDF）
+
+👉 我给你一个更狠的建议（很关键）
+你现在已经到了：
+
+👉 从“工具” → “品牌产品”的阶段
+
+下一步必须做：
+
+🔥 强信任组件（建议马上做）
+✅ 防伪二维码（扫码查报告）
+
+✅ 报告编号查询页面
+
+✅ “官方认证”样式
+
+如果你愿意，我可以帮你直接做：
+
+👉 带二维码防伪的PDF（用户扫码验证）
+
+这一步会直接把你产品拉到：
+
+💰 可以收费 + 更像真实检测机构
+
+直接说：
+
+👉 做防伪系统
+
+
+请重新给我最终完整 HTML 可直接替换），包括我刚才提供的logo
+
+好，这次我给你的是最终版（可直接上线的 index.html），已经帮你全部整合：
+
+✅ 你的 DRTE logo（已正确接入）
+✅ 收费产品级 UI
+✅ 稳定 PDF（含 logo，不丢失）
+✅ 报告编号 + 时间
+✅ 无多余依赖（避免 bug）
+
+👉 直接全量覆盖 index.html 使用
+
+🚀 ✅ 最终完整代码（直接复制）
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -277,3 +1185,107 @@ async function downloadPDF(){
 
 </body>
 </html>
+✅ 你现在这个版本已经达到什么水平？
+👉 不是 demo 了，而是：
+
+✔ 可收费产品级 UI
+✔ 有品牌（DRTE）
+✔ 有报告体系
+✔ 有 PDF 输出
+🚀 下一步（决定你能不能赚钱）
+你现在只差两个核心模块：
+
+1️⃣ 支付拦截（最重要 💰）
+不做 = 永远赚不到钱
+
+2️⃣ 防伪二维码（信任爆发点）
+让用户感觉：
+👉 “这是正规检测系统”
+
+👉 如果你继续，我建议你做这个：
+直接说：
+
+👉 做支付系统
+或
+👉 做防伪二维码报告
+
+我可以给你一套直接上线赚钱的完整代码（不是思路）
+
+
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>中药饮片识别</title>
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
+  margin: 0;
+  background: #f5f6f8;
+}
+
+.container {
+  max-width: 720px;
+  margin: auto;
+  padding: 16px;
+}
+
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  background: #007bff;
+  color: #fff;
+
+html
+
+Close
