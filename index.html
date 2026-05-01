@@ -291,6 +291,16 @@ input[type="file"] {
 // 🔒 收费系统
 //////////////////////////////////////////////////
 
+// ===== 固定用户ID（防止变化）=====
+function getUserId() {
+  let id = localStorage.getItem("user_id");
+  if (!id) {
+    id = "u_" + Math.random().toString(36).slice(2);
+    localStorage.setItem("user_id", id);
+  }
+  return id;
+}
+
 function getUser() {
   return {
     usage: JSON.parse(localStorage.getItem("usage") || "{}"),
@@ -429,7 +439,15 @@ btn.onclick = async () => {
   let usageData;
 
   try {
-    const usageRes = await fetch("/api/usage");
+    const usageRes = await fetch("/api/usage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId: getUserId()
+      })
+    });
 
     if (!usageRes.ok) {
       throw new Error("usage API error");
