@@ -239,7 +239,6 @@ function compress(file) {
 async function generatePDF() {
 
   const report = document.getElementById("report");
-
   if (!report) {
     alert("报告不存在");
     return;
@@ -317,7 +316,7 @@ async function generatePDF() {
   document.body.appendChild(container);
 
   // ===== 生成PDF =====
-  try {
+   try {
 
     const pdfBlob = await html2pdf()
       .set({
@@ -327,31 +326,31 @@ async function generatePDF() {
         html2canvas: {
           scale: 1.2,
           useCORS: true,
-          scrollY: -(window.scrollY || 0),
-          windowHeight: document.body.scrollHeight
+          scrollY: -(window.scrollY || 0)
         },
 
         jsPDF: {
           unit: "mm",
           format: "a4"
-        },
-
+        }
       })
       .from(container)
       .outputPdf("blob");
-      
-      const url = URL.createObjectURL(pdf);
-      
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "DRTE-中药检测报告.pdf";
-      a.click();
-      
-      URL.revokeObjectURL(url); 
-      a.remove();
+
+    // ✅ 下载
+    const url = URL.createObjectURL(pdfBlob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "DRTE-中药检测报告.pdf";
+    document.body.appendChild(a);
+    a.click();
+
+    URL.revokeObjectURL(url);
+    a.remove();
 
   } catch (err) {
-    console.error(err);
+    console.error("PDF失败:", err);
     alert("PDF生成失败");
   }
 
