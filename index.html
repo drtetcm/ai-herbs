@@ -84,6 +84,8 @@ img {
 <!-- PDF库（必须在这里） -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <script>
 //////////////////////////////////////////////////
 // 🔒 收费系统
@@ -239,138 +241,55 @@ function compress(file) {
 async function generatePDF() {
 
   const report = document.getElementById("report");
+
   if (!report) {
     alert("报告不存在");
     return;
   }
 
-  // ===== 克隆 =====
-  const clone = report.cloneNode(true);
-  clone.querySelectorAll("button").forEach(btn => btn.remove());
+  try {
 
-  // ===== 标题 =====
-  const title = document.createElement("h1");
-  title.innerText = "中药材检测报告";
-  title.style.textAlign = "center";
- 
-  // ===== 报告编号 =====
-  const reportId = document.createElement("p");
-  reportId.innerText = "报告编号：DRTE-" + Date.now();
-  reportId.style.fontSize = "12px";
-  reportId.style.textAlign = "center";
-  reportId.style.margin = "2px 0";
-
-  // ===== 日期 =====
-  const reportDate = document.createElement("p");
-  reportDate.innerText = "检测日期：" + new Date().toLocaleDateString();
-  reportDate.style.fontSize = "12px";
-  reportDate.style.textAlign = "center";
-  reportDate.style.margin = "2px 0 10px";
-
-  // 插入顶部
-  clone.prepend(reportDate);
-  clone.prepend(reportId);
-  clone.prepend(title);
-
-  // ===== 压缩布局（防分页）=====
-   clone.style.padding = "10px";
-   clone.style.margin = "0";
-
-  // ===== 二维码 =====
-  const qrCanvas = document.createElement("canvas");
-
-  await new Promise((resolve, reject) => {
-    QRCode.toCanvas(qrCanvas, "https://drte.io/report?id=" + Date.now(), (err) => {
-      if (err) reject(err);
-      else resolve();
+    // ===== 1️⃣ 用 html2canvas 转成图片 =====
+    const canvas = await html2canvas(report, {
+      scale: 2,
+      useCORS: true,
+      scrollY: -(window.scrollY || 0)
     });
-  });
 
-  const qrWrap = document.createElement("div");
-  qrWrap.style.textAlign = "center";
-  qrWrap.style.marginTop = "12px";
+    const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
-  const qrText = document.createElement("p");
-  qrText.innerText = "扫码验证报告";
-  qrText.style.fontSize = "12px";
-  qrText.style.margin = "4px 0";
+    // ===== 2️⃣ 创建PDF =====
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
 
-  qrWrap.appendChild(qrCanvas);
-  qrWrap.appendChild(qrText);
+    const pageWidth = 210;
+    const pageHeight = 297;
 
-  clone.appendChild(qrWrap);
+    // 图片尺寸换算
+    const imgWidth = pageWidth;
+    const imgHeight = canvas.height * pageWidth / canvas.width;
 
-  // ===== 容器 =====
-  const container = document.createElement("div");
-  container.style.background = "#fff";
-  container.style.width = "210mm";   // ✅ A4宽度
-  
-  container.style.position = "fixed";
-  container.style.top = "0";
-  container.style.left = "0";
-  container.style.opacity = "0";
+    let heightLeft = imgHeight;
+    let position = 0;
 
-  container.appendChild(clone);
-  document.body.appendChild(container);
+    // ===== 3️⃣ 第一页 =====
+    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
 
-  // ===== 生成PDF =====
-   try {
+    // ===== 4️⃣ 自动分页 =====
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
 
-    const pdfBlob = await html2pdf()
-      .set({
-        margin: [5, 5, 5, 5],
-        filename: "DRTE-中药检测报告.pdf",
-
-        html2canvas: {
-          scale: 1.2,
-          useCORS: true,
-          scrollY: -(window.scrollY || 0)
-        },
-
-        jsPDF: {
-          unit: "mm",
-          format: "a4"
-        }
-      })
-      .from(container)
-      .outputPdf("blob");
-
-    // ✅ 下载
-    const url = URL.createObjectURL(pdfBlob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "DRTE-中药检测报告.pdf";
-    document.body.appendChild(a);
-    a.click();
-
-    URL.revokeObjectURL(url);
-    a.remove();
+    // ===== 5️⃣ 下载 =====
+    pdf.save("DRTE-中药检测报告.pdf");
 
   } catch (err) {
     console.error("PDF失败:", err);
     alert("PDF生成失败");
-  }
-
-  document.body.removeChild(container);
-}
-
-function downloadPDF() {
-
-   if (!window.latestData) {
-    alert("请先识别");
-    return;
-  }
-
-  if (canDownloadPDF()) {
-    generatePDF();
-    localStorage.removeItem("pdf_paid");
-    return;
-  }
-
-  if (confirm("下载PDF需支付 RM1，是否继续？")) {
-    localStorage.setItem("pdf_paid", "true");
-    alert("已解锁，请再次点击下载");
   }
 } 
 
@@ -397,7 +316,19 @@ function render(d) {
   resultDiv.innerHTML = `
     <div id="report" class="card" style="background:#fff;">
 
-      <h2>📋 中药检测报告</h2>
+       <div style="text-align:center;margin-bottom:16px;">
+        <h1 style="margin:0;font-size:22px;">中药材检测报告</h1>
+        
+        <p style="margin:4px 0;font-size:12px;color:#666;">
+          报告编号：DRTE-${Date.now()}
+        </p>
+        
+        <p style="margin:0;font-size:12px;color:#666;">
+          检测日期：${new Date().toLocaleDateString()}
+        </p>
+      </div>
+
+      <h2>📋 中药材检测报告</h2>
 
       <!-- 基本信息 -->
       <div style="margin-bottom:16px;">
