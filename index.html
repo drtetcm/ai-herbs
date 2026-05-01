@@ -419,7 +419,23 @@ fileInput.onchange = (e) => {
 
 btn.onclick = async () => {
 
-  if (!checkUsage()) return;
+  // ===== 防破解：调用后端判断 =====
+  const usageRes = await fetch("/api/usage");
+  const usageData = await usageRes.json();
+  
+  if (!usageData.allowed) {
+    showUpgradeModal();
+    return;
+  }
+
+  // ===== 防破解：调用后端判断 =====
+  const usageRes = await fetch("/api/usage");
+  const usageData = await usageRes.json();
+  
+  if (!usageData.allowed) {
+    showUpgradeModal();
+    return;
+  }
 
   if (!currentFile) {
     alert("请选择图片");
