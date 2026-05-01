@@ -429,137 +429,79 @@ fileInput.onchange = (e) => {
 
 btn.onclick = async () => {
 
-  // ❗防止重复点击
   if (isProcessing) return;
   isProcessing = true;
-
-  let usageData;
 
   try {
 
     // ===== 1. 检查图片 =====
     if (!currentFile) {
       alert("请选择图片");
-      isProcessing = false;
       return;
     }
 
-    // ===== 2. usage检查 =====
-    const usageRes = await fetch("/api/usage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: getUserId() })
-    });
+    // ===== 2. usage检查（后端）=====
+    let usageData = { allowed: true };
 
-    if (!usageRes.ok) {
-      throw new Error("usage API error");
+    try {
+      const usageRes = await fetch("/api/usage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: getUserId() })
+      });
+
+      if (usageRes.ok) {
+        usageData = await usageRes.json();
+      }
+    } catch (e) {
+      console.warn("usage接口失败，使用fallback");
     }
 
-    usageData = await usageRes.json();
-
-  } catch (e) {
-    console.error("usage检查失败:", e);
-
-    // fallback：允许继续
-    usageData = { allowed: true };
-  }
-
-  if (!usageData) usageData = { allowed: true };
-  
-  // ===== 前端兜底限制（关键）=====
-  const today = new Date().toDateString();
-  
-  if (localUsage.date !== today) {
-    localUsage = { date: today, count: 0 };
-  }
-
-  // ===== 扣次数逻辑（核心）=====
-  const user = getUser();
-
-  if (!isPro()) {
-
-  if (user.credits > 0) {
-    // 👉 用次数包
-    localStorage.setItem("credits", user.credits - 1);
-
-  } else {
-    // 👉 用免费次数
+    // ===== 3. 前端统一逻辑（唯一一套）=====
     const today = new Date().toDateString();
-    
+
+    let usage = JSON.parse(localStorage.getItem("usage") || "{}");
     if (usage.date !== today) {
       usage = { date: today, count: 0 };
     }
 
-    if (usage.count >= 2) {
-      showUpgradeModal();
-      isProcessing = false;
-      return;
+    const user = getUser();
+
+    if (!isPro()) {
+
+      if (user.credits > 0) {
+        // 👉 用次数包
+        localStorage.setItem("credits", user.credits - 1);
+
+      } else {
+
+        // 👉 免费次数
+        if (usage.count >= 2) {
+          showUpgradeModal();
+          return;
+        }
+
+        usage.count++;
+        localStorage.setItem("usage", JSON.stringify(usage));
+      }
     }
 
-    usage.count++;
-    localStorage.setItem("usage", JSON.stringify(usage));
-  }
-}
+    // ===== UI loading =====
+    btn.disabled = true;
 
-  // 👉 免费2次
-  // ===== 优先判断 Pro =====
-  if (!isPro()) {
+    resultDiv.innerHTML = `
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <div class="loading-title">AI 正在识别中</div>
+        <div class="loading-sub" id="loadingText">准备中...</div>
+        <div class="loading-progress">
+          <div class="loading-bar" id="loadingBar"></div>
+        </div>
+      </div>
+    `;
 
-  // ===== 如果有次数包 → 用次数 =====
-  if (user.credits > 0) {
-    localStorage.setItem("credits", user.credits - 1);
-  } else {
+    setTimeout(() => startLoadingAnimation(), 50);
 
-    // ===== 再走免费次数 =====
-    const today = new Date().toDateString();
-    
-    if (usage.date !== today) {
-      usage = { date: today, count: 0 };
-    }
-
-    if (usage.count >= 20) {
-      showUpgradeModal();
-      isProcessing = false;
-      return;
-    }
-
-    usage.count++;
-    localStorage.setItem("usage", JSON.stringify(usage));
-  }
-}
-
-  // 👉 记录使用
-  localUsage.count++;
-  localStorage.setItem("usage", JSON.stringify(localUsage));
-
-  // ===== UI loading =====
-  btn.disabled = true;
-
-  resultDiv.innerHTML = `
-  <div class="loading-box">
-    <div class="spinner"></div>
-    <div class="loading-title">AI 正在识别中</div>
-    <div class="loading-sub" id="loadingText">准备中...</div>
-
-    <div class="loading-progress">
-      <div class="loading-bar" id="loadingBar"></div>
-    </div>
-
-    <div class="loading-steps">
-      <div class="loading-step" id="s1">📷 上传图片</div>
-      <div class="loading-step" id="s2">🧠 AI识别</div>
-      <div class="loading-step" id="s3">🔍 特征分析</div>
-      <div class="loading-step" id="s4">📊 质量评估</div>
-      <div class="loading-step" id="s5">📄 生成报告</div>
-    </div>
-  </div>
-  `;
-
-  setTimeout(() => {
-    startLoadingAnimation();
-  }, 50);
-
-  try {
     // ===== 压缩图片 =====
     const base64 = await compress(currentFile);
 
@@ -574,7 +516,6 @@ btn.onclick = async () => {
     });
 
     const text = await res.text();
-    console.log("API返回:", text);
 
     let data;
     try {
@@ -587,25 +528,25 @@ btn.onclick = async () => {
 
     stopLoadingAnimation();
 
-    // ===== increment（修复点：正确调用）=====
+    // ===== 记录使用 =====
     try {
       await fetch("/api/increment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: getUserId() })
       });
-    } catch (e) {
-      console.error("increment失败:", e);
-    }
+    } catch {}
 
-    // ===== 渲染 =====
     render(data.data);
 
   } catch (err) {
+
     console.error(err);
     stopLoadingAnimation();
-    resultDiv.innerHTML = `<div class="card">[ERROR] ${err.message}</div>`;
+    resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
+
   } finally {
+
     btn.disabled = false;
     isProcessing = false;
   }
