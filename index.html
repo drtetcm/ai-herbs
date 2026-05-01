@@ -65,9 +65,25 @@ img {
   padding: 20px;
 }
 
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top: 4px solid #0f766e;
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 input[type="file"] {
   display: block;
-  margin: 16px auto;
+  margin: 10px auto;
 }
 </style>
 </head>
@@ -83,8 +99,16 @@ input[type="file"] {
 
   <button id="btn">开始检测</button>
 
+  <div id="loadingBox" style="display:none;text-align:center;margin-top:20px;">
+  <div class="spinner"></div>
+  <div id="loadingText" style="margin-top:10px;color:#666;">
+    正在分析图片...
+  </div>
+  </div>
+
   <div class="footer">
-    © 2026 DRTE HerbAI™ · All Rights Reserved
+    © 2026 DRTE HerbAI™ · 
+    All Rights Reserved
   </div>
 
   <div id="preview"></div>
@@ -173,7 +197,6 @@ btn.onclick = async () => {
   }
 
   btn.disabled = true;
-  resultDiv.innerHTML = `<div class="loading">⏳ 识别中...</div>`;
 
   try {
     const base64 = await compress(currentFile);
@@ -448,7 +471,54 @@ function render(d) {
 
     </div>
   `;
-}
+  
+  async function analyze(){
+    const loadingBox = document.getElementById("loadingBox");
+    const loadingText = document.getElementById("loadingText");
+    
+    // 👉 显示 loading
+    loadingBox.style.display = "block";
+    
+    const steps = [
+      "正在分析图片...",
+      "正在识别药材特征...",
+      "正在匹配数据库...",
+      "生成检测报告中..."
+    ];
+  
+    let i = 0;
+    const interval = setInterval(() => {
+      loadingText.innerText = steps[i % steps.length];
+      i++;
+    }, 1200);
+    
+    // 👉 模拟API延迟（你后面换成真实API）
+    await new Promise(r => setTimeout(r, 3500));
+    
+    clearInterval(interval);
+    
+    // 👉 隐藏 loading
+    loadingBox.style.display = "none";
+    
+    // ===== 下面保持你原来的逻辑 =====
+    // const result = {
+      name: "人参"
+      confidence: 96
+      features: "根条粗壮，质地坚实"
+      quality: "优质"
+    };
+    
+    document.getElementById("name").innerText = result.name;
+    document.getElementById("confidence").innerText = result.confidence + "%";
+    document.getElementById("features").innerText = result.features;
+    document.getElementById("quality").innerText = result.quality;
+
+    document.getElementById("reportId").innerText = "DRTE-" + Date.now();
+    document.getElementById("date").innerText = new Date().toLocaleString();
+
+    document.getElementById("report").style.display = "block";
+  }
+
 </script>
 
 <div id="pdfReport" style="
