@@ -516,6 +516,24 @@ btn.onclick = async () => {
     if (!data.success) throw new Error(data.error);
 
     stopLoadingAnimation();
+
+    // ✅ 识别成功后才计数（带日志）
+    try {
+      const incRes = await fetch("/api/increment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: getUserId()
+      })
+    });
+
+    const incData = await incRes.json();
+    console.log("increment成功:", incData);
+
+    } catch (e) {
+    console.error("increment失败:", e);
+    }
+
     render(data.data);
 
   } catch (err) {
