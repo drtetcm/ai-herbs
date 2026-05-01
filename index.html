@@ -321,6 +321,26 @@ function isExecutive() {
   return Date.now() < getUser().execExpire;
 }
 
+function getRemainingCount() {
+
+  const user = getUser();
+
+  // ===== 免费次数 =====
+  const today = new Date().toDateString();
+  let usage = JSON.parse(localStorage.getItem("usage") || "{}");
+
+  let freeLeft = 2;
+
+  if (usage.date === today) {
+    freeLeft = Math.max(0, 2 - (usage.count || 0));
+  }
+
+  // ===== 付费次数 =====
+  const credits = user.credits || 0;
+
+  return freeLeft + credits;
+}
+
 function canDownloadPDF() {
   return isPro() || isExecutive() || getUser().pdfPaid;
 }
@@ -800,7 +820,7 @@ function render(d) {
 
   resultDiv.innerHTML += `
   <div style="font-size:12px;color:#666;margin-top:10px;">
-    剩余次数：${user.credits || 0}
+    剩余次数：${getRemainingCount()}
   </div>
 `;
 
