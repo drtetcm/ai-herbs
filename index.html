@@ -62,6 +62,46 @@ img {
   text-align: center;
   padding: 20px;
 }
+
+.loading-box {
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.loading-progress {
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.loading-bar {
+  height: 100%;
+  width: 0%;
+  background: #007bff;
+  transition: width 0.3s;
+}
+
 </style>
 </head>
 
@@ -161,7 +201,16 @@ btn.onclick = async () => {
   }
 
   btn.disabled = true;
-  resultDiv.innerHTML = `<div class="loading">⏳ 识别中...</div>`;
+  startLoadingAnimation();
+  resultDiv.innerHTML = `
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">📷 图片上传中...</div>
+    <div class="loading-progress">
+      <div class="loading-bar" id="loadingBar"></div>
+    </div>
+    </div>
+  `;
 
   try {
     const base64 = await compress(currentFile);
@@ -187,9 +236,11 @@ btn.onclick = async () => {
 
     if (!data.success) throw new Error(data.error);
 
+    stopLoadingAnimation();
     render(data.data);
 
   } catch (err) {
+    stopLoadingAnimation();
     resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
   } finally {
     btn.disabled = false;
@@ -437,6 +488,53 @@ function render(d) {
     </div>
   `;
 }
+
+//////////////////////////////////////////////////
+// ⏳ Loading 动画（核心增强）
+//////////////////////////////////////////////////
+
+let loadingTimer = null;
+
+function startLoadingAnimation() {
+
+  const textEl = document.getElementById("loadingText");
+  const barEl = document.getElementById("loadingBar");
+
+  if (!textEl || !barEl) return;
+
+  const steps = [
+    "📷 图片上传中...",
+    "🧠 AI识别中...",
+    "🔍 特征分析中...",
+    "📊 质量评估中...",
+    "📄 生成报告中..."
+  ];
+
+  let i = 0;
+  let progress = 0;
+
+  loadingTimer = setInterval(() => {
+
+    // 文案轮播
+    textEl.innerText = steps[i % steps.length];
+    i++;
+
+    // 进度推进（最多到90%，避免假完成）
+    if (progress < 90) {
+      progress += Math.random() * 10;
+      barEl.style.width = progress + "%";
+    }
+
+  }, 800);
+}
+
+function stopLoadingAnimation() {
+  clearInterval(loadingTimer);
+
+  const barEl = document.getElementById("loadingBar");
+  if (barEl) barEl.style.width = "100%";
+}
+
 </script>
 
 <div id="pdfReport" style="
