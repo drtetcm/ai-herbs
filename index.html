@@ -448,16 +448,27 @@ btn.onclick = async () => {
 
   if (!usageData) usageData = { allowed: true };
   
-  // ✅ 判断是否超限
-  if (!usageData.allowed) {
+  // ===== 前端兜底限制（关键）=====
+  const today = new Date().toDateString();
+  let localUsage = JSON.parse(localStorage.getItem("usage") || "{}");
+  
+  if (localUsage.date !== today) {
+    localUsage = { date: today, count: 0 };
+  }
+
+  // 👉 免费1次
+  if (localUsage.count >= 1 && !usageData.isPro) {
     showUpgradeModal();
     isProcessing = false;
     return;
   }
 
+  // 👉 记录使用
+  localUsage.count++;
+  localStorage.setItem("usage", JSON.stringify(localUsage));
+
   // ===== UI loading =====
   btn.disabled = true;
-  startLoadingAnimation();
 
   resultDiv.innerHTML = `
   <div class="loading-box">
@@ -478,6 +489,10 @@ btn.onclick = async () => {
     </div>
   </div>
   `;
+
+  setTimeout(() => {
+    startLoadingAnimation();
+  }, 50);
 
   try {
     // ===== 压缩图片 =====
