@@ -307,6 +307,9 @@ function getUser() {
     pdfPaid: localStorage.getItem("pdf_paid") === "true",
     execExpire: Number(localStorage.getItem("exec_expire") || 0),
     proExpire: Number(localStorage.getItem("pro_expire") || 0),
+
+    // ✅ 新增
+    credits: Number(localStorage.getItem("credits") || 0)
   };
 }
 
@@ -330,6 +333,12 @@ function activatePro(days) {
   const expire = Date.now() + days * 24 * 60 * 60 * 1000;
   localStorage.setItem("pro_expire", expire);
   alert("已开通成功！");
+}
+
+function buyCredits(n) {
+  const current = Number(localStorage.getItem("credits") || 0);
+  localStorage.setItem("credits", current + n);
+  alert(`🎉 已获得 ${n} 次识别`);
 }
 
 function closeModal() {
@@ -366,14 +375,23 @@ function showUpgradeModal() {
         升级后解锁无限识别 + 完整分析报告
       </p>
 
-      <button onclick="activatePro(7);closeModal()" 
+      <button onclick="activatePro(7);closeModal()"
         style="margin:8px 0;">
-        🚀 RM 9.99 / 7天
+        🚀 RM 9.99 / 7天（无限）🔥推荐
       </button>
 
-      <button onclick="activatePro(30);closeModal()" 
+      <button onclick="activatePro(30);closeModal()"
         style="background:#22c55e;">
-        💎 RM 29.99 / 月
+        💎 RM 29.99 / 月（无限）
+      </button>
+
+      <div style="margin:10px 0;font-size:13px;color:#666;">
+        偶尔使用？
+      </div>
+
+      <button onclick="buyCredits(10);closeModal()"
+        style="background:#eee;color:#333;">
+        ⚡ RM 5.99 / 10次
       </button>
 
       <button onclick="closeModal()" 
@@ -450,18 +468,65 @@ btn.onclick = async () => {
   
   // ===== 前端兜底限制（关键）=====
   const today = new Date().toDateString();
-  let localUsage = JSON.parse(localStorage.getItem("usage") || "{}");
   
   if (localUsage.date !== today) {
     localUsage = { date: today, count: 0 };
   }
 
-  // 👉 免费2次
-  if (localUsage.count >= 20 && !usageData.isPro) {
-    showUpgradeModal();
-    isProcessing = false;
-    return;
+  // ===== 扣次数逻辑（核心）=====
+  const user = getUser();
+
+  if (!isPro()) {
+
+  if (user.credits > 0) {
+    // 👉 用次数包
+    localStorage.setItem("credits", user.credits - 1);
+
+  } else {
+    // 👉 用免费次数
+    const today = new Date().toDateString();
+    
+    if (usage.date !== today) {
+      usage = { date: today, count: 0 };
+    }
+
+    if (usage.count >= 2) {
+      showUpgradeModal();
+      isProcessing = false;
+      return;
+    }
+
+    usage.count++;
+    localStorage.setItem("usage", JSON.stringify(usage));
   }
+}
+
+  // 👉 免费2次
+  // ===== 优先判断 Pro =====
+  if (!isPro()) {
+
+  // ===== 如果有次数包 → 用次数 =====
+  if (user.credits > 0) {
+    localStorage.setItem("credits", user.credits - 1);
+  } else {
+
+    // ===== 再走免费次数 =====
+    const today = new Date().toDateString();
+    
+    if (usage.date !== today) {
+      usage = { date: today, count: 0 };
+    }
+
+    if (usage.count >= 2) {
+      showUpgradeModal();
+      isProcessing = false;
+      return;
+    }
+
+    usage.count++;
+    localStorage.setItem("usage", JSON.stringify(usage));
+  }
+}
 
   // 👉 记录使用
   localUsage.count++;
@@ -785,8 +850,18 @@ function render(d) {
       </div>
 
     </div>
+
+    
   `;
 }
+
+  const user = getUser();
+
+  resultDiv.innerHTML += `
+  <div style="font-size:12px;color:#666;margin-top:10px;">
+    剩余次数：${user.credits || 0}
+  </div>
+`;
 
 //////////////////////////////////////////////////
 // 🚀 高级 Loading 动画
