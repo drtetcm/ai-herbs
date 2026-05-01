@@ -418,6 +418,7 @@ const resultDiv = document.getElementById("result");
 const btn = document.getElementById("btn");
 
 let currentFile = null;
+let isProcessing = false;
 
 fileInput.onchange = (e) => {
   const file = e.target.files[0];
@@ -440,6 +441,7 @@ btn.onclick = async () => {
     // ===== 1. 检查图片 =====
     if (!currentFile) {
       alert("请选择图片");
+      isProcessing = false;
       return;
     }
 
@@ -463,6 +465,8 @@ btn.onclick = async () => {
     usageData = { allowed: true };
   }
 
+  if (!usageData) usageData = { allowed: true };
+  
   // ✅ 判断是否超限
   if (!usageData.allowed) {
     showUpgradeModal();
