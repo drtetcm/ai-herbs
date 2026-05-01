@@ -508,11 +508,6 @@ function render(d) {
       quality: "优质"
     };
     
-    document.getElementById("name").innerText = result.name;
-    document.getElementById("confidence").innerText = result.confidence + "%";
-    document.getElementById("features").innerText = result.features;
-    document.getElementById("quality").innerText = result.quality;
-
     document.getElementById("reportId").innerText = "DRTE-" + Date.now();
     document.getElementById("date").innerText = new Date().toLocaleString();
 
