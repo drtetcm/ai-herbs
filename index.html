@@ -323,25 +323,6 @@ function canDownloadPDF() {
 }
 
 function checkUsage() {
-  const today = new Date().toDateString();
-  let usage = JSON.parse(localStorage.getItem("usage") || "{}");
-
-  // ===== 新的一天 → 重置 =====
-  if (usage.date !== today) {
-    usage = { date: today, count: 0 };
-  }
-
-  // ===== 超过免费次数 =====
-  if (usage.count >= 1 && !isExecutive() && !isPro()) {
-
-    showUpgradeModal(); // 👈 改这里（核心）
-    return false;
-  }
-
-  // ===== 正常使用 → +1 =====
-  usage.count++;
-  localStorage.setItem("usage", JSON.stringify(usage));
-
   return true;
 }
 
