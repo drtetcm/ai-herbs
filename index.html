@@ -253,8 +253,7 @@ async function generatePDF() {
   const title = document.createElement("h1");
   title.innerText = "中药材检测报告";
   title.style.textAlign = "center";
-  title.style.margin = "4px 0";
-
+ 
   // ===== 报告编号 =====
   const reportId = document.createElement("p");
   reportId.innerText = "报告编号：DRTE-" + Date.now();
@@ -273,7 +272,6 @@ async function generatePDF() {
   clone.prepend(reportDate);
   clone.prepend(reportId);
   clone.prepend(title);
-  clone.prepend(logo);
 
   // ===== 压缩布局（防分页）=====
    clone.style.padding = "10px";
@@ -321,7 +319,7 @@ async function generatePDF() {
   // ===== 生成PDF =====
   try {
 
-    const worker = html2pdf()
+    const pdfBlob = await html2pdf()
       .set({
         margin: [5, 5, 5, 5],
         filename: "DRTE-中药检测报告.pdf",
@@ -340,9 +338,7 @@ async function generatePDF() {
 
       })
       .from(container)
-      .save();
-
-      const pdf = await worker.outputPdf("blob");
+      .outputPdf("blob");
       
       const url = URL.createObjectURL(pdf);
       
@@ -351,7 +347,8 @@ async function generatePDF() {
       a.download = "DRTE-中药检测报告.pdf";
       a.click();
       
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url); 
+      a.remove();
 
   } catch (err) {
     console.error(err);
