@@ -419,26 +419,34 @@ fileInput.onchange = (e) => {
 
 btn.onclick = async () => {
 
-  // ===== 防破解：调用后端判断 =====
-  const usageRes = await fetch("/api/usage");
-  const usageData = await usageRes.json();
-  
-  if (!usageData.allowed) {
-    showUpgradeModal();
-    return;
-  }
-
-  // ===== 防破解：调用后端判断 =====
-  const usageRes = await fetch("/api/usage");
-  const usageData = await usageRes.json();
-  
-  if (!usageData.allowed) {
-    showUpgradeModal();
-    return;
-  }
-
+  // ✅ 1. 先检查是否选图（优先）
   if (!currentFile) {
     alert("请选择图片");
+    return;
+  }
+
+  // ✅ 2. 再做 usage 检查（防卡死版）
+  let usageData;
+
+  try {
+    const usageRes = await fetch("/api/usage");
+
+    if (!usageRes.ok) {
+      throw new Error("usage API error");
+    }
+
+    usageData = await usageRes.json();
+
+  } catch (e) {
+    console.error("usage检查失败:", e);
+
+    // fallback：允许继续
+    usageData = { allowed: true };
+  }
+
+  // ✅ 3. 判断是否超限
+  if (!usageData.allowed) {
+    showUpgradeModal();
     return;
   }
 
