@@ -781,9 +781,6 @@ let loadingTimer = null;
 
 function startLoadingAnimation() {
 
-  const bar = document.getElementById("loadingBar");
-  const text = document.getElementById("loadingText");
-
   const steps = [
     { id: "s1", text: "图片上传中..." },
     { id: "s2", text: "AI识别中..." },
@@ -795,23 +792,15 @@ function startLoadingAnimation() {
   let progress = 0;
   let currentStep = 0;
 
-  function activateStep(index) {
-    const el = document.getElementById(steps[index].id);
-    if (el) el.classList.add("active");
-  }
-
-  function completeStep(index) {
-    const el = document.getElementById(steps[index].id);
-    if (el) {
-      el.classList.remove("active");
-      el.classList.add("done");
-      el.innerText = "✔ " + el.innerText;
-    }
-  }
-
   loadingTimer = setInterval(() => {
 
-    // 👉 进度增长（前快后慢）
+    const bar = document.getElementById("loadingBar");
+    const text = document.getElementById("loadingText");
+
+    // ❗关键防护：DOM还没渲染就跳过
+    if (!bar || !text) return;
+
+    // 👉 进度增长
     if (progress < 90) {
       progress += (100 - progress) * 0.08;
       bar.style.width = progress + "%";
@@ -820,12 +809,18 @@ function startLoadingAnimation() {
     // 👉 步骤推进
     if (currentStep < steps.length) {
 
-      activateStep(currentStep);
-      text.innerText = steps[currentStep].text;
+      const stepEl = document.getElementById(steps[currentStep].id);
 
-      setTimeout(() => {
-        completeStep(currentStep);
-      }, 500);
+      if (stepEl) {
+        stepEl.classList.add("active");
+        text.innerText = steps[currentStep].text;
+
+        setTimeout(() => {
+          stepEl.classList.remove("active");
+          stepEl.classList.add("done");
+          stepEl.innerText = "✔ " + stepEl.innerText;
+        }, 500);
+      }
 
       currentStep++;
     }
