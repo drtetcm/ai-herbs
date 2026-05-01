@@ -316,19 +316,87 @@ function checkUsage() {
   const today = new Date().toDateString();
   let usage = JSON.parse(localStorage.getItem("usage") || "{}");
 
+  // ===== 新的一天 → 重置 =====
   if (usage.date !== today) {
     usage = { date: today, count: 0 };
   }
 
+  // ===== 超过免费次数 =====
   if (usage.count >= 1 && !isExecutive() && !isPro()) {
-    alert("今日免费次数已用完");
+
+    showUpgradeModal(); // 👈 改这里（核心）
     return false;
   }
 
+  // ===== 正常使用 → +1 =====
   usage.count++;
   localStorage.setItem("usage", JSON.stringify(usage));
+
   return true;
 }
+
+function activatePro(days) {
+  const expire = Date.now() + days * 24 * 60 * 60 * 1000;
+  localStorage.setItem("pro_expire", expire);
+  alert("已开通成功！");
+}
+
+function closeModal() {
+  const m = document.getElementById("payModal");
+  if (m) m.remove();
+}
+
+function showUpgradeModal() {
+
+  if (document.getElementById("payModal")) return;
+  
+  const modal = document.createElement("div");
+
+  modal.innerHTML = `
+  <div style="
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+  ">
+    <div style="
+      background:#fff;
+      padding:20px;
+      border-radius:12px;
+      width:90%;
+      max-width:320px;
+      text-align:center;
+    ">
+      <h3>🔒 免费次数已用完</h3>
+      <p style="font-size:13px;color:#666;">
+        升级后解锁无限识别 + 完整分析报告
+      </p>
+
+      <button onclick="activatePro(7);closeModal()" 
+        style="margin:8px 0;">
+        🚀 RM 9.99 / 7天
+      </button>
+
+      <button onclick="activatePro(30);closeModal()" 
+        style="background:#22c55e;">
+        💎 RM 29.99 / 月
+      </button>
+
+      <button onclick="closeModal()" 
+        style="background:#eee;color:#333;margin-top:8px;">
+        取消
+      </button>
+    </div>
+  </div>
+  `;
+
+  modal.id = "payModal";
+  document.body.appendChild(modal);
+}
+
 
 //////////////////////////////////////////////////
 // 📸 主逻辑
