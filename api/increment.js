@@ -43,5 +43,13 @@ if (!setRes.ok) {
   throw new Error("KV写入失败");
 }
 
+  // ===== 🔥 全局统计（新增） =====
+  const totalKey = `total:${today}`;
+
+  await fetch(`${KV_REST_API_URL}/incr/${totalKey}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
+  });
+
   return res.json({ success: true, count });
 }
