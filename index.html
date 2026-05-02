@@ -515,7 +515,7 @@ async function loadStats() {
 
     const el = document.getElementById("globalStats");
     if (el) {
-      const displayCount = Math.max(data.count, 38); // 防冷启动
+      const displayCount = Math.max(data.total || 0, 38).toLocaleString();
 
       el.innerHTML = `
         🔥 已有 <b>1,200+</b> 用户使用<br/>
