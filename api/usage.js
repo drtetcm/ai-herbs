@@ -13,29 +13,42 @@ export default async function handler(req, res) {
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
   const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
 
-  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
+  // ===== ✅ 保底返回（永不 null）=====
+  const safeReturn = (data = {}) => {
     return res.json({
       allowed: true,
-      remaining: 1
+      count: 0,
+      isPro: false,
+      remaining: 0,
+      ...data,
+      // 👉 强制兜底
+      remaining:
+        typeof data.remaining === "number"
+          ? data.remaining
+          : 0
     });
+  };
+
+  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
+    return safeReturn({ remaining: 1 });
   }
 
   try {
 
-    // ===== 1. 用户识别 =====
-    const { userId } = req.body || {};
+    // ===== ✅ 同时支持 GET + POST（关键修复）=====
+    const userId =
+      req.body?.userId ||
+      req.query?.userId ||
+      null;
+
     const ip = getIP(req);
 
+    // ===== ✅ userId异常直接兜底 =====
     if (!userId || userId.length < 10) {
-      return res.json({
-        allowed: true,
-        count: 0,
-        isPro: false,
-        remaining: 2
-      });
+      return safeReturn({ remaining: 2 });
     }
 
-    // ===== 🔥 2. IP 限流 =====
+    // ===== 🔥 IP 限流 =====
     const ipKey = `ip:${ip}`;
 
     const ipRes = await fetch(`${KV_REST_API_URL}/get/${ipKey}`, {
@@ -48,7 +61,8 @@ export default async function handler(req, res) {
     if (ipCount > 30) {
       return res.json({
         allowed: false,
-        error: "Too many requests (IP limited)"
+        error: "Too many requests (IP limited)",
+        remaining: 0
       });
     }
 
@@ -57,15 +71,15 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
     });
 
-    // ===== 3. 强绑定 user =====
-    const userKey = `${userId}:${ip}`;
+    // ===== ✅ userKey（去掉IP绑定，防漂移）=====
+    const userKey = userId;
 
-    // ===== 4. Key =====
+    // ===== Key =====
     const today = new Date().toISOString().slice(0, 10);
     const usageKey = `usage:${userKey}:${today}`;
     const proKey = `pro:${userKey}`;
 
-    // ===== 5. 查会员 =====
+    // ===== 查会员 =====
     const proRes = await fetch(`${KV_REST_API_URL}/get/${proKey}`, {
       headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
     });
@@ -74,7 +88,7 @@ export default async function handler(req, res) {
     const proExpire = Number(proJson.result || 0);
     const isPro = Date.now() < proExpire;
 
-    // ===== 6. 查使用次数 =====
+    // ===== 查使用次数 =====
     const usageRes = await fetch(`${KV_REST_API_URL}/get/${usageKey}`, {
       headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
     });
@@ -82,15 +96,16 @@ export default async function handler(req, res) {
     const usageJson = await usageRes.json();
     const count = Number(usageJson.result || 0);
 
-    // ===== 🔥 7. 免费额度 =====
     const FREE_LIMIT = 2;
 
-    // ===== 🔥 8. 剩余次数（核心）=====
-    const remaining = isPro ? "∞" : Math.max(0, FREE_LIMIT - count);
+    // ===== ✅ 核心修复：统一 number 类型 =====
+    const remaining = isPro
+      ? 9999   // 👉 不再用 "∞"
+      : Math.max(0, FREE_LIMIT - count);
 
-    // ===== 9. 限制 =====
+    // ===== 限制 =====
     if (!isPro && count >= FREE_LIMIT) {
-      return res.json({
+      return safeReturn({
         allowed: false,
         count,
         isPro: false,
@@ -98,8 +113,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // ===== 10. 返回 =====
-    return res.json({
+    // ===== 返回 =====
+    return safeReturn({
       allowed: true,
       count,
       isPro,
@@ -110,9 +125,6 @@ export default async function handler(req, res) {
 
     console.error("usage error:", err);
 
-    return res.json({
-      allowed: true,
-      remaining: 1
-    });
+    return safeReturn({ remaining: 1 });
   }
 }

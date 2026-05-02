@@ -306,6 +306,8 @@ function safeParse(key) {
   }
 }
 
+let updatingUI = false;
+
 //////////////////////////////////////////////////
 // 🔒 收费系统
 //////////////////////////////////////////////////
@@ -397,33 +399,79 @@ function getUserPlan() {
 }
 
 async function getUsageData() {
-  const res = await fetch("/api/usage", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      userId: getUserId()
-    })
-  });
+  try {
+    const res = await fetch("/api/usage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: getUserId() })
+    });
 
-  return await res.json();
-}
+    if (!res.ok) {
+      console.warn("usage接口异常 status:", res.status);
+      return { remaining: 0, allowed: true, isPro: false };
+    }
 
-async function updateButtonUI() {
-  const btn = document.getElementById("btn");
-  if (!btn) return;
+    const text = await res.text();
 
-  const data = await getUsageData();
+    // ✅ 防止返回非JSON
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.warn("usage返回非JSON:", text);
+      return { remaining: 0, allowed: true, isPro: false };
+    }
 
-  if (data.isPro) {
-    btn.innerText = "🚀 无限识别中";
-  } else {
-    btn.innerText = `🚀 免费识别（剩余 ${data.remaining} 次）`;
+    // ✅ 强制兜底（核心）
+    return {
+      allowed: data?.allowed ?? true,
+      isPro: data?.isPro ?? false,
+      remaining:
+        typeof data?.remaining === "number"
+          ? data.remaining
+          : 0
+    };
+
+  } catch (e) {
+    console.warn("usage请求失败", e);
+    return { remaining: 0, allowed: true, isPro: false };
   }
 }
 
-function updateUsageUI() {
+async function updateButtonUI() {
+
+  if (updatingUI) return;   // ✅ 防止并发
+  updatingUI = true;
+
+  try {
+    const btn = document.getElementById("btn");
+    if (!btn) return;
+
+    const data = await getUsageData();
+
+    if (data?.isPro) {
+      btn.innerText = "🚀 无限识别中";
+      btn.disabled = false;
+    } else {
+      let r = Number(data?.remaining);
+
+      if (isNaN(r) || r < 0) r = 0;
+
+      if (r === 0) {
+        btn.innerText = "⚠️ 今日已用完";
+        btn.disabled = true;
+      } else {
+        btn.innerText = `🚀 免费识别（剩余 ${r} 次）`;
+        btn.disabled = false;
+      }
+    }
+
+  } finally {
+    updatingUI = false;   // ✅ 解锁
+  }
+}
+
+async function updateUsageUI() {
   const el = document.getElementById("usageText");
   if (!el) return;
 
@@ -450,16 +498,12 @@ function updateUsageUI() {
     return;
   }
 
-// ===== 免费用户 =====
-const today = new Date().toDateString();
-let usage = safeParse("usage");
-
-let freeLeft = 2;
-if (usage.date === today) {
-  freeLeft = Math.max(0, 2 - (usage.count || 0));
-}
-
 const credits = user.credits || 0;
+
+const data = await getUsageData();
+
+let freeLeft = Number(data?.remaining);
+if (isNaN(freeLeft) || freeLeft < 0) freeLeft = 0;
 
 // 🔥 新增：判断是否用完
 const isLow = freeLeft === 0 && credits === 0;
@@ -528,9 +572,9 @@ async function loadStats() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
-  updateUsageUI();
+  await updateUsageUI();
   updateButtonUI();
   loadStats();
 
@@ -735,6 +779,14 @@ console.log("🚀 开始识别流程");
   console.warn("⚠️ usage接口失败，使用前端逻辑");
 }
 
+  // ✅ 防止API异常 + 正确拦截
+  if (usageData && usageData.allowed === false) {
+  showUpgradeModal();
+  isProcessing = false;
+  return;
+  }
+
+
     // ===== 3. 前端统一逻辑（唯一一套）=====
     const today = new Date().toDateString();
 
@@ -746,20 +798,13 @@ console.log("🚀 开始识别流程");
     const user = getUser();
     const isProUser = isPro();
 
-    if (!isPro()) {
+    if (!isProUser && usageData.allowed !== false) {
 
       if (user.credits > 0) {
         // 👉 用次数包
         localStorage.setItem("credits", user.credits - 1);
 
       } else {
-
-        // 👉 免费次数
-        if (usage.count >= 2) {
-          showUpgradeModal();
-          isProcessing = false; 
-          return;
-        }
 
         usage.count++;
         localStorage.setItem("usage", JSON.stringify(usage));
@@ -829,14 +874,13 @@ console.log("🚀 开始识别流程");
         body: JSON.stringify({ userId: getUserId() })
       });
 
-      updateUsageUI();
-      updateButtonUI();
+      await updateUsageUI();
 
     } catch {}
 
     render(data.data);
 
-    updateUsageUI();
+    await updateUsageUI();
     loadStats();
     
   } catch (err) {
@@ -846,9 +890,8 @@ console.log("🚀 开始识别流程");
     resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
 
   } finally {
-
-    btn.disabled = false;
     isProcessing = false;
+     updateButtonUI();
   }
 };
 
