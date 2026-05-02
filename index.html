@@ -636,16 +636,22 @@ function showUpgradeModal() {
       </button>
 
       <div style="margin:10px 0;font-size:13px;color:#666;">
-        偶尔使用？
+        适合偶尔使用
       </div>
 
       <button onclick="buyCredits(10);closeModal()"
+        onmouseover="this.style.background='#e5e7eb'"
+        onmouseout="this.style.background='#f3f4f6'"
         style="width:100%;
         margin-top:10px;
         padding:12px;
-        border:none;
         border-radius:10px;
-        background:#eee;">
+        background:#f3f4f6;
+        color:#374151;
+        border:1px dashed #d1d5db;
+        font-weight:500;
+        cursor:pointer;
+        transition:all 0.2s;">
         ⚡ RM 5.99 / 10次
       </button>
 
