@@ -550,18 +550,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const plan = getUserPlan();
   const user = getUser();
 
-  async function updateButtonUI() {
-  const btn = document.getElementById("btn");
-  if (!btn) return;
-
-  const data = await getUsageData();
-
-  if (data.isPro) {
-    btn.innerText = "🚀 无限识别中";
-  } else {
-    btn.innerText = `🚀 免费识别（剩余 ${data.remaining} 次）`;
-  }
-}
 });
 
 function checkUsage() {

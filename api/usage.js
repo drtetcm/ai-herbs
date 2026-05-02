@@ -27,7 +27,12 @@ export default async function handler(req, res) {
     const ip = getIP(req);
 
     if (!userId || userId.length < 10) {
-      return res.status(400).json({ allowed: false });
+      return res.json({
+        allowed: true,
+        count: 0,
+        isPro: false,
+        remaining: 2
+      });
     }
 
     // ===== 🔥 2. IP 限流 =====
