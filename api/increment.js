@@ -1,3 +1,13 @@
+function getIP(req) {
+  const xf = req.headers["x-forwarded-for"];
+  if (xf) return xf.split(",")[0].trim();
+
+  const xr = req.headers["x-real-ip"];
+  if (xr) return xr;
+
+  return req.socket?.remoteAddress || "unknown";
+}
+
 export default async function handler(req, res) {
 
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
@@ -5,12 +15,20 @@ export default async function handler(req, res) {
 
   const { userId } = req.body || {};
 
-  if (!userId) {
-    return res.status(400).json({ error: "no userId" });
+  // ✅ 基础校验（防伪造）
+  if (!userId || userId.length < 8) {
+    return res.status(400).json({ error: "invalid userId" });
   }
 
+  // ✅ 获取IP
+  const ip = getIP(req);
+
+  // 🔥 核心绑定
+  const userKey = `${userId}:${ip}`;
+
   const today = new Date().toISOString().slice(0, 10);
-  const usageKey = `usage:${userId}:${today}`;
+
+  const usageKey = `usage:${userKey}:${today}`;
 
   // ===== 读取当前 =====
   const usageRes = await fetch(`${KV_REST_API_URL}/get/${usageKey}`, {
@@ -22,6 +40,7 @@ export default async function handler(req, res) {
 
   count += 1;
 
+  // ===== 计算TTL（到当天结束）=====
   const expireSeconds = Math.floor(
     (new Date(today + "T23:59:59").getTime() - Date.now()) / 1000
   );
@@ -32,18 +51,18 @@ export default async function handler(req, res) {
     headers: {
       Authorization: `Bearer ${KV_REST_API_TOKEN}`,
       "Content-Type": "application/json"
-  },
+    },
     body: JSON.stringify({
       value: count,
       ex: expireSeconds
     })
   });
 
-if (!setRes.ok) {
-  throw new Error("KV写入失败");
-}
+  if (!setRes.ok) {
+    throw new Error("KV写入失败");
+  }
 
-  // ===== 🔥 全局统计（新增） =====
+  // ===== 🔥 全局统计 =====
   const totalKey = `total:${today}`;
 
   await fetch(`${KV_REST_API_URL}/incr/${totalKey}`, {
@@ -52,4 +71,5 @@ if (!setRes.ok) {
   });
 
   return res.json({ success: true, count });
+
 }
