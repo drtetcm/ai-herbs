@@ -291,6 +291,11 @@ input[type="file"] {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
+
+window.onerror = function(msg, url, line) {
+  console.error("JS错误:", msg, "行:", line);
+};
+
 //////////////////////////////////////////////////
 // 🔒 收费系统
 //////////////////////////////////////////////////
@@ -506,8 +511,24 @@ async function loadStats() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
   updateUsageUI();
   loadStats();
+
+  const btn = document.getElementById("btn");
+  if (!btn) return;
+
+  const plan = getUserPlan();
+  const user = getUser();
+
+  let total = getRemainingCount();
+
+  if (plan.type !== "free") {
+    btn.innerText = "🚀 无限识别中";
+  } else {
+    btn.innerText = `🚀 免费识别（剩余 ${total} 次）`;
+  }
+
 });
 
 function canDownloadPDF() {
@@ -639,23 +660,6 @@ const fileInput = document.getElementById("file");
 const preview = document.getElementById("preview");
 const resultDiv = document.getElementById("result");
 const btn = document.getElementById("btn");
-
-if (!btn) return;
-
-if (plan.type === "pro") {
-  btn.innerText = "🚀 无限识别中";
-  return;
-}
-
-if (plan.type === "exec") {
-  btn.innerText = "🚀 无限识别中";
-  return;
-}
-
-// 免费用户
-const total = freeLeft + credits;
-
-btn.innerText = `🚀 免费识别（剩余 ${total} 次）`;
 
 let currentFile = null;
 let isProcessing = false;
