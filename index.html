@@ -396,30 +396,31 @@ function getUserPlan() {
   };
 }
 
-function getRemainingCount() {
+async function getUsageData() {
+  const res = await fetch("/api/usage", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: getUserId()
+    })
+  });
 
-  const plan = getUserPlan();
+  return await res.json();
+}
 
-  // ===== Pro / Exec 都是无限 =====
-  if (plan.type !== "free") {
-    return "∞";
+async function updateButtonUI() {
+  const btn = document.getElementById("btn");
+  if (!btn) return;
+
+  const data = await getUsageData();
+
+  if (data.isPro) {
+    btn.innerText = "🚀 无限识别中";
+  } else {
+    btn.innerText = `🚀 免费识别（剩余 ${data.remaining} 次）`;
   }
-
-  const user = getUser();
-
-  // ===== 免费次数 =====
-  const today = new Date().toDateString();
-  let usage = safeParse("usage");
-
-  let freeLeft = 2;
-
-  if (usage.date === today) {
-    freeLeft = Math.max(0, 2 - (usage.count || 0));
-  }
-
-  const credits = user.credits || 0;
-
-  return freeLeft + credits;
 }
 
 function updateUsageUI() {
@@ -530,6 +531,7 @@ async function loadStats() {
 document.addEventListener("DOMContentLoaded", () => {
 
   updateUsageUI();
+  updateButtonUI();
   loadStats();
 
   // ✅ 统一获取 DOM（关键）
@@ -547,13 +549,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===== 原有逻辑（保留）=====
   const plan = getUserPlan();
   const user = getUser();
-  let total = getRemainingCount();
 
-  if (plan.type !== "free") {
+  async function updateButtonUI() {
+  const btn = document.getElementById("btn");
+  if (!btn) return;
+
+  const data = await getUsageData();
+
+  if (data.isPro) {
     btn.innerText = "🚀 无限识别中";
   } else {
-    btn.innerText = `🚀 免费识别（剩余 ${total} 次）`;
+    btn.innerText = `🚀 免费识别（剩余 ${data.remaining} 次）`;
   }
+}
 });
 
 function checkUsage() {
@@ -832,6 +840,9 @@ console.log("🚀 开始识别流程");
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: getUserId() })
       });
+
+      updateUsageUI();
+      updateButtonUI();
 
     } catch {}
 
