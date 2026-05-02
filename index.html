@@ -554,49 +554,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     btn.innerText = `🚀 免费识别（剩余 ${total} 次）`;
   }
-
-  // ===== ✅ 新增：图片预览 =====
-  let currentFile = null;
-  let isProcessing = false;
-
-  fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    currentFile = file;
-    preview.innerHTML = `<img src="${URL.createObjectURL(file)}" />`;
-  });
-
-  // ===== ✅ 新增：按钮点击 =====
-  btn.onclick = async () => {
-    console.log("🔥 点击开始识别");
-
-    if (isProcessing) {
-      console.warn("⚠️ 正在处理中");
-      return;
-    }
-
-    isProcessing = true;
-
-    try {
-
-      if (!currentFile) {
-        alert("请选择图片");
-        isProcessing = false;
-        return;
-      }
-
-      console.log("🚀 进入识别逻辑");
-
-      // 👉 这里你原来的识别代码继续放（不用改）
-
-    } catch (err) {
-      console.error(err);
-    } finally {
-      isProcessing = false;
-    }
-  };
-
 });
 
 function checkUsage() {
