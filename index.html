@@ -172,7 +172,7 @@ img {
 
 .loading-step.done {
   color: #22c55e;
-  opacity: 1;
+  font-weight: 500;
 }
 
 input[type="file"] {
@@ -774,14 +774,16 @@ console.log("🚀 开始识别流程");
         <div class="loading-sub" id="loadingText">准备中...</div>
         <div class="loading-progress">
           <div class="loading-bar" id="loadingBar"></div>
-          <div class="loading-steps">
+        </div>
+        
+        <div class="loading-steps">
             <div class="loading-step" id="s1">📷 上传图片</div>
             <div class="loading-step" id="s2">🧠 AI识别</div>
             <div class="loading-step" id="s3">🔍 特征分析</div>
             <div class="loading-step" id="s4">📊 质量评估</div>
             <div class="loading-step" id="s5">📄 生成报告</div>
-          </div>
         </div>
+        
       </div>
     `;
 
