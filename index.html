@@ -304,7 +304,7 @@ window.onerror = function(msg, url, line) {
 function getUserId() {
   let id = localStorage.getItem("user_id");
   if (!id) {
-    id = "u_" + Math.random().toString(36).slice(2);
+    id = crypto.randomUUID();
     localStorage.setItem("user_id", id);
   }
   return id;
@@ -312,7 +312,15 @@ function getUserId() {
 
 function getUser() {
   return {
-    usage: JSON.parse(localStorage.getItem("usage") || "{}"),
+    usage: (() => {
+      try {
+        const raw = localStorage.getItem("usage");
+        if (!raw) return {};
+        return JSON.parse(raw);
+    } catch {
+      return {};
+    }
+  })(),
     pdfPaid: localStorage.getItem("pdf_paid") === "true",
     execExpire: Number(localStorage.getItem("exec_expire") || 0),
     proExpire: Number(localStorage.getItem("pro_expire") || 0),
@@ -515,12 +523,21 @@ document.addEventListener("DOMContentLoaded", () => {
   updateUsageUI();
   loadStats();
 
+  // ✅ 统一获取 DOM（关键）
+  const fileInput = document.getElementById("file");
+  const preview = document.getElementById("preview");
+  const resultDiv = document.getElementById("result");
   const btn = document.getElementById("btn");
-  if (!btn) return;
 
+  // 👉 防止DOM异常
+  if (!btn || !fileInput || !preview || !resultDiv) {
+    console.error("❌ DOM元素缺失");
+    return;
+  }
+
+  // ===== 原有逻辑（保留）=====
   const plan = getUserPlan();
   const user = getUser();
-
   let total = getRemainingCount();
 
   if (plan.type !== "free") {
@@ -529,11 +546,49 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.innerText = `🚀 免费识别（剩余 ${total} 次）`;
   }
 
-});
+  // ===== ✅ 新增：图片预览 =====
+  let currentFile = null;
+  let isProcessing = false;
 
-function canDownloadPDF() {
-  return isPro() || isExecutive() || getUser().pdfPaid;
-}
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    currentFile = file;
+    preview.innerHTML = `<img src="${URL.createObjectURL(file)}" />`;
+  });
+
+  // ===== ✅ 新增：按钮点击 =====
+  btn.onclick = async () => {
+    console.log("🔥 点击开始识别");
+
+    if (isProcessing) {
+      console.warn("⚠️ 正在处理中");
+      return;
+    }
+
+    isProcessing = true;
+
+    try {
+
+      if (!currentFile) {
+        alert("请选择图片");
+        isProcessing = false;
+        return;
+      }
+
+      console.log("🚀 进入识别逻辑");
+
+      // 👉 这里你原来的识别代码继续放（不用改）
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      isProcessing = false;
+    }
+  };
+
+});
 
 function checkUsage() {
   return true;
@@ -664,18 +719,24 @@ const btn = document.getElementById("btn");
 let currentFile = null;
 let isProcessing = false;
 
-fileInput.onchange = (e) => {
+fileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
   currentFile = file;
   preview.innerHTML = `<img src="${URL.createObjectURL(file)}" />`;
-};
+});
 
 btn.onclick = async () => {
+  console.log("🔥 点击开始识别");
 
-  if (isProcessing) return;
-  isProcessing = true;
+  if (isProcessing) {
+    console.warn("⚠️ 正在处理中，阻止重复点击");
+    return;
+  }
+isProcessing = true;
+
+console.log("🚀 开始识别流程");
 
   try {
 
@@ -689,19 +750,22 @@ btn.onclick = async () => {
     // ===== 2. usage检查（后端）=====
     let usageData = { allowed: true };
 
-    try {
-      const usageRes = await fetch("/api/usage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: getUserId() })
-      });
+  try {
+    const usageRes = await fetch("/api/usage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: getUserId() })
+  });
 
-      if (usageRes.ok) {
-        usageData = await usageRes.json();
-      }
-    } catch (e) {
-      console.warn("usage接口失败，使用fallback");
-    }
+  if (usageRes.ok) {
+    usageData = await usageRes.json();
+  } else {
+    console.warn("⚠️ usage接口异常");
+  }
+
+} catch (e) {
+  console.warn("⚠️ usage接口失败，使用前端逻辑");
+}
 
     // ===== 3. 前端统一逻辑（唯一一套）=====
     const today = new Date().toDateString();
@@ -762,6 +826,10 @@ btn.onclick = async () => {
         mediaType: "image/jpeg"
       })
     });
+
+    if (!res.ok) {
+     throw new Error("AI服务异常（analyze失败）");
+}
 
     const text = await res.text();
 
@@ -1048,7 +1116,6 @@ function render(d) {
   `;
 }
 
-  const user = getUser();
 
 //////////////////////////////////////////////////
 // 🚀 高级 Loading 动画
