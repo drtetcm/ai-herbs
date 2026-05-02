@@ -273,6 +273,10 @@ input[type="file"] {
 
   <button id="btn">开始识别</button>
 
+  <div id="usageText" style="margin-top:10px;font-size:13px;color:#666;">
+  剩余次数：--
+  </div>
+
   <div id="preview"></div>
   <div id="result"></div>
 </div>
@@ -321,7 +325,63 @@ function isExecutive() {
   return Date.now() < getUser().execExpire;
 }
 
+function activateExecutive(days) {
+  const expire = Date.now() + days * 24 * 60 * 60 * 1000;
+  localStorage.setItem("exec_expire", expire);
+
+  alert("🚀 Executive 已开通！");
+  updateUsageUI();
+}
+
+function activatePro(days) {
+  const expire = Date.now() + days * 24 * 60 * 60 * 1000;
+  localStorage.setItem("pro_expire", expire);
+
+  alert("💎 Pro 已开通！");
+  updateUsageUI();
+}
+
+function getRemainingDays(expire) {
+  if (!expire) return 0;
+
+  const diff = expire - Date.now();
+
+  if (diff <= 0) return 0;
+
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function getUserPlan() {
+  const user = getUser();
+
+  if (Date.now() < user.proExpire) {
+    return {
+      type: "pro",
+      days: getRemainingDays(user.proExpire)
+    };
+  }
+
+  if (Date.now() < user.execExpire) {
+    return {
+      type: "exec",
+      days: getRemainingDays(user.execExpire)
+    };
+  }
+
+  return {
+    type: "free",
+    days: 0
+  };
+}
+
 function getRemainingCount() {
+
+  const plan = getUserPlan();
+
+  // ===== Pro / Exec 都是无限 =====
+  if (plan.type !== "free") {
+    return "∞";
+  }
 
   const user = getUser();
 
@@ -335,11 +395,34 @@ function getRemainingCount() {
     freeLeft = Math.max(0, 2 - (usage.count || 0));
   }
 
-  // ===== 付费次数 =====
   const credits = user.credits || 0;
 
   return freeLeft + credits;
 }
+
+function updateUsageUI() {
+
+  const el = document.getElementById("usageText");
+  if (!el) return;
+
+  const plan = getUserPlan();
+
+  if (plan.type === "pro") {
+    el.innerText = `💎 Pro会员：无限使用（剩余 ${plan.days} 天）`;
+    return;
+  }
+
+  if (plan.type === "exec") {
+    el.innerText = `🚀 Executive：无限使用（剩余 ${plan.days} 天）`;
+    return;
+  }
+
+  el.innerText = "剩余次数：" + getRemainingCount();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateUsageUI();
+});
 
 function canDownloadPDF() {
   return isPro() || isExecutive() || getUser().pdfPaid;
@@ -353,6 +436,9 @@ function activatePro(days) {
   const expire = Date.now() + days * 24 * 60 * 60 * 1000;
   localStorage.setItem("pro_expire", expire);
   alert("已开通成功！");
+
+  // ✅ 关键：刷新UI
+  updateUsageUI();
 }
 
 function buyCredits(n) {
@@ -395,7 +481,7 @@ function showUpgradeModal() {
         升级后解锁无限识别 + 完整分析报告
       </p>
 
-      <button onclick="activatePro(7);closeModal()"
+      <button onclick="activateExecutive(7);closeModal()"
         style="margin:8px 0;">
         🚀 RM 9.99 / 7天（无限）🔥推荐
       </button>
