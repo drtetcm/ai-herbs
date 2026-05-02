@@ -296,6 +296,16 @@ window.onerror = function(msg, url, line) {
   console.error("JS错误:", msg, "行:", line);
 };
 
+function safeParse(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
 //////////////////////////////////////////////////
 // 🔒 收费系统
 //////////////////////////////////////////////////
@@ -399,7 +409,7 @@ function getRemainingCount() {
 
   // ===== 免费次数 =====
   const today = new Date().toDateString();
-  let usage = JSON.parse(localStorage.getItem("usage") || "{}");
+  let usage = safeParse("usage");
 
   let freeLeft = 2;
 
@@ -441,7 +451,7 @@ function updateUsageUI() {
 
 // ===== 免费用户 =====
 const today = new Date().toDateString();
-let usage = JSON.parse(localStorage.getItem("usage") || {});
+let usage = safeParse("usage");
 
 let freeLeft = 2;
 if (usage.date === today) {
@@ -769,7 +779,7 @@ console.log("🚀 开始识别流程");
     // ===== 3. 前端统一逻辑（唯一一套）=====
     const today = new Date().toDateString();
 
-    let usage = JSON.parse(localStorage.getItem("usage") || "{}");
+    let usage = safeParse("usage");
     if (usage.date !== today) {
       usage = { date: today, count: 0 };
     }
