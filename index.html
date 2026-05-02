@@ -274,7 +274,7 @@ input[type="file"] {
   <button id="btn">开始识别</button>
 
   <div id="usageText" style="margin-top:10px;font-size:13px;color:#666;">
-  剩余次数：--
+  🆓 今日免费：2 次（立即体验）
   </div>
 
   <div id="preview"></div>
@@ -458,28 +458,56 @@ el.innerHTML = `
       <span style="font-size:12px;">⚠️ 免费次数已用完</span>
 
       <br/>
-      <button 
-        onclick="showUpgradeModal()" 
-        style="
-          margin-top:8px;
-          padding:6px 12px;
-          border:none;
-          border-radius:6px;
-          background:#2563eb;
-          color:#fff;
-          font-size:12px;
-          cursor:pointer;
-        ">
-        🚀 立即解锁，无限识别
-      </button>
+      <button onclick="showUpgradeModal()" style="
+  margin-top:8px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:#fff;
+  font-size:15px;
+  font-weight:600;
+  width:100%;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+">
+
+  🚀 立即解锁无限识别
+
+  <br/>
+
+  <span style="font-size:12px;opacity:0.9;">
+    ⚠️ 今日已用完 · 推荐7天体验
+  </span>
+
+</button>
     ` : ''}
 
   </div>
 `;
 }
 
+async function loadStats() {
+  try {
+    const res = await fetch("/api/stats");
+    const data = await res.json();
+
+    const el = document.getElementById("globalStats");
+    if (el) {
+      const displayCount = Math.max(data.count, 38); // 防冷启动
+
+      el.innerHTML = `
+        🔥 已有 <b>1,200+</b> 用户使用<br/>
+        今日已有 <b>${displayCount}</b> 次识别
+      `;
+    }
+  } catch (e) {
+    console.warn("stats加载失败");
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   updateUsageUI();
+  loadStats();
 });
 
 function canDownloadPDF() {
@@ -534,18 +562,34 @@ function showUpgradeModal() {
       max-width:320px;
       text-align:center;
     ">
-      <h3>🔒 今天的2次免费次数已用完</h3>
+      <h3>🔒 今天免费次数已用完</h3>
       <p style="font-size:13px;color:#666;">
-        升级后解锁无限识别 + 完整分析报告
+        升级后解锁：
+        <br/>✔ 无限识别
+        <br/>✔ 专业分析报告
       </p>
 
       <button onclick="activateExecutive(7);closeModal()"
-        style="margin:8px 0;">
+        style="width:100%;
+        margin-top:15px;
+        padding:12px;
+        border:none;
+        border-radius:10px;
+        background:#2563eb;
+        color:#fff;
+        font-size:16px;">
         🚀 RM 9.99 / 7天（无限）🔥推荐
       </button>
 
       <button onclick="activatePro(30);closeModal()"
-        style="background:#22c55e;">
+        style="width:100%;
+        margin-top:10px;
+        padding:12px;
+        border:none;
+        border-radius:10px;
+        background:#22c55e;
+        color:#fff;
+        font-size:16px;">
         💎 RM 29.99 / 月（无限）
       </button>
 
@@ -554,9 +598,25 @@ function showUpgradeModal() {
       </div>
 
       <button onclick="buyCredits(10);closeModal()"
-        style="background:#eee;color:#333;">
+        style="width:100%;
+        margin-top:10px;
+        padding:12px;
+        border:none;
+        border-radius:10px;
+        background:#eee;">
         ⚡ RM 5.99 / 10次
       </button>
+
+        <div id="globalStats" style="
+        font-size:12px;
+        color:#999;
+        margin-top:10px;
+        text-align:center;
+        line-height:1.6;
+        ">
+        🔥 已有 <b>1,200+</b> 用户使用<br/>
+        今日已有 <b>--</b> 次识别
+        </div> 
 
       <button onclick="closeModal()" 
         style="background:#eee;color:#333;margin-top:8px;">
@@ -579,6 +639,23 @@ const fileInput = document.getElementById("file");
 const preview = document.getElementById("preview");
 const resultDiv = document.getElementById("result");
 const btn = document.getElementById("btn");
+
+if (!btn) return;
+
+if (plan.type === "pro") {
+  btn.innerText = "🚀 无限识别中";
+  return;
+}
+
+if (plan.type === "exec") {
+  btn.innerText = "🚀 无限识别中";
+  return;
+}
+
+// 免费用户
+const total = freeLeft + credits;
+
+btn.innerText = `🚀 免费识别（剩余 ${total} 次）`;
 
 let currentFile = null;
 let isProcessing = false;
@@ -708,7 +785,8 @@ btn.onclick = async () => {
     render(data.data);
 
     updateUsageUI();
-
+    loadStats();
+    
   } catch (err) {
 
     console.error(err);
