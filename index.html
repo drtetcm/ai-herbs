@@ -543,6 +543,7 @@ btn.onclick = async () => {
     // ===== 1. 检查图片 =====
     if (!currentFile) {
       alert("请选择图片");
+      isProcessing = false;
       return;
     }
 
@@ -572,7 +573,8 @@ btn.onclick = async () => {
     }
 
     const user = getUser();
-
+    const isProUser = isPro();
+    
     if (!isPro()) {
 
       if (user.credits > 0) {
@@ -584,6 +586,7 @@ btn.onclick = async () => {
         // 👉 免费次数
         if (usage.count >= 2) {
           showUpgradeModal();
+          isProcessing = false; 
           return;
         }
 
@@ -641,9 +644,12 @@ btn.onclick = async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: getUserId() })
       });
+
     } catch {}
 
     render(data.data);
+
+    updateUsageUI();
 
   } catch (err) {
 
