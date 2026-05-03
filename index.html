@@ -335,8 +335,8 @@ function getUser() {
     })(),
 
     pdfPaid: localStorage.getItem("pdf_paid") === "true",
-    execExpire: Number(localStorage.getItem("exec_expire") || 0),
-    proExpire: Number(localStorage.getItem("pro_expire") || 0),
+    execExpire: Number(localStorage.getItem("execExpire") || 0),
+    proExpire: Number(localStorage.getItem("proExpire") || 0),
     credits: Number(localStorage.getItem("credits") || 0)
   };
 }
@@ -357,7 +357,7 @@ function isExecutive() {
 
 function activateExecutive(days) {
   const expire = Date.now() + days * 24 * 60 * 60 * 1000;
-  localStorage.setItem("exec_expire", expire);
+  localStorage.setItem("execExpire", expire);
 
   alert("🚀 Executive 已开通！");
   updateUsageUI();
@@ -365,7 +365,7 @@ function activateExecutive(days) {
 
 function activatePro(days) {
   const expire = Date.now() + days * 24 * 60 * 60 * 1000;
-  localStorage.setItem("pro_expire", expire);
+  localStorage.setItem("proExpire", expire);
 
   alert("💎 Pro 已开通！");
   updateUsageUI();
