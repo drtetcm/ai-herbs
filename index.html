@@ -510,19 +510,11 @@ async function updateButtonUI() {
 
 async function updateUsageUI() {
 
-  // ===== Executive用户 =====
-  if (isExecutive()) {
-    const usageEl = document.getElementById("usageInfo");
-    if (usageEl) {
-      usageEl.innerHTML = "🚀 Executive会员：无限识别";
-    }
-  return;
-  }
-
   const el = document.getElementById("usageText");
   if (!el) return;
 
   const plan = getUserPlan();
+  console.log("plan:", plan);
   const user = getUser();
 
   // ===== 💎 Pro（月）=====
@@ -954,7 +946,8 @@ btn.onclick = async () => {
     const user = getUser();
 
     // 🔥 统一身份（最优先）
-    const isProUser = isPro() || isExecutive();
+    const isProUser = isPro();
+    const isExecUser = isExecutive();
     const hasCredits = user?.credits > 0;
 
     let usageData = {
