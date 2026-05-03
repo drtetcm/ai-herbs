@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         }
       ],
 
-      success_url: "https://ai-herbs.vercel.app/?success=exec",
+      success_url: "https://ai-herbs.vercel.app/success.html",
       cancel_url: "https://ai-herbs.vercel.app/?cancel=1"
     });
 

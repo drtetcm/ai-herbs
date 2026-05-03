@@ -12,19 +12,37 @@
 ">
 
   <h2>✅ 支付成功</h2>
-  <p>正在激活你的会员...</p>
+  <p id="status">正在激活你的会员...</p>
 
   <script>
-    // ✅ 激活 Executive 7天
-    localStorage.setItem("execExpire", Date.now() + 7*24*60*60*1000);
+    (function () {
+      try {
+        console.log("🎉 进入 success.html");
 
-    // ✅ 提示
-    console.log("已开通 Executive 7天");
+        // ===== 1. 激活 Executive 7天 =====
+        const expire = Date.now() + 7 * 24 * 60 * 60 * 1000;
+        localStorage.setItem("execExpire", expire);
 
-    // ✅ 跳回首页
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 1500);
+        // ===== 2. 可扩展（未来支持更多套餐）=====
+        localStorage.setItem("userPlan", "exec");
+
+        console.log("✅ 已写入 execExpire:", expire);
+
+        // ===== 3. UI提示 =====
+        document.getElementById("status").innerText =
+          "会员已激活，正在返回首页...";
+
+        // ===== 4. 防止缓存问题（关键）=====
+        setTimeout(() => {
+          window.location.replace("/");
+        }, 1200);
+
+      } catch (e) {
+        console.error("❌ 激活失败:", e);
+        document.getElementById("status").innerText =
+          "激活失败，请联系客服";
+      }
+    })();
   </script>
 
 </body>
