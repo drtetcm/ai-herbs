@@ -956,7 +956,7 @@ btn.onclick = async () => {
 };
 
     // 👉 ❗ 只有普通用户才请求 usage
-    if (!isProUser && !hasCredits) {
+    if (!isExecutive() && !isPro() && !hasCredits) {
       try {
         usageData = await getUsageData();
       } catch (e) {
@@ -971,7 +971,7 @@ btn.onclick = async () => {
     console.log("是否有次数包:", hasCredits);
 
     // ===== 3. 拦截逻辑（最终版）=====
-    if (!usageData.allowed && !isProUser && !hasCredits) {
+    if (!isExecutive() && !isPro() && !hasCredits) {
       console.log("🚫 被拦截：弹升级");
       showUpgradeModal();
       isProcessing = false;
