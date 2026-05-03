@@ -456,7 +456,7 @@ async function updateButtonUI() {
     const user = getUser();
 
     // 🔥 关键：加入前端 Executive 判断
-    const isProUser = data?.isPro || isPro();
+    const isProUser = isPro() || isExecutive() || data?.isPro;
 
     // ✅ 1️⃣ Pro / Executive（最高优先级）
     if (isProUser) {
@@ -781,7 +781,7 @@ btn.onclick = async () => {
     const user = getUser();
 
     // 🔥 统一身份（最优先）
-    const isProUser = isPro() || isExecutive();
+    const isProUser = isPro() || isExecutive() || data?.isPro;
     const hasCredits = user?.credits > 0;
 
     let usageData = {
