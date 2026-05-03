@@ -440,7 +440,7 @@ async function getUsageData() {
 
 async function updateButtonUI() {
 
-  if (updatingUI) return;   // ✅ 防止并发
+  if (updatingUI) return;
   updatingUI = true;
 
   try {
@@ -448,26 +448,36 @@ async function updateButtonUI() {
     if (!btn) return;
 
     const data = await getUsageData();
+    const user = getUser(); // ✅ 读取次数包
 
+    // ✅ 1️⃣ Pro / Exec（最高优先级）
     if (data?.isPro) {
       btn.innerText = "🚀 无限识别中";
       btn.disabled = false;
+      return;
+    }
+
+    // ✅ 2️⃣ 次数包（关键补充）
+    if (user?.credits > 0) {
+      btn.innerText = `⚡ 使用次数包（剩余 ${user.credits} 次）`;
+      btn.disabled = false;
+      return;
+    }
+
+    // ✅ 3️⃣ 免费次数
+    let r = Number(data?.remaining);
+    if (isNaN(r) || r < 0) r = 0;
+
+    if (r === 0) {
+      btn.innerText = "⚠️ 今日已用完";
+      btn.disabled = true;
     } else {
-      let r = Number(data?.remaining);
-
-      if (isNaN(r) || r < 0) r = 0;
-
-      if (r === 0) {
-        btn.innerText = "⚠️ 今日已用完";
-        btn.disabled = true;
-      } else {
-        btn.innerText = `🚀 免费识别（剩余 ${r} 次）`;
-        btn.disabled = false;
-      }
+      btn.innerText = `🚀 免费识别（剩余 ${r} 次）`;
+      btn.disabled = false;
     }
 
   } finally {
-    updatingUI = false;   // ✅ 解锁
+    updatingUI = false;
   }
 }
 
