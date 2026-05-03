@@ -790,15 +790,16 @@ console.log("🚀 开始识别流程");
 }
 
   // ✅ 防止API异常 + 正确拦截
-  if (usageData && usageData.allowed === false) {
-  showUpgradeModal();
-  isProcessing = false;
-  return;
+  const user = getUser();
+
+  if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
+    showUpgradeModal();
+    isProcessing = false;
+    return;
   }
 
-
-    // ===== 3. 前端统一逻辑（唯一一套）=====
-    const today = new Date().toDateString();
+  // ===== 3. 前端统一逻辑（唯一一套）=====
+  const today = new Date().toDateString();
 
     let usage = safeParse("usage");
     if (usage.date !== today) {
