@@ -400,10 +400,15 @@ function getUserPlan() {
 
 async function getUsageData() {
   try {
+    const user = getUser();
+
     const res = await fetch("/api/usage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: getUserId() })
+      body: JSON.stringify({
+        userId: getUserId(),
+        execExpire: user?.execExpire || 0
+      })
     });
 
     if (!res.ok) {
@@ -776,11 +781,16 @@ console.log("🚀 开始识别流程");
     let usageData = { allowed: true };
 
   try {
+    const user = getUser();
+
     const usageRes = await fetch("/api/usage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: getUserId() })
-  });
+      body: JSON.stringify({
+        userId: getUserId(),
+        execExpire: user?.execExpire || 0
+      })
+    });
 
   if (usageRes.ok) {
   try {
