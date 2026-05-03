@@ -721,7 +721,7 @@ function showUpgradeModal() {
         line-height:1.6;
         ">
         🔥 已有 <b>1,200+</b> 用户使用<br/>
-        今日已有 <b>--</b> 次识别
+        今日已有 <b id="todayCount">--</b> 次识别
         </div> 
 
       <button onclick="closeModal()" 
@@ -734,6 +734,21 @@ function showUpgradeModal() {
 
   modal.id = "payModal";
   document.body.appendChild(modal);
+
+  setTimeout(() => {
+    const el = document.getElementById("todayCount");
+    const global = document.getElementById("globalStats");
+
+    if (el && global) {
+      const bs = global.querySelectorAll("b");
+
+    if (bs.length >= 2) {
+        el.innerText = bs[1].innerText;
+    } else {
+        el.innerText = "38";
+      }
+    }
+  }, 50);
 }
 
 
