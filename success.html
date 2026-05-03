@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>支付成功</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body style="
+  text-align:center;
+  padding:60px;
+  font-family:sans-serif;
+">
+
+  <h2>✅ 支付成功</h2>
+  <p>正在激活你的会员...</p>
+
+  <script>
+    // ✅ 激活 Executive 7天
+    localStorage.setItem("execExpire", Date.now() + 7*24*60*60*1000);
+
+    // ✅ 提示
+    console.log("已开通 Executive 7天");
+
+    // ✅ 跳回首页
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1500);
+  </script>
+
+</body>
+</html>
