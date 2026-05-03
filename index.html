@@ -764,9 +764,9 @@ btn.onclick = async () => {
     console.warn("⚠️ 正在处理中，阻止重复点击");
     return;
   }
-isProcessing = true;
 
-console.log("🚀 开始识别流程");
+  isProcessing = true;
+  console.log("🚀 开始识别流程");
 
   try {
 
@@ -777,95 +777,58 @@ console.log("🚀 开始识别流程");
       return;
     }
 
-    // ===== 2. usage检查（后端）=====
-    let usageData = { allowed: true };
+    // ===== 2. usage检查（唯一入口）=====
+    let usageData;
 
-  try {
+    try {
+      usageData = await getUsageData();
+    } catch (e) {
+      console.warn("⚠️ usage获取失败，使用兜底");
+
+      usageData = {
+        allowed: true,
+        isPro: false,
+        remaining: 0
+      };
+    }
+
     const user = getUser();
 
-    const usageRes = await fetch("/api/usage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: getUserId(),
-        execExpire: user?.execExpire || 0
-      })
-    });
+    // 🔥 统一身份（关键修复）
+    const isProUser = isPro() || isExecutive();
+    const hasCredits = user?.credits > 0;
 
-  if (usageRes.ok) {
-  try {
-    const raw = await usageRes.json();
+    // 🔍 调试日志
+    console.log("usageData:", usageData);
+    console.log("user:", user);
+    console.log("是否Pro:", isProUser);
+    console.log("是否有次数包:", hasCredits);
 
-    // ✅ 强制兜底（关键修复）
-    usageData = {
-      allowed: raw?.allowed ?? true,
-      isPro: raw?.isPro ?? false,
-      remaining:
-        typeof raw?.remaining === "number"
-          ? raw.remaining
-          : 0
-    };
+    // ===== 3. 拦截逻辑（最终版）=====
+    if (!usageData.allowed && !isProUser && !hasCredits) {
+      console.log("🚫 被拦截：弹升级");
+      showUpgradeModal();
+      isProcessing = false;
+      return;
+    }
 
-  } catch (e) {
-    console.warn("⚠️ usage JSON解析失败");
-
-    // ✅ JSON异常兜底
-    usageData = {
-      allowed: true,
-      isPro: false,
-      remaining: 0
-    };
-  }
-
-} else {
-  console.warn("⚠️ usage接口异常 status:", usageRes.status);
-
-  // ✅ HTTP异常兜底
-  usageData = {
-    allowed: true,
-    isPro: false,
-    remaining: 0
-  };
-}
-
-} catch (e) {
-  console.warn("⚠️ usage接口失败，使用前端逻辑");
-}
-
-  // ✅ 防止API异常 + 正确拦截
-  const user = getUser();
-
-// 🔥 调试日志（必须放这里）
-console.log("usageData:", usageData);
-console.log("user:", user);
-console.log("是否拦截:",
-  !usageData.allowed && !usageData.isPro && !(user?.credits > 0)
-);
-
-if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
-    showUpgradeModal();
-    isProcessing = false;
-    return;
-  }
-
-  // ===== 3. 前端统一逻辑（唯一一套）=====
-  const today = new Date().toDateString();
+    // ===== 4. 前端使用逻辑 =====
+    const today = new Date().toDateString();
 
     let usage = safeParse("usage");
     if (usage.date !== today) {
       usage = { date: today, count: 0 };
     }
 
-    const isProUser = isPro();
+    // 🔥 关键修复：Pro / Exec 不扣次数
+    if (!isProUser) {
 
-    if (!isProUser && usageData.allowed !== false) {
-
-      if (user.credits > 0) {
+      if (hasCredits) {
         // 👉 用次数包
         localStorage.setItem("credits", user.credits - 1);
 
       } else {
-
+        // 👉 免费次数
         usage.count++;
         localStorage.setItem("usage", JSON.stringify(usage));
       }
@@ -910,8 +873,8 @@ if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
     });
 
     if (!res.ok) {
-     throw new Error("AI服务异常（analyze失败）");
-}
+      throw new Error("AI服务异常（analyze失败）");
+    }
 
     const text = await res.text();
 
@@ -926,7 +889,7 @@ if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
 
     stopLoadingAnimation();
 
-    // ===== 记录使用 =====
+    // ===== 后端计数 =====
     try {
       await fetch("/api/increment", {
         method: "POST",
@@ -935,14 +898,14 @@ if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
       });
 
       await updateUsageUI();
-
     } catch {}
 
     render(data.data);
 
     await updateUsageUI();
+    await updateButtonUI();
     loadStats();
-    
+
   } catch (err) {
 
     console.error(err);
@@ -950,8 +913,10 @@ if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
     resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
 
   } finally {
+
     isProcessing = false;
-     updateButtonUI();
+    updateButtonUI();
+
   }
 };
 
