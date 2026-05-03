@@ -830,8 +830,24 @@ function showUpgradeModal() {
 }
 
 // ===== Stripe =====
-    function payStripeExec() {
-      alert("Stripe 7天（下一步接入）");
+    async function payStripeExec() {
+      try {
+        const res = await fetch("/api/stripe-exec", {
+          method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert("支付创建失败");
+        }
+
+      } catch (e) {
+        console.error(e);
+        alert("支付异常");
+      }
     }
 
     function payStripeMonthly() {
