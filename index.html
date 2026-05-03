@@ -735,16 +735,22 @@ function showUpgradeModal() {
   modal.id = "payModal";
   document.body.appendChild(modal);
 
-  setTimeout(() => {
-    const el = document.getElementById("todayCount");
-    const global = document.getElementById("globalStats");
+  setTimeout(async () => {
+    try {
+      const res = await fetch("/api/stats");
+      const data = await res.json();
 
-    if (el && global) {
-      const bs = global.querySelectorAll("b");
+      const count = Math.max(data?.total || 0, 38);
 
-    if (bs.length >= 2) {
-        el.innerText = bs[1].innerText;
-    } else {
+      const el = document.getElementById("todayCount");
+      if (el) {
+        el.innerText = count.toLocaleString();
+      }
+
+    } catch (e) {
+      // 兜底（永不显示 --）
+      const el = document.getElementById("todayCount");
+      if (el) {
         el.innerText = "38";
       }
     }
