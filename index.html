@@ -342,11 +342,17 @@ function getUser() {
 }
 
 function isPro() {
-  return Date.now() < getUser().proExpire;
+  const expire = localStorage.getItem("proExpire");
+  return expire && Date.now() < Number(expire);
 }
 
 function isExecutive() {
-  return Date.now() < getUser().execExpire;
+  try {
+    const expire = localStorage.getItem("execExpire");
+    return expire && Date.now() < Number(expire);
+  } catch {
+    return false;
+  }
 }
 
 function activateExecutive(days) {
