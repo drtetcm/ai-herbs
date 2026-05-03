@@ -900,11 +900,10 @@ btn.onclick = async () => {
     const user = getUser();
 
     // 🔥 统一身份（最优先）
-    const isProUser = isPro() || isExecutive() || data?.isPro;
+    const isProUser = isPro() || isExecutive();
     const hasCredits = user?.credits > 0;
 
     let usageData = {
-      allowed: true,
       isPro: false,
       remaining: 0
 };
