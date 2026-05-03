@@ -450,8 +450,11 @@ async function updateButtonUI() {
     const data = await getUsageData();
     const user = getUser();
 
+    // 🔥 关键：加入前端 Executive 判断
+    const isProUser = data?.isPro || isPro();
+
     // ✅ 1️⃣ Pro / Executive（最高优先级）
-    if (data?.isPro) {
+    if (isProUser) {
       btn.innerText = "🚀 无限识别中";
       btn.disabled = false;
       return;
