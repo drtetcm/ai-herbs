@@ -669,48 +669,120 @@ function showUpgradeModal() {
         <br/>✔ 专业分析报告
       </p>
 
-      <button onclick="activateExecutive(7);closeModal()"
-        style="width:100%;
-        margin-top:15px;
-        padding:12px;
-        border:none;
-        border-radius:10px;
-        background:#2563eb;
-        color:#fff;
-        font-size:16px;">
-        🚀 RM 9.99 / 7天（无限）🔥推荐
-      </button>
+      <!-- ===== 套餐区 ===== -->
 
-      <button onclick="activatePro(30);closeModal()"
-        style="width:100%;
-        margin-top:10px;
-        padding:12px;
-        border:none;
-        border-radius:10px;
-        background:#22c55e;
-        color:#fff;
-        font-size:16px;">
-        💎 RM 29.99 / 月（无限）
-      </button>
+      <!-- 7天无限 -->
+      <div style="margin-top:15px;text-align:left">
 
-      <div style="margin:10px 0;font-size:13px;color:#666;">
-        适合偶尔使用
+        <div style="font-weight:bold;margin-bottom:6px">
+          🚀 RM 9.99 / 7天（无限）🔥推荐
+        </div>
+
+        <button onclick="payStripeExec()" 
+          style="width:100%;
+          margin-bottom:6px;
+          padding:10px;
+          border-radius:8px;
+          background:#635bff;
+          color:white;
+          border:none;">
+          💳 信用卡 / Apple Pay / Google Pay
+        </button>
+
+        <button onclick="payToyyibExec()" 
+          style="width:100%;
+          padding:10px;
+          border-radius:8px;
+          background:#16a34a;
+          color:white;
+          border:none;">
+          📱 TnG / DuitNow / FPX
+        </button>
+
       </div>
 
-      <button onclick="buyCredits(10);closeModal()"
-        onmouseover="this.style.background='#e5e7eb'"
-        onmouseout="this.style.background='#f3f4f6'"
+      <!-- 月会员 -->
+        <div style="margin-top:15px;text-align:left">
+
+          <div style="font-weight:bold;margin-bottom:6px">
+            💎 RM 29.99 / 月（无限）
+          </div>
+
+          <button onclick="payStripeMonthly()" 
+            style="width:100%;
+            margin-bottom:6px;
+            padding:10px;
+            border-radius:8px;
+            background:#635bff;
+            color:white;
+            border:none;">
+            💳 信用卡 / Apple Pay / Google Pay
+          </button>
+
+          <button onclick="payToyyibMonthly()" 
+            style="width:100%;
+            padding:10px;
+            border-radius:8px;
+            background:#16a34a;
+            color:white;
+            border:none;">
+            📱 TnG / DuitNow / FPX
+          </button>
+
+        </div>
+
+      <!-- 10次包 -->
+      <div style="margin-top:15px;text-align:left">
+
+        <div style="font-weight:bold;margin-bottom:6px">
+          ⚡ RM 5.99 / 10次（按次使用）
+        </div>
+
+        <div style="margin:10px 0;font-size:13px;color:#666;">         
+            适合偶尔使用       
+        </div>
+
+        <button onclick="payStripeCredits()" 
+          style="width:100%;
+          margin-bottom:6px;
+          padding:10px;
+          border-radius:8px;
+          background:#635bff;
+          color:white;
+          border:none;">
+          💳 信用卡 / Apple Pay / Google Pay
+        </button>
+
+        <button onclick="payToyyibCredits()" 
+            style="width:100%;
+            padding:10px;
+            border-radius:8px;
+            background:#16a34a;
+            color:white;
+            border:none;">
+            📱 TnG / DuitNow / FPX
+        </button>
+
+       </div>
+
+      <!-- 分隔 -->
+          <div style="margin:14px 0;text-align:center;color:#999;font-size:13px">
+          或使用优惠码（10次免费）
+          </div>
+
+      <!-- 优惠码 -->
+        <input id="promoCode" placeholder="输入优惠码"
+          style="width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;" />
+
+      <button onclick="applyPromoCode()" 
         style="width:100%;
-        margin-top:10px;
+        margin-top:8px;
         padding:12px;
+        border:none;
         border-radius:10px;
-        background:#f3f4f6;
-        color:#374151;
-        border:1px dashed #d1d5db;
-        font-weight:500;
-        cursor:pointer;
-        transition:all 0.2s;">
-        ⚡ RM 5.99 / 10次
+        background:#f59e0b;
+        color:#fff;">
+        🎁 使用优惠码
       </button>
 
         <div id="globalStats" style="
@@ -756,6 +828,32 @@ function showUpgradeModal() {
     }
   }, 50);
 }
+
+// ===== Stripe =====
+    function payStripeExec() {
+      alert("Stripe 7天（下一步接入）");
+    }
+
+    function payStripeMonthly() {
+      alert("Stripe 月（下一步接入）");
+    }
+
+    function payStripeCredits() {
+      alert("Stripe 10次（下一步接入）");
+    }
+
+// ===== Toyyib =====
+    function payToyyibExec() {
+      alert("TnG 7天（下一步接入）");
+    }
+
+    function payToyyibMonthly() {
+      alert("TnG 月（下一步接入）");
+    }
+
+    function payToyyibCredits() {
+      alert("TnG 10次（下一步接入）");
+    }
 
 
 //////////////////////////////////////////////////
