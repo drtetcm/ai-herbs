@@ -777,26 +777,27 @@ btn.onclick = async () => {
       return;
     }
 
-    // ===== 2. usage检查（唯一入口）=====
-    let usageData;
-
-    try {
-      usageData = await getUsageData();
-    } catch (e) {
-      console.warn("⚠️ usage获取失败，使用兜底");
-
-      usageData = {
-        allowed: true,
-        isPro: false,
-        remaining: 0
-      };
-    }
-
+    // ===== 2. 身份优先判断（关键修复）=====
     const user = getUser();
 
-    // 🔥 统一身份（关键修复）
+    // 🔥 统一身份（最优先）
     const isProUser = isPro() || isExecutive();
     const hasCredits = user?.credits > 0;
+
+    let usageData = {
+      allowed: true,
+      isPro: false,
+      remaining: 0
+};
+
+    // 👉 ❗ 只有普通用户才请求 usage
+    if (!isProUser && !hasCredits) {
+      try {
+        usageData = await getUsageData();
+      } catch (e) {
+        console.warn("⚠️ usage获取失败，使用兜底");
+      }
+}
 
     // 🔍 调试日志
     console.log("usageData:", usageData);
