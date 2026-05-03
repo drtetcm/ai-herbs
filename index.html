@@ -451,6 +451,19 @@ async function getUsageData() {
 
 async function updateButtonUI() {
 
+  // ===== 🔥 最高优先级：Executive =====
+  if (isExecutive()) {
+    btn.innerHTML = "🚀 无限识别中";
+    btn.disabled = false;
+
+    const info = document.getElementById("usageInfo");
+    if (info) {
+      info.innerHTML = "✅ Executive会员（无限识别）";
+  }
+
+  return; // ❗必须中断后面逻辑
+  }
+
   if (updatingUI) return;
   updatingUI = true;
 
@@ -496,6 +509,16 @@ async function updateButtonUI() {
 }
 
 async function updateUsageUI() {
+
+  // ===== Executive用户 =====
+  if (isExecutive()) {
+    const usageEl = document.getElementById("usageInfo");
+    if (usageEl) {
+      usageEl.innerHTML = "🚀 Executive会员：无限识别";
+    }
+  return;
+  }
+
   const el = document.getElementById("usageText");
   if (!el) return;
 
