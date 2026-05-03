@@ -448,16 +448,16 @@ async function updateButtonUI() {
     if (!btn) return;
 
     const data = await getUsageData();
-    const user = getUser(); // ✅ 读取次数包
+    const user = getUser();
 
-    // ✅ 1️⃣ Pro / Exec（最高优先级）
+    // ✅ 1️⃣ Pro / Executive（最高优先级）
     if (data?.isPro) {
       btn.innerText = "🚀 无限识别中";
       btn.disabled = false;
       return;
     }
 
-    // ✅ 2️⃣ 次数包（关键补充）
+    // ✅ 2️⃣ 次数包
     if (user?.credits > 0) {
       btn.innerText = `⚡ 使用次数包（剩余 ${user.credits} 次）`;
       btn.disabled = false;
