@@ -836,19 +836,28 @@ function showUpgradeModal() {
           method: "POST"
         });
 
-        const data = await res.json();
+    // 👉 先用 text（防止 JSON 解析报错）
+    const text = await res.text();
 
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          alert("支付创建失败");
-        }
-
-      } catch (e) {
-        console.error(e);
-        alert("支付异常");
-      }
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.warn("返回不是JSON，可能已跳转");
+      return;
     }
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("支付创建失败");
+    }
+
+  } catch (e) {
+    console.error(e);
+    alert("支付异常");
+  }
+}
 
     function payStripeMonthly() {
       alert("Stripe 月（下一步接入）");
