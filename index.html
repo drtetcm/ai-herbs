@@ -780,10 +780,40 @@ console.log("🚀 开始识别流程");
   });
 
   if (usageRes.ok) {
-    usageData = await usageRes.json();
-  } else {
-    console.warn("⚠️ usage接口异常");
+  try {
+    const raw = await usageRes.json();
+
+    // ✅ 强制兜底（关键修复）
+    usageData = {
+      allowed: raw?.allowed ?? true,
+      isPro: raw?.isPro ?? false,
+      remaining:
+        typeof raw?.remaining === "number"
+          ? raw.remaining
+          : 0
+    };
+
+  } catch (e) {
+    console.warn("⚠️ usage JSON解析失败");
+
+    // ✅ JSON异常兜底
+    usageData = {
+      allowed: true,
+      isPro: false,
+      remaining: 0
+    };
   }
+
+} else {
+  console.warn("⚠️ usage接口异常 status:", usageRes.status);
+
+  // ✅ HTTP异常兜底
+  usageData = {
+    allowed: true,
+    isPro: false,
+    remaining: 0
+  };
+}
 
 } catch (e) {
   console.warn("⚠️ usage接口失败，使用前端逻辑");
@@ -792,7 +822,14 @@ console.log("🚀 开始识别流程");
   // ✅ 防止API异常 + 正确拦截
   const user = getUser();
 
-  if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
+// 🔥 调试日志（必须放这里）
+console.log("usageData:", usageData);
+console.log("user:", user);
+console.log("是否拦截:",
+  !usageData.allowed && !usageData.isPro && !(user?.credits > 0)
+);
+
+if (!usageData.allowed && !usageData.isPro && !(user?.credits > 0)) {
     showUpgradeModal();
     isProcessing = false;
     return;
@@ -806,7 +843,6 @@ console.log("🚀 开始识别流程");
       usage = { date: today, count: 0 };
     }
 
-    const user = getUser();
     const isProUser = isPro();
 
     if (!isProUser && usageData.allowed !== false) {
