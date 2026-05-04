@@ -523,62 +523,32 @@ async function getUsageData() {
   }
 }
 
-async function updateButtonUI() {
+function updateButtonUI() {
+  const user = window.currentUser;
 
-  // ===== 🔥 最高优先级：Executive =====
-  if (user?.isPro) {
-    btn.innerHTML = "🚀 无限识别中";
-    btn.disabled = false;
+  if (!user) return;
 
-    const info = document.getElementById("usageInfo");
-    if (info) {
-      info.innerHTML = "✅ Executive会员（无限识别）";
+  const btn =
+    document.getElementById("submit-btn") ||
+    document.getElementById("btn");
+
+  if (!btn) {
+    console.warn("⚠️ 找不到按钮");
+    return;
   }
 
-  return; // ❗必须中断后面逻辑
+  if (!user.allowed) {
+    btn.disabled = true;
+    btn.innerText = "⚠️ 次数已用完";
+    return;
   }
 
-  if (updatingUI) return;
-  updatingUI = true;
+  btn.disabled = false;
 
-  try {
-    const btn = document.getElementById("btn");
-    if (!btn) return;
-
-    const data = await getUsageData();
-    const user = getUser();
-
-    // 🔥 关键：加入前端 Executive 判断
-    const isProUser = isPro() || user?.isPro() || data?.isPro;
-
-    // ✅ 1️⃣ Pro / Executive（最高优先级）
-    if (isProUser) {
-      btn.innerText = "🚀 无限识别中";
-      btn.disabled = false;
-      return;
-    }
-
-    // ✅ 2️⃣ 次数包
-    if (user?.credits > 0) {
-      btn.innerText = `⚡ 使用次数包（剩余 ${user?.credits ?? 0} 次）`;
-      btn.disabled = false;
-      return;
-    }
-
-    // ✅ 3️⃣ 免费次数
-    let r = Number(data?.remaining);
-    if (isNaN(r) || r < 0) r = 0;
-
-    if (r === 0) {
-      btn.innerText = "⚠️ 今日已用完";
-      btn.disabled = true;
-    } else {
-      btn.innerText = `🚀 免费识别（剩余 ${r} 次）`;
-      btn.disabled = false;
-    }
-
-  } finally {
-    updatingUI = false;
+  if (user.isPro) {
+    btn.innerText = "🚀 无限识别中";
+  } else {
+    btn.innerText = "开始识别";
   }
 }
 
