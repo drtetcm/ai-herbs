@@ -404,18 +404,12 @@ async function fetchUser() {
       return;
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5秒超时
-
-    const res = await fetch("/api/user", {
+    const res = await fetch("https://ai-herbs.vercel.app/api/user", {
       headers: {
         Authorization: "Bearer " + token
       },
-      cache: "no-store",
-      signal: controller.signal
+      cache: "no-store"
     });
-
-    clearTimeout(timeout);
 
     const data = await res.json();
 
