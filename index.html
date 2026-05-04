@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>DRTE HerbAI™</title>
+
 <link rel="icon" type="image/png" href="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png" />
 
 <style>
@@ -12,22 +14,12 @@ body {
   margin: 0;
   background: #f5f6f8;
 }
-
 .container {
   max-width: 720px;
   margin: auto;
   padding: 16px;
   text-align: center;
 }
-
-.card {
-  background: #fff;
-  padding: 16px;
-  border-radius: 12px;
-  margin-top: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-
 button {
   width: 100%;
   padding: 12px;
@@ -36,776 +28,185 @@ button {
   border-radius: 10px;
   background: #007bff;
   color: #fff;
-  cursor: pointer;
 }
-
-button:disabled {
-  background: #aaa;
-}
-
-img {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.progress {
-  height: 8px;
-  background: #eee;
-  border-radius: 4px;
-}
-
-.bar {
-  height: 100%;
-}
-
-.loading {
-  text-align: center;
-  padding: 20px;
-}
-
-.loading-box {
-  text-align: center;
-  padding: 30px 10px;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #eee;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  margin: 0 auto 12px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.loading-progress {
-  height: 6px;
-  background: #eee;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.loading-bar {
-  height: 100%;
-  width: 0%;
-  background: #007bff;
-  transition: width 0.3s;
-}
-
-/* ===== 高级 Loading UI ===== */
-
-.loading-box {
-  text-align: center;
-  padding: 30px 10px;
-}
-
-.spinner {
-  width: 42px;
-  height: 42px;
-  border: 4px solid #eee;
-  border-top: 4px solid #007bff;
-  border-radius: 50%;
-  margin: 0 auto 15px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-title {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.loading-sub {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 15px;
-}
-
-.loading-progress {
-  height: 6px;
-  background: #eee;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 15px;
-}
-
-.loading-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #007bff, #00c6ff);
-  transition: width 0.4s ease;
-}
-
-/* 步骤列表 */
-.loading-steps {
-  text-align: left;
-  font-size: 13px;
-  color: #555;
-  max-width: 260px;
-  margin: 0 auto;
-}
-
-.loading-step {
-  margin: 6px 0;
-  opacity: 0.4;
-  transition: all 0.3s;
-}
-
-.loading-step.active {
-  opacity: 1;
-}
-
-.loading-step.done {
-  color: #22c55e;
-  opacity: 1;
-}
-
-input[type="file"] {
-  display: block;
-  margin: 10px auto 20px;
-  text-align: center;
-}
-
-.footer {
-  text-align: center;
-  font-size: 12px;
-  color: #888;
-  padding: 20px 10px;
-}
-
-/* ===== SaaS Footer ===== */
-
+button:disabled { background: #aaa; }
+img { max-width: 400px; border-radius: 10px; }
 .footer {
   background: #0f172a;
   color: #cbd5f5;
   margin-top: 40px;
   padding: 30px 15px;
-}
-
-.footer-inner {
-  max-width: 720px;
-  margin: auto;
   text-align: center;
 }
-
-/* 品牌区 */
-.footer-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.footer-logo {
-  width: 28px;
-  height: 28px;
-}
-
-.footer-title {
-  font-weight: 600;
-  color: #fff;
-}
-
-.footer-desc {
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-/* 链接 */
-.footer-links {
-  margin: 15px 0;
-}
-
-.footer-links a {
-  color: #94a3b8;
-  text-decoration: none;
-  margin: 0 10px;
-  font-size: 13px;
-}
-
-.footer-links a:hover {
-  color: #fff;
-}
-
-/* 分割线 */
-.footer-divider {
-  height: 1px;
-  background: #1e293b;
-  margin: 15px 0;
-}
-
-/* 底部 */
-.footer-bottom {
-  font-size: 12px;
-  color: #64748b;
-  line-height: 1.6;
-}
-
 </style>
 </head>
 
 <body>
 
 <div class="container">
-  <h1><img 
-    src="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png"
-    style="width:32px;height:32px;vertical-align:middle;margin-right:8px;"> DRTE HerbAI™</h1>
+  <h1>DRTE HerbAI™</h1>
   <h2>📸 AI 中药智能识别系统</h2>
 
   <input type="file" id="file" accept="image/*" />
   <br><br>
 
   <button id="btn">开始识别</button>
+  <div id="usageText"></div>
 
   <div id="preview"></div>
   <div id="result"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-
-<!-- PDF库（必须在这里） -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
 //////////////////////////////////////////////////
-// 🔒 收费系统
+// ✅ 单一用户状态源（唯一真相）
 //////////////////////////////////////////////////
 
-function getUser() {
-  return {
-    usage: JSON.parse(localStorage.getItem("usage") || "{}"),
-    pdfPaid: localStorage.getItem("pdf_paid") === "true",
-    execExpire: Number(localStorage.getItem("exec_expire") || 0),
-    proExpire: Number(localStorage.getItem("pro_expire") || 0),
-  };
-}
+const UserStore = {
+  state: {
+    isPro: false,
+    remaining: 0,
+    allowed: true,
+    credits: 0
+  },
 
-function isPro() {
-  return Date.now() < getUser().proExpire;
-}
-
-function isExecutive() {
-  return Date.now() < getUser().execExpire;
-}
-
-function canDownloadPDF() {
-  return isPro() || isExecutive() || getUser().pdfPaid;
-}
-
-function checkUsage() {
-  const today = new Date().toDateString();
-  let usage = JSON.parse(localStorage.getItem("usage") || "{}");
-
-  if (usage.date !== today) {
-    usage = { date: today, count: 0 };
-  }
-
-  if (usage.count >= 30 && !isExecutive() && !isPro()) {
-    alert("今日免费次数已用完");
-    return false;
-  }
-
-  usage.count++;
-  localStorage.setItem("usage", JSON.stringify(usage));
-  return true;
-}
-
-//////////////////////////////////////////////////
-// 📸 主逻辑
-//////////////////////////////////////////////////
-
-const fileInput = document.getElementById("file");
-const preview = document.getElementById("preview");
-const resultDiv = document.getElementById("result");
-const btn = document.getElementById("btn");
-
-let currentFile = null;
-
-fileInput.onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  currentFile = file;
-  preview.innerHTML = `<img src="${URL.createObjectURL(file)}" />`;
-};
-
-btn.onclick = async () => {
-
-  if (!checkUsage()) return;
-
-  if (!currentFile) {
-    alert("请选择图片");
-    return;
-  }
-
-  btn.disabled = true;
-  startLoadingAnimation();
-  resultDiv.innerHTML = `
-  <div class="loading-box">
-    <div class="spinner"></div>
-     <div class="loading-title">AI 正在识别中</div>
-     <div class="loading-sub" id="loadingText">准备中...</div>
-    
-     <div class="loading-progress">
-      <div class="loading-bar" id="loadingBar"></div>
-    </div>
-
-    <div class="loading-steps">
-      <div class="loading-step" id="s1">📷 上传图片</div>
-      <div class="loading-step" id="s2">🧠 AI识别</div>
-      <div class="loading-step" id="s3">🔍 特征分析</div>
-      <div class="loading-step" id="s4">📊 质量评估</div>
-      <div class="loading-step" id="s5">📄 生成报告</div>
-    </div>
-
-  </div>
-  `;
-
-  try {
-    const base64 = await compress(currentFile);
-
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        imageBase64: base64.split(",")[1],
-        mediaType: "image/jpeg"
-      })
-    });
-
-    const text = await res.text();
-    console.log("API返回:", text);
-    
-    let data;
+  async init() {
     try {
-      data = JSON.parse(text);
+      const res = await fetch("/api/user");
+      const data = await res.json();
+
+      this.state = {
+        isPro: data?.isPro ?? false,
+        remaining: data?.remaining ?? 0,
+        allowed: data?.allowed ?? true,
+        credits: data?.credits ?? 0
+      };
     } catch {
-    throw new Error("API返回不是JSON");
-  }
-
-    if (!data.success) throw new Error(data.error);
-
-    stopLoadingAnimation();
-    render(data.data);
-
-  } catch (err) {
-    stopLoadingAnimation();
-    resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
-  } finally {
-    btn.disabled = false;
-  }
-};
-
-//////////////////////////////////////////////////
-// 📦 图片压缩
-//////////////////////////////////////////////////
-
-function compress(file) {
-  return new Promise((resolve, reject) => {
-
-    const img = new Image();
-    const reader = new FileReader();
-
-    reader.onload = e => {
-      img.src = e.target.result;
-    };
-
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-
-      const scale = Math.min(1, 800 / img.width);
-
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      resolve(canvas.toDataURL("image/jpeg", 0.7));
-    };
-
-    img.onerror = () => {
-      reject(new Error("图片格式不支持（建议用JPG）"));
-    };
-
-    reader.onerror = () => {
-      reject(new Error("读取图片失败"));
-    };
-
-    reader.readAsDataURL(file);
-  });
-}
-
-//////////////////////////////////////////////////
-// 📄 PDF（唯一正确版本）
-//////////////////////////////////////////////////
-
-async function generatePDF() {
-
-  const report = document.getElementById("report");
-
-  if (!report) {
-    alert("报告不存在");
-    return;
-  }
-
-  try {
-
-    // ===== 1️⃣ 用 html2canvas 转成图片 =====
-    const canvas = await html2canvas(report, {
-      scale: 2,
-      useCORS: true,
-      scrollY: -(window.scrollY || 0)
-    });
-
-    const imgData = canvas.toDataURL("image/jpeg", 0.95);
-
-    // ===== 2️⃣ 创建PDF =====
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    const pageWidth = 210;
-    const pageHeight = 297;
-
-    // 图片尺寸换算
-    const imgWidth = pageWidth;
-    const imgHeight = canvas.height * pageWidth / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    // ===== 3️⃣ 第一页 =====
-    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    // ===== 4️⃣ 自动分页 =====
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      this.state = { isPro: false, remaining: 0, allowed: true, credits: 0 };
     }
 
-    // ===== 5️⃣ 下载 =====
-    pdf.save("DRTE-中药检测报告.pdf");
-
-  } catch (err) {
-    console.error("PDF失败:", err);
-    alert("PDF生成失败");
+    UI.render(this.state);
   }
-} 
-
-function downloadPDF() {
-
-  if (!window.latestData) {
-    alert("请先识别");
-    return;
-  }
-
-  // 👉 直接调用生成
-  generatePDF();
-}
+};
 
 //////////////////////////////////////////////////
-// 🎨 UI
+// ✅ UI 层（只负责显示）
 //////////////////////////////////////////////////
 
-function render(d) {
+const UI = {
+  usageEl: null,
+  btn: null,
+  preview: null,
+  result: null,
 
-  window.latestData = d;
+  init() {
+    this.usageEl = document.getElementById("usageText");
+    this.btn = document.getElementById("btn");
+    this.preview = document.getElementById("preview");
+    this.result = document.getElementById("result");
+  },
 
-  const score = d.quality?.score || 0;
+  render(user) {
+    if (this.usageEl) {
+      this.usageEl.innerText = user.isPro
+        ? "👑 Pro会员（无限使用）"
+        : `⚡ 剩余 ${user.remaining} 次`;
+    }
 
-  const color =
-    score > 80 ? "#22c55e" :
-    score > 60 ? "#f59e0b" :
-    "#ef4444";
+    if (this.btn) {
+      this.btn.disabled = !user.allowed && !user.isPro;
+      this.btn.innerText = user.isPro ? "🚀 无限识别" : "开始识别";
+    }
+  }
+};
 
-  const level =
-    score > 80 ? "优质" :
-    score > 60 ? "合格" :
-    "风险";
+//////////////////////////////////////////////////
+// ✅ 业务逻辑（唯一入口）
+//////////////////////////////////////////////////
 
-  resultDiv.innerHTML = `
-    <div id="report" class="card" style="background:#fff;">
- 
-        <p style="margin:4px 0;font-size:12px;color:#666;">
-          报告编号：DRTE-${Date.now()}
-        </p>
-        
-        <p style="margin:0;font-size:12px;color:#666;">
-          检测日期：${new Date().toLocaleDateString()}
-        </p>
+const App = {
+  file: null,
+  processing: false,
 
-        <!-- 基本信息 -->
-        <div style="margin-bottom:16px;">
-        <h3>📌 药材名称：${d.name}</h3>
-        <p>置信度：<b>${(d.confidence * 100).toFixed(1)}%</b></p>
-        </div>
+  init() {
+    UI.init();
 
-        <!-- 评分模块 -->
-        <div style="margin-bottom:16px;">
-        <p>质量评分：<b>${score}</b>（${level}）</p>
+    const fileInput = document.getElementById("file");
+    const btn = document.getElementById("btn");
 
-        <div class="progress">
-          <div class="bar" style="width:${score}%;background:${color}"></div>
-        </div>
+    if (fileInput) {
+      fileInput.addEventListener("change", (e) => {
+        this.file = e.target.files[0];
+        if (this.file && UI.preview) {
+          UI.preview.innerHTML =
+            `<img src="${URL.createObjectURL(this.file)}">`;
+        }
+      });
+    }
 
-        <!-- 状态标签 -->
-        <div style="
-        padding:10px;
-        border-radius:8px;
-        background:${d.quality?.is_normal ? "#e6ffed" : "#ffe6e6"};
-        margin-bottom:16px;
-        ">
-        
-        <b style="
-          color:${d.quality?.is_normal ? "green" : "red"};
-          font-size:16px;
-        ">
-          ${d.quality?.is_normal ? "✔ 正常药材" : "⚠ 存在风险"}
-        </b>
-      </div>
+    if (btn) {
+      btn.addEventListener("click", () => this.handleClick());
+    }
 
-      <!-- 特征分析 -->
-      <div style="margin-bottom:16px;">
-        <h3>🔍 特征分析</h3>
-        <ul>
-          <li>形状：${d.features?.shape || "-"}</li>
-          <li>颜色：${d.features?.color || "-"}</li>
-          <li>质地：${d.features?.texture || "-"}</li>
-          <li>大小：${d.features?.size || "-"}</li>
-        </ul>
-      </div>
+    UserStore.init();
+  },
 
-      <!-- 问题列表 -->
-      ${
-        (d.quality?.problems || []).length > 0
-        ? `
-        <div style="margin-bottom:16px;">
-          <h3>⚠ 发现问题</h3>
-          <ul>
-            ${d.quality.problems.map(p => `<li>${p}</li>`).join("")}
-          </ul>
-        </div>
-        `
-        : ""
+  async handleClick() {
+    if (this.processing) return;
+    this.processing = true;
+
+    try {
+      if (!this.file) {
+        alert("请选择图片");
+        return;
       }
 
-      <!-- 专业说明 -->
-      <div style="margin-bottom:16px;">
-        <h3>📄 AI分析说明</h3>
-        <p style="line-height:1.6;">
-          ${d.quality?.reason || "暂无详细说明"}
-        </p>
-      </div>
+      const user = UserStore.state;
 
-      <!-- 建议（商业关键） -->
-      <div style="
-        padding:12px;
-        border-radius:8px;
-        background:#f0f9ff;
-        margin-bottom:16px;
-      ">
-        <h3>💡 使用建议</h3>
-        <p>
-          ${
-            d.quality?.is_normal
-            ? "该药材外观符合常规标准，可正常使用。"
-            : "建议谨慎使用，可能存在质量问题，必要时咨询专业人士。"
-          }
-        </p>
-      </div>
+      if (!user.allowed && !user.isPro && user.credits <= 0) {
+        alert("次数已用完");
+        return;
+      }
 
-      <h2>📋 中药材检测报告</h2>
+      UI.btn.disabled = true;
 
-    
-      <!-- 操作按钮 -->
-      <button onclick="downloadPDF()" style="margin-bottom:10px;">
-        📄 下载PDF报告
-      </button>
+      const form = new FormData();
+      form.append("file", this.file);
 
-      <button onclick="location.reload()" style="background:#6b7280;">
-        🔄 重新识别
-      </button>
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        body: form
+      });
 
-      <!-- 免责声明 -->
-      <div style="margin-top:15px;font-size:12px;color:#888;">
-        ⚠ 本报告由AI生成，仅供参考，不作为医疗依据
-      </div>
+      const data = await res.json();
 
-    </div>
-  `;
-}
+      if (UI.result) {
+        UI.result.innerText = JSON.stringify(data, null, 2);
+      }
 
-//////////////////////////////////////////////////
-// 🚀 高级 Loading 动画
-//////////////////////////////////////////////////
+      await UserStore.init();
 
-let loadingTimer = null;
-
-function startLoadingAnimation() {
-
-  const bar = document.getElementById("loadingBar");
-  const text = document.getElementById("loadingText");
-
-  const steps = [
-    { id: "s1", text: "图片上传中..." },
-    { id: "s2", text: "AI识别中..." },
-    { id: "s3", text: "分析特征..." },
-    { id: "s4", text: "评估质量..." },
-    { id: "s5", text: "生成报告..." }
-  ];
-
-  let progress = 0;
-  let currentStep = 0;
-
-  function activateStep(index) {
-    const el = document.getElementById(steps[index].id);
-    if (el) el.classList.add("active");
-  }
-
-  function completeStep(index) {
-    const el = document.getElementById(steps[index].id);
-    if (el) {
-      el.classList.remove("active");
-      el.classList.add("done");
-      el.innerText = "✔ " + el.innerText;
+    } catch (e) {
+      console.error(e);
+      alert("识别失败");
+    } finally {
+      this.processing = false;
+      UI.render(UserStore.state);
     }
   }
+};
 
-  loadingTimer = setInterval(() => {
+//////////////////////////////////////////////////
+// ✅ 启动（唯一入口）
+//////////////////////////////////////////////////
 
-    // 👉 进度增长（前快后慢）
-    if (progress < 90) {
-      progress += (100 - progress) * 0.08;
-      bar.style.width = progress + "%";
-    }
-
-    // 👉 步骤推进
-    if (currentStep < steps.length) {
-
-      activateStep(currentStep);
-      text.innerText = steps[currentStep].text;
-
-      setTimeout(() => {
-        completeStep(currentStep);
-      }, 500);
-
-      currentStep++;
-    }
-
-  }, 900);
-}
-
-function stopLoadingAnimation() {
-  clearInterval(loadingTimer);
-
-  const bar = document.getElementById("loadingBar");
-  if (bar) bar.style.width = "100%";
-
-  // 👉 平滑结束（关键高级感）
-  setTimeout(() => {
-    const box = document.querySelector(".loading-box");
-    if (box) {
-      box.style.transition = "opacity 0.4s";
-      box.style.opacity = "0";
-    }
-  }, 300);
-}
-
+document.addEventListener("DOMContentLoaded", () => {
+  App.init();
+});
 </script>
 
-<div id="pdfReport" style="
-  position: fixed;
-  left: -9999px;
-  top: 0;
-  width: 210mm;
-  background: #fff;
-  padding: 40px;
-  font-family: Arial;
-">
-
-  <h1 style="text-align:center;">中药材检测报告</h1>
-  <hr />
-
-  <h2 id="pdf-name"></h2>
-
-  <p><b>置信度：</b><span id="pdf-confidence"></span></p>
-  <p><b>质量评分：</b><span id="pdf-score"></span></p>
-
-  <h3>特征分析</h3>
-  <ul>
-    <li id="pdf-shape"></li>
-    <li id="pdf-color"></li>
-    <li id="pdf-texture"></li>
-    <li id="pdf-size"></li>
-  </ul>
-
-  <h3>质量评估</h3>
-  <p id="pdf-normal"></p>
-  <p id="pdf-problems"></p>
-
-  <h3>详细说明</h3>
-  <p id="pdf-reason"></p>
-
-  <hr />
-  <p style="text-align:center; font-size:12px; color:#999;">
-    DRTE AI 中药智能识别系统
-  </p>
-
-</div>
-
 <footer class="footer">
-  <div class="footer-inner">
-
-    <div class="footer-brand">
-      <img 
-        src="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png"
-        class="footer-logo"
-      >
-      <div>
-        <div class="footer-title">DRTE HerbAI™</div>
-        <div class="footer-desc">AI 中药智能识别系统</div>
-      </div>
-    </div>
-
-    <div class="footer-links">
-      <a href="#">关于我们</a>
-      <a href="#">隐私政策</a>
-      <a href="#">使用条款</a>
-      <a href="#">联系我们</a>
-    </div>
-
-    <div class="footer-divider"></div>
-
-    <div class="footer-bottom">
-      © 2026 DRTE HerbAI™ · All Rights Reserved · Powered by AI Recognition Technology 
-      <br>
-      ⚠ 本系统基于 AI 分析，仅供参考，不作为医疗依据
-    </div>
-
-  </div>
+  DRTE HerbAI™ · AI 中药识别
 </footer>
 
 </body>
