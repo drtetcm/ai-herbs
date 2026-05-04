@@ -326,10 +326,6 @@ input[type="file"] {
   <button id="btn">开始识别</button>
   <div id="usage-box" style="margin-top:10px;font-size:13px;color:#666;"></div>
 
-  <div id="usage-box" style="margin-top:10px;font-size:13px;color:#666;">
-  🆓 今日免费：2 次（立即体验）
-  </div>
-
   <div id="preview"></div>
   <div id="result"></div>
 </div>
@@ -553,7 +549,7 @@ function updateButtonUI() {
   }
 }
 
-function updateUsageUI() {
+async function updateUsageUI() {
   const user = window.currentUser;
 
   if (!user) {
@@ -561,23 +557,29 @@ function updateUsageUI() {
     return;
   }
 
-  const el = document.getElementById("usage-box") || document.getElementById("usage-box");
+  const el = document.getElementById("usage-box");
 
   if (!el) {
-    console.warn("⚠️ 找不到 usageText / usage-box");
+    console.warn("⚠️ 找不到 usage-box");
     return;
   }
 
-if (user?.isPro) {
-  const days = user.days ?? 0;
-  el.innerHTML = `
-    <div style="padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;">
-      👑 <b>Pro会员</b>（剩余 ${plan.days} 天）｜无限使用
-    </div>
-  `;
-  return;
-}
+  // ✅ 修复1：补 plan
+  const plan = getUserPlan();
 
+  // ===== Pro =====
+  if (user?.isPro) {
+    const days = plan.days ?? 0;
+
+    el.innerHTML = `
+      <div style="padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;">
+        👑 <b>Pro会员</b>（剩余 ${days} 天）｜无限使用
+      </div>
+    `;
+    return;
+  }
+
+  // ===== Executive =====
   if (plan.type === "exec") {
     el.innerHTML = `
       <div style="padding:10px;border-radius:10px;background:#eff6ff;color:#1d4ed8;">
@@ -587,63 +589,59 @@ if (user?.isPro) {
     return;
   }
 
+  // ===== 普通用户 =====
+  const credits = user?.credits ?? 0;
+
+  let data;
+  try {
+    data = await getUsageData();
+  } catch {
+    data = { remaining: 0 };
+  }
+
+  let freeLeft = Number(data?.remaining);
+  if (isNaN(freeLeft) || freeLeft < 0) freeLeft = 0;
+
+  const isLow = freeLeft === 0 && credits === 0;
+
+  const color = isLow ? "#fef2f2" : "#f9fafb";
+  const textColor = isLow ? "#dc2626" : "#374151";
+
   el.innerHTML = `
-    🆓 今日免费：${user.remaining ?? 0} 次
+    <div style="padding:10px;border-radius:10px;background:${color};color:${textColor};">
+      
+      🆓 今日免费：<b>${freeLeft}</b> 次
+      &nbsp;｜&nbsp;
+      ⚡ 次数包：<b>${credits}</b> 次
+
+      ${isLow ? `
+        <br/>
+        <span style="font-size:12px;">⚠️ 免费次数已用完</span>
+
+        <br/>
+        <button onclick="showUpgradeModal()" style="
+          margin-top:8px;
+          padding:12px;
+          border:none;
+          border-radius:10px;
+          background:linear-gradient(135deg,#2563eb,#1d4ed8);
+          color:#fff;
+          font-size:15px;
+          font-weight:600;
+          width:100%;
+          box-shadow:0 4px 12px rgba(0,0,0,0.15);
+        ">
+          🚀 立即解锁无限识别
+          <br/>
+          <span style="font-size:12px;opacity:0.9;">
+            ⚠️ 今日已用完 · 推荐7天体验
+          </span>
+        </button>
+      ` : ''}
+
+    </div>
   `;
-  }  
-const credits = user?.credits ?? 0;
-
-const data = await getUsageData();
-
-let freeLeft = Number(data?.remaining);
-if (isNaN(freeLeft) || freeLeft < 0) freeLeft = 0;
-
-// 🔥 新增：判断是否用完
-const isLow = freeLeft === 0 && credits === 0;
-
-// 🔥 新增：动态颜色
-const color = isLow ? "#fef2f2" : "#f9fafb";
-const textColor = isLow ? "#dc2626" : "#374151";
-
-// 🔥 替换 UI
-el.innerHTML = `
-  <div style="padding:10px;border-radius:10px;background:${color};color:${textColor};">
-    
-    🆓 今日免费：<b>${freeLeft}</b> 次
-    &nbsp;｜&nbsp;
-    ⚡ 次数包：<b>${credits}</b> 次
-
-    ${isLow ? `
-      <br/>
-      <span style="font-size:12px;">⚠️ 免费次数已用完</span>
-
-      <br/>
-      <button onclick="showUpgradeModal()" style="
-  margin-top:8px;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg,#2563eb,#1d4ed8);
-  color:#fff;
-  font-size:15px;
-  font-weight:600;
-  width:100%;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
-">
-
-  🚀 立即解锁无限识别
-
-  <br/>
-
-  <span style="font-size:12px;opacity:0.9;">
-    ⚠️ 今日已用完 · 推荐7天体验
-  </span>
-
-</button>
-    ` : ''}
-
-  </div>
-`;
+}
 
 
 async function loadStats() {
