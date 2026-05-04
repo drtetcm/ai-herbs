@@ -651,30 +651,16 @@ async function loadStats() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  console.log("🚀 init");
 
-  await fetchUser();
+  try {
+    await fetchUser();
+  } catch {}
+
   updateUsageUI();
   updateButtonUI();
 
-setInterval(fetchUser, 5000);
-  loadStats();
-
-  // ✅ 统一获取 DOM（关键）
-  const fileInput = document.getElementById("file");
-  const preview = document.getElementById("preview");
-  const resultDiv = document.getElementById("result");
-  const btn = document.getElementById("btn");
-
-  // 👉 防止DOM异常
-  if (!btn || !fileInput || !preview || !resultDiv) {
-    console.error("❌ DOM元素缺失");
-    return;
-  }
-
-  // ===== 原有逻辑（保留）=====
-  const plan = getUserPlan();
-  const user = getUser();
-
+  setInterval(fetchUser, 5000);
 });
 
 function checkUsage() {
