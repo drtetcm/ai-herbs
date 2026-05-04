@@ -28,8 +28,13 @@ export default async function handler(req, res) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
-    console.log("✅ 支付成功:", session.customer_email);
-  }
+    const email =
+      session.customer_details?.email ||
+      session.customer_email ||
+      "unknown";
+
+    console.log("📦 session:", session);
+    console.log("✅ 支付成功:", email);
 
   res.status(200).json({ received: true });
 }
