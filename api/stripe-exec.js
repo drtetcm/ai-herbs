@@ -1,4 +1,5 @@
 import { verifyToken } from "../lib/auth"
+import Stripe from "stripe"
 
 function getUserEmail(req) {
   const auth = req.headers.authorization
@@ -16,22 +17,28 @@ function getUserEmail(req) {
   }
 }
 
-import Stripe from "stripe";
-
 export default async function handler(req, res) {
   try {
+    // ✅ 1. 获取用户 email（关键）
+    const email = getUserEmail(req)
 
-    // ✅ 初始化 Stripe（从环境变量拿）
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    if (!email) {
+      return res.status(401).json({ error: "Not logged in" })
+    }
 
-    // ✅ 创建 Checkout Session
+    // ✅ 2. 初始化 Stripe
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+    // ✅ 3. 创建 Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
 
       mode: "payment",
 
-      customer_email: email, 
+      // ⭐⭐⭐ 核心：绑定用户
+      customer_email: email,
 
+      // ⭐⭐⭐ 兜底（双保险）
       metadata: {
         email: email
       },
@@ -51,18 +58,18 @@ export default async function handler(req, res) {
 
       success_url: "https://ai-herbs.vercel.app/success.html",
       cancel_url: "https://ai-herbs.vercel.app/?cancel=1"
-    });
+    })
 
-    // ✅ 返回支付链接
+    // ✅ 4. 返回支付链接
     res.status(200).json({
       url: session.url
-    });
+    })
 
   } catch (err) {
-    console.error("Stripe error:", err);
+    console.error("❌ Stripe error:", err)
 
     res.status(500).json({
       error: "Stripe 创建失败"
-    });
+    })
   }
 }
