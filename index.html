@@ -58,151 +58,108 @@ img { max-width: 400px; border-radius: 10px; }
 </div>
 
 <script>
+
 //////////////////////////////////////////////////
-// ✅ 单一用户状态源（唯一真相）
+// ✅ 唯一用户状态（核心修复）
 //////////////////////////////////////////////////
 
 const UserStore = {
-  state: {
-    isPro: false,
-    remaining: 0,
-    allowed: true,
-    credits: 0
-  },
+  data: { isPro: false, remaining: 0, allowed: true, credits: 0 },
 
   async init() {
     try {
       const res = await fetch("/api/user");
       const data = await res.json();
 
-      this.state = {
+      this.data = {
         isPro: data?.isPro ?? false,
         remaining: data?.remaining ?? 0,
         allowed: data?.allowed ?? true,
         credits: data?.credits ?? 0
       };
+
     } catch {
-      this.state = { isPro: false, remaining: 0, allowed: true, credits: 0 };
+      this.data = { isPro: false, remaining: 0, allowed: true, credits: 0 };
     }
 
-    UI.render(this.state);
+    updateUI();
   }
 };
 
 //////////////////////////////////////////////////
-// ✅ UI 层（只负责显示）
+// ✅ UI（稳定）
 //////////////////////////////////////////////////
 
-const UI = {
-  usageEl: null,
-  btn: null,
-  preview: null,
-  result: null,
+function updateUI() {
+  const u = UserStore.data;
+  const box = document.getElementById("usageText");
+  const btn = document.getElementById("btn");
 
-  init() {
-    this.usageEl = document.getElementById("usageText");
-    this.btn = document.getElementById("btn");
-    this.preview = document.getElementById("preview");
-    this.result = document.getElementById("result");
-  },
-
-  render(user) {
-    if (this.usageEl) {
-      this.usageEl.innerText = user.isPro
-        ? "👑 Pro会员（无限使用）"
-        : `⚡ 剩余 ${user.remaining} 次`;
-    }
-
-    if (this.btn) {
-      this.btn.disabled = !user.allowed && !user.isPro;
-      this.btn.innerText = user.isPro ? "🚀 无限识别" : "开始识别";
-    }
+  if (box) {
+    box.innerText = u.isPro
+      ? "👑 Pro会员（无限）"
+      : `⚡ 剩余 ${u.remaining} 次`;
   }
-};
 
-//////////////////////////////////////////////////
-// ✅ 业务逻辑（唯一入口）
-//////////////////////////////////////////////////
-
-const App = {
-  file: null,
-  processing: false,
-
-  init() {
-    UI.init();
-
-    const fileInput = document.getElementById("file");
-    const btn = document.getElementById("btn");
-
-    if (fileInput) {
-      fileInput.addEventListener("change", (e) => {
-        this.file = e.target.files[0];
-        if (this.file && UI.preview) {
-          UI.preview.innerHTML =
-            `<img src="${URL.createObjectURL(this.file)}">`;
-        }
-      });
-    }
-
-    if (btn) {
-      btn.addEventListener("click", () => this.handleClick());
-    }
-
-    UserStore.init();
-  },
-
-  async handleClick() {
-    if (this.processing) return;
-    this.processing = true;
-
-    try {
-      if (!this.file) {
-        alert("请选择图片");
-        return;
-      }
-
-      const user = UserStore.state;
-
-      if (!user.allowed && !user.isPro && user.credits <= 0) {
-        alert("次数已用完");
-        return;
-      }
-
-      UI.btn.disabled = true;
-
-      const form = new FormData();
-      form.append("file", this.file);
-
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        body: form
-      });
-
-      const data = await res.json();
-
-      if (UI.result) {
-        UI.result.innerText = JSON.stringify(data, null, 2);
-      }
-
-      await UserStore.init();
-
-    } catch (e) {
-      console.error(e);
-      alert("识别失败");
-    } finally {
-      this.processing = false;
-      UI.render(UserStore.state);
-    }
+  if (btn) {
+    btn.disabled = !u.allowed && !u.isPro;
+    btn.innerText = u.isPro ? "🚀 无限识别" : "开始识别";
   }
-};
+}
 
 //////////////////////////////////////////////////
-// ✅ 启动（唯一入口）
+// ✅ 识别逻辑（修复稳定）
+//////////////////////////////////////////////////
+
+let currentFile = null;
+let isProcessing = false;
+
+document.getElementById("file").addEventListener("change", (e) => {
+  currentFile = e.target.files[0];
+  if (currentFile) {
+    document.getElementById("preview").innerHTML =
+      `<img src="${URL.createObjectURL(currentFile)}">`;
+  }
+});
+
+document.getElementById("btn").addEventListener("click", async () => {
+
+  if (isProcessing) return;
+  isProcessing = true;
+
+  try {
+    if (!currentFile) {
+      alert("请选择图片");
+      return;
+    }
+
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      body: currentFile
+    });
+
+    const data = await res.json();
+
+    document.getElementById("result").innerText =
+      JSON.stringify(data, null, 2);
+
+    await UserStore.init();
+
+  } catch (e) {
+    alert("识别失败");
+  } finally {
+    isProcessing = false;
+  }
+});
+
+//////////////////////////////////////////////////
+// ✅ 初始化
 //////////////////////////////////////////////////
 
 document.addEventListener("DOMContentLoaded", () => {
-  App.init();
+  UserStore.init();
 });
+
 </script>
 
 <footer class="footer">
