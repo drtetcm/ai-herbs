@@ -1,9 +1,6 @@
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const email = req.query.email;
 
-  const users = global.users || {};
-
-  // 默认返回结构（统一！）
   const defaultUser = {
     plan: "free",
     isPro: false,
@@ -11,16 +8,38 @@ export default function handler(req, res) {
     allowed: true
   };
 
-  if (!email || !users[email]) {
+  if (!email) {
     return res.json(defaultUser);
   }
 
-  const user = users[email];
+  try {
+    const KV_REST_API_URL = process.env.KV_REST_API_URL;
+    const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
 
-  return res.json({
-    plan: user.plan,
-    isPro: user.plan === "pro",
-    remaining: user.plan === "pro" ? 9999 : 2,
-    allowed: true
-  });
+    const r = await fetch(`${KV_REST_API_URL}/get/user:${email}`, {
+      headers: {
+        Authorization: `Bearer ${KV_REST_API_TOKEN}`
+      }
+    });
+
+    const json = await r.json();
+    const user = json.result;
+
+    if (!user) {
+      return res.json(defaultUser);
+    }
+
+    const isPro = user.plan === "pro" && Date.now() < user.expires;
+
+    return res.json({
+      plan: user.plan,
+      isPro,
+      remaining: isPro ? 9999 : 2,
+      allowed: true
+    });
+
+  } catch (e) {
+    console.error("user error:", e);
+    return res.json(defaultUser);
+  }
 }
