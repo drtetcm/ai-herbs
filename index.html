@@ -413,6 +413,7 @@ async function getUsageData() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId: getUserId(),
+        email: localStorage.getItem("user_email") || "",
         execExpire: user?.execExpire || 0
       })
     });
@@ -854,7 +855,10 @@ function showUpgradeModal() {
     async function payStripeExec() {
       try {
         const res = await fetch("/api/stripe-exec", {
-          method: "POST"
+          method: "POST",
+          body: JSON.stringify({
+            email: userEmail
+          })
         });
 
     // 👉 先用 text（防止 JSON 解析报错）

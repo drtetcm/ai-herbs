@@ -10,6 +10,19 @@
     marginRight: "auto"
   }}>
 
+    {/* 🔥 会员状态条（新增） */}
+    <div style={{
+      marginBottom: 20,
+      padding: 10,
+      borderRadius: 8,
+      background: user?.isPro ? "#ecfdf5" : "#fef3c7",
+      fontSize: 14
+    }}>
+      {user?.isPro
+        ? "👑 Pro会员：无限识别"
+        : `🆓 免费次数剩余：${user?.remaining ?? 0} 次`}
+    </div>
+
     {/* 标题 */}
     <h2 style={{ marginBottom: 20 }}>📋 中药饮片识别报告</h2>
 
@@ -26,7 +39,9 @@
 
       {/* 评分条 */}
       <div style={{ marginTop: 10 }}>
-        <div style={{ fontSize: 14 }}>质量评分：{result.data.quality?.score || 0}</div>
+        <div style={{ fontSize: 14 }}>
+          质量评分：{result.data.quality?.score || 0}
+        </div>
         <div style={{
           height: 8,
           background: "#eee",
@@ -44,16 +59,47 @@
       </div>
     </div>
 
-    {/* ================= 特征 ================= */}
-    <div style={{ marginBottom: 20 }}>
-      <h3>🔍 特征分析</h3>
-      <ul style={{ lineHeight: 1.8 }}>
-        <li>形状：{result.data.features?.shape || "-"}</li>
-        <li>颜色：{result.data.features?.color || "-"}</li>
-        <li>质地：{result.data.features?.texture || "-"}</li>
-        <li>大小：{result.data.features?.size || "-"}</li>
-      </ul>
-    </div>
+    {/* ================= 🔥 非会员限制（关键） ================= */}
+    {!user?.isPro && (
+      <div style={{
+        padding: 15,
+        borderRadius: 10,
+        background: "#fef2f2",
+        marginBottom: 20,
+        textAlign: "center"
+      }}>
+        <p style={{ marginBottom: 10 }}>
+          🔒 高级分析已锁定
+        </p>
+
+        <button
+          onClick={activatePro}
+          style={{
+            padding: "10px 20px",
+            borderRadius: 8,
+            background: "#2563eb",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer"
+          }}
+        >
+          🚀 升级会员（无限识别）
+        </button>
+      </div>
+    )}
+
+    {/* ================= 特征（会员才显示） ================= */}
+    {user?.isPro && (
+      <div style={{ marginBottom: 20 }}>
+        <h3>🔍 特征分析</h3>
+        <ul style={{ lineHeight: 1.8 }}>
+          <li>形状：{result.data.features?.shape || "-"}</li>
+          <li>颜色：{result.data.features?.color || "-"}</li>
+          <li>质地：{result.data.features?.texture || "-"}</li>
+          <li>大小：{result.data.features?.size || "-"}</li>
+        </ul>
+      </div>
+    )}
 
     {/* ================= 质量 ================= */}
     <div style={{
@@ -86,7 +132,6 @@
         </b>
       </p>
 
-      {/* 问题 */}
       {(result.data.quality?.problems || []).length > 0 && (
         <>
           <p style={{ marginTop: 10 }}>问题：</p>
@@ -100,12 +145,14 @@
     </div>
 
     {/* ================= 说明 ================= */}
-    <details style={{ marginTop: 15 }}>
-      <summary style={{ cursor: "pointer" }}>📄 查看详细说明</summary>
-      <p style={{ marginTop: 10, lineHeight: 1.6 }}>
-        {result.data.quality?.reason || "暂无说明"}
-      </p>
-    </details>
+    {user?.isPro && (
+      <details style={{ marginTop: 15 }}>
+        <summary style={{ cursor: "pointer" }}>📄 查看详细说明</summary>
+        <p style={{ marginTop: 10, lineHeight: 1.6 }}>
+          {result.data.quality?.reason || "暂无说明"}
+        </p>
+      </details>
+    )}
 
   </div>
 )}

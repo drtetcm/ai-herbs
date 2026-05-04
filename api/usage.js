@@ -1,19 +1,16 @@
 function getIP(req) {
-  const xf = req.headers["x-forwarded-for"];
-  if (xf) return xf.split(",")[0].trim();
-
-  const xr = req.headers["x-real-ip"];
-  if (xr) return xr;
-
-  return req.socket?.remoteAddress || "unknown";
+  return (
+    req.headers["x-vercel-forwarded-for"] ||
+    req.headers["x-real-ip"] ||
+    req.socket?.remoteAddress ||
+    "unknown"
+  );
 }
 
 export default async function handler(req, res) {
-
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
   const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
 
-  // ===== ✅ 永不返回 null =====
   const safeReturn = (data = {}) => {
     return res.json({
       allowed: true,
@@ -24,7 +21,7 @@ export default async function handler(req, res) {
       remaining:
         typeof data.remaining === "number"
           ? data.remaining
-          : 0
+          : 0,
     });
   };
 
@@ -33,25 +30,32 @@ export default async function handler(req, res) {
   }
 
   try {
-
-    // ===== ✅ 参数统一 =====
+    // ===== 参数 =====
     const userId =
       req.body?.userId ||
       req.query?.userId ||
       null;
+
+    const emailRaw =
+      req.body?.email ||
+      req.query?.email ||
+      "";
+
+    const email = decodeURIComponent(emailRaw || "")
+      .trim()
+      .toLowerCase();
 
     const execExpireRaw =
       req.body?.execExpire ||
       req.query?.execExpire ||
       0;
 
-    // 🔥 关键：强制转 number（防字符串坑）
     const execExpire = Number(execExpireRaw || 0);
 
     const ip = getIP(req);
 
-    // ===== 用户异常兜底 =====
-    if (!userId || userId.length < 10) {
+    // ===== userId校验（加强）=====
+    if (!userId || !/^[a-zA-Z0-9_-]{8,}$/.test(userId)) {
       return safeReturn({ remaining: 2 });
     }
 
@@ -59,7 +63,7 @@ export default async function handler(req, res) {
     const ipKey = `ip:${ip}`;
 
     const ipRes = await fetch(`${KV_REST_API_URL}/get/${ipKey}`, {
-      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
+      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
     });
 
     const ipJson = await ipRes.json();
@@ -69,45 +73,74 @@ export default async function handler(req, res) {
       return safeReturn({
         allowed: false,
         isPro: false,
-        remaining: 0
+        remaining: 0,
       });
     }
 
     await fetch(`${KV_REST_API_URL}/incr/${ipKey}`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
+      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
     });
 
-    // ===== Key =====
-    const today = new Date().toISOString().slice(0, 10);
-    const usageKey = `usage:${userId}:${today}`;
-    const proKey = `pro:${userId}`;
+    // ===== 🔥 KV会员判断（唯一可信来源）=====
+    let isKvPro = false;
 
-    // ===== KV会员 =====
-    const proRes = await fetch(`${KV_REST_API_URL}/get/${proKey}`, {
-      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
-    });
+    if (email) {
+      try {
+        const userRes = await fetch(
+          `${KV_REST_API_URL}/get/user:${email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+            },
+          }
+        );
 
-    const proJson = await proRes.json();
-    const proExpire = Number(proJson.result || 0);
+        const userJson = await userRes.json();
+        const raw = userJson.result;
 
-    const now = Date.now();
+        if (raw) {
+          let user = null;
 
-    // ===== ✅ 会员判断（最终正确版）=====
-    const isKvPro = now < proExpire;
+          // ✅ 兼容历史数据格式
+          try {
+            user = JSON.parse(raw);
+          } catch {
+            try {
+              user = JSON.parse(JSON.parse(raw));
+            } catch {
+              user = null;
+            }
+          }
 
-    // 🔥 修复点：必须拆开写（避免 false 判定）
+          if (
+            user &&
+            typeof user.expires === "number" &&
+            user.expires > Date.now()
+          ) {
+            isKvPro = true;
+          }
+        }
+      } catch (e) {
+        console.error("❌ KV user读取失败:", e);
+      }
+    }
+
+    // ===== Executive（仅作为补充，不可信）=====
     const isExec =
       execExpire > 0 &&
       Number.isFinite(execExpire) &&
-      now < execExpire;
+      Date.now() < execExpire;
 
-    // 🔥 最终统一
+    // ===== 最终会员状态 =====
     const isPro = Boolean(isKvPro || isExec);
 
     // ===== 使用次数 =====
+    const today = new Date().toISOString().slice(0, 10);
+    const usageKey = `usage:${userId}:${today}`;
+
     const usageRes = await fetch(`${KV_REST_API_URL}/get/${usageKey}`, {
-      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` }
+      headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
     });
 
     const usageJson = await usageRes.json();
@@ -115,19 +148,17 @@ export default async function handler(req, res) {
 
     const FREE_LIMIT = 2;
 
-    // ===== ✅ 核心逻辑（统一）=====
     const allowed = isPro || count < FREE_LIMIT;
 
     const remaining = isPro
       ? 9999
       : Math.max(0, FREE_LIMIT - count);
 
-    // ===== 返回 =====
     return safeReturn({
       allowed,
       count,
       isPro,
-      remaining
+      remaining,
     });
 
   } catch (err) {
