@@ -556,7 +556,7 @@ async function updateButtonUI() {
 
     // ✅ 2️⃣ 次数包
     if (user?.credits > 0) {
-      btn.innerText = `⚡ 使用次数包（剩余 ${user.credits} 次）`;
+      btn.innerText = `⚡ 使用次数包（剩余 ${user?.credits ?? 0} 次）`;
       btn.disabled = false;
       return;
     }
@@ -609,7 +609,7 @@ if (user?.isPro) {
     return;
   }
 
-const credits = user.credits || 0;
+const credits = user?.credits ?? 0;
 
 const data = await getUsageData();
 
@@ -1091,7 +1091,7 @@ btn.onclick = async () => {
 
       if (hasCredits) {
         // 👉 用次数包
-        localStorage.setItem("credits", user.credits - 1);
+        localStorage.setItem("credits", user?.credits ?? 0 - 1);
 
       } else {
         // 👉 免费次数
