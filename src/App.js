@@ -1,158 +1,175 @@
-{result?.success && result?.data && (
-  <div style={{
-    marginTop: 30,
-    padding: isMobile ? 15 : 25,
-    borderRadius: 16,
-    background: "#ffffff",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-    maxWidth: 800,
-    marginLeft: "auto",
-    marginRight: "auto"
-  }}>
+import { useEffect, useState } from "react"
 
-    {/* 🔥 会员状态条（新增） */}
-    <div style={{
-      marginBottom: 20,
-      padding: 10,
-      borderRadius: 8,
-      background: user?.isPro ? "#ecfdf5" : "#fef3c7",
-      fontSize: 14
-    }}>
-      {user?.isPro
-        ? "👑 Pro会员：无限识别"
-        : `🆓 免费次数剩余：${user?.remaining ?? 0} 次`}
-    </div>
+export default function App() {
+  const [user, setUser] = useState(null)
+  const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-    {/* 标题 */}
-    <h2 style={{ marginBottom: 20 }}>📋 中药饮片识别报告</h2>
+  // ✅ 获取用户信息
+  async function loadUser() {
+    const token = localStorage.getItem("token")
 
-    {/* ================= 基本信息 ================= */}
-    <div style={{
-      padding: 15,
-      borderRadius: 10,
-      background: "#f6f8fa",
-      marginBottom: 20
-    }}>
-      <h3>📌 {result.data.name || "未知药材"}</h3>
+    if (!token) {
+      console.log("❌ no token")
+      return
+    }
 
-      <p>置信度：{((result.data.confidence || 0) * 100).toFixed(1)}%</p>
+    try {
+      const res = await fetch("/api/user", {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      })
 
-      {/* 评分条 */}
-      <div style={{ marginTop: 10 }}>
-        <div style={{ fontSize: 14 }}>
-          质量评分：{result.data.quality?.score || 0}
-        </div>
-        <div style={{
-          height: 8,
-          background: "#eee",
-          borderRadius: 4,
-          overflow: "hidden"
-        }}>
-          <div style={{
-            width: `${result.data.quality?.score || 0}%`,
-            height: "100%",
-            background:
-              (result.data.quality?.score || 0) > 80 ? "#22c55e" :
-              (result.data.quality?.score || 0) > 60 ? "#f59e0b" : "#ef4444"
-          }} />
-        </div>
-      </div>
-    </div>
+      const data = await res.json()
+      console.log("👤 user:", data)
 
-    {/* ================= 🔥 非会员限制（关键） ================= */}
-    {!user?.isPro && (
+      setUser(data)
+    } catch (err) {
+      console.error("❌ loadUser error", err)
+    }
+  }
+
+  // ✅ 页面加载
+  useEffect(() => {
+    loadUser()
+
+    // 🔥 自动刷新（支付后生效）
+    const interval = setInterval(loadUser, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // ✅ 上传识别（示例）
+  async function handleUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setLoading(true)
+
+    const formData = new FormData()
+    formData.append("file", file)
+
+    const token = localStorage.getItem("token")
+
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token
+        },
+        body: formData
+      })
+
+      const data = await res.json()
+      setResult(data)
+
+      // 🔥 每次识别后刷新用户（扣次数）
+      loadUser()
+
+    } catch (err) {
+      console.error(err)
+    }
+
+    setLoading(false)
+  }
+
+  // ✅ 升级会员
+  async function activatePro() {
+    const token = localStorage.getItem("token")
+
+    const res = await fetch("/api/stripe-exec", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+
+    const data = await res.json()
+
+    if (data.url) {
+      window.location.href = data.url
+    }
+  }
+
+  return (
+    <div style={{ padding: 20, textAlign: "center" }}>
+      <h1>DRTE HerbAI™</h1>
+      <p>📸 AI 中药智能识别系统</p>
+
+      {/* 上传 */}
+      <input type="file" onChange={handleUpload} />
+
+      {/* 🔥 会员状态 */}
       <div style={{
-        padding: 15,
-        borderRadius: 10,
-        background: "#fef2f2",
-        marginBottom: 20,
-        textAlign: "center"
+        marginTop: 20,
+        padding: 10,
+        borderRadius: 8,
+        background: user?.isPro ? "#ecfdf5" : "#fef3c7"
       }}>
-        <p style={{ marginBottom: 10 }}>
-          🔒 高级分析已锁定
-        </p>
+        {user?.isPro
+          ? "👑 Pro会员：无限识别"
+          : `🆓 剩余次数：${user?.remaining ?? 0}`}
+      </div>
 
-        <button
-          onClick={activatePro}
-          style={{
-            padding: "10px 20px",
+      {/* 加载 */}
+      {loading && <p>分析中...</p>}
+
+      {/* 结果 */}
+      {result?.success && result?.data && (
+        <div style={{
+          marginTop: 30,
+          padding: 25,
+          borderRadius: 16,
+          background: "#fff",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          maxWidth: 800,
+          marginLeft: "auto",
+          marginRight: "auto"
+        }}>
+
+          {/* 状态条 */}
+          <div style={{
+            marginBottom: 20,
+            padding: 10,
             borderRadius: 8,
-            background: "#2563eb",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          🚀 升级会员（无限识别）
-        </button>
-      </div>
-    )}
+            background: user?.isPro ? "#ecfdf5" : "#fef3c7"
+          }}>
+            {user?.isPro
+              ? "👑 Pro会员：无限识别"
+              : `🆓 免费次数剩余：${user?.remaining ?? 0} 次`}
+          </div>
 
-    {/* ================= 特征（会员才显示） ================= */}
-    {user?.isPro && (
-      <div style={{ marginBottom: 20 }}>
-        <h3>🔍 特征分析</h3>
-        <ul style={{ lineHeight: 1.8 }}>
-          <li>形状：{result.data.features?.shape || "-"}</li>
-          <li>颜色：{result.data.features?.color || "-"}</li>
-          <li>质地：{result.data.features?.texture || "-"}</li>
-          <li>大小：{result.data.features?.size || "-"}</li>
-        </ul>
-      </div>
-    )}
+          <h2>📋 识别结果</h2>
 
-    {/* ================= 质量 ================= */}
-    <div style={{
-      padding: 15,
-      borderRadius: 10,
-      background: result.data.quality?.is_normal ? "#ecfdf5" : "#fef2f2"
-    }}>
-      <h3>⚖️ 质量评估</h3>
+          <p>名称：{result.data.name}</p>
+          <p>置信度：{((result.data.confidence || 0) * 100).toFixed(1)}%</p>
 
-      <p>
-        是否正常：
-        <b style={{
-          color: result.data.quality?.is_normal ? "#16a34a" : "#dc2626"
-        }}>
-          {result.data.quality?.is_normal ? " 正常" : " 异常"}
-        </b>
-      </p>
+          {/* 🔒 非会员 */}
+          {!user?.isPro && (
+            <div style={{
+              marginTop: 20,
+              padding: 15,
+              background: "#fef2f2",
+              borderRadius: 10
+            }}>
+              <p>🔒 高级分析已锁定</p>
 
-      <p>
-        风险等级：
-        <b style={{
-          color:
-            (result.data.quality?.score || 0) > 80 ? "#16a34a" :
-            (result.data.quality?.score || 0) > 60 ? "#f59e0b" : "#dc2626"
-        }}>
-          {
-            (result.data.quality?.score || 0) > 80 ? " 低风险" :
-            (result.data.quality?.score || 0) > 60 ? " 中风险" : " 高风险"
-          }
-        </b>
-      </p>
+              <button onClick={activatePro}>
+                🚀 升级会员
+              </button>
+            </div>
+          )}
 
-      {(result.data.quality?.problems || []).length > 0 && (
-        <>
-          <p style={{ marginTop: 10 }}>问题：</p>
-          <ul>
-            {(result.data.quality?.problems || []).map((p, i) => (
-              <li key={i}>{p}</li>
-            ))}
-          </ul>
-        </>
+          {/* 👑 Pro内容 */}
+          {user?.isPro && (
+            <div style={{ marginTop: 20 }}>
+              <h3>🔍 特征</h3>
+              <p>形状：{result.data.features?.shape}</p>
+              <p>颜色：{result.data.features?.color}</p>
+            </div>
+          )}
+        </div>
       )}
     </div>
-
-    {/* ================= 说明 ================= */}
-    {user?.isPro && (
-      <details style={{ marginTop: 15 }}>
-        <summary style={{ cursor: "pointer" }}>📄 查看详细说明</summary>
-        <p style={{ marginTop: 10, lineHeight: 1.6 }}>
-          {result.data.quality?.reason || "暂无说明"}
-        </p>
-      </details>
-    )}
-
-  </div>
-)}
+  )
+}

@@ -1,3 +1,48 @@
+<script>
+async function loadUser() {
+  const token = localStorage.getItem("token")
+
+  if (!token) {
+    console.log("❌ no token")
+    return
+  }
+
+  try {
+    const res = await fetch("/api/user", {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    })
+
+    const data = await res.json()
+    console.log("user:", data)
+
+    updateUI(data)
+
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+function updateUI(user) {
+  const box = document.querySelector(".usage-box")
+
+  if (!box) {
+    console.error("❌ 找不到 usage-box")
+    return
+  }
+
+  if (user.isPro) {
+    box.innerText = "🔥 Pro会员（无限使用）"
+  } else {
+    box.innerText = `⚡ 剩余 ${user.remaining} 次`
+  }
+}
+
+// 页面加载自动执行
+loadUser()
+</script>
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -341,9 +386,33 @@ function getUser() {
   };
 }
 
+let currentUser = null;
+
+async function fetchUser() {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const res = await fetch("/api/user", {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
+
+    const data = await res.json();
+    currentUser = data;
+
+    console.log("👤 当前用户:", data);
+
+    return data;
+  } catch (e) {
+    console.error("user获取失败", e);
+    return null;
+  }
+}
+
 function isPro() {
-  const expire = localStorage.getItem("proExpire");
-  return !!expire && Date.now() < Number(expire);
+  return currentUser?.isPro === true;
 }
 
 function isExecutive() {
@@ -515,18 +584,20 @@ async function updateUsageUI() {
   if (!el) return;
 
   const plan = getUserPlan();
-  console.log("plan:", plan);
-  const user = getUser();
+console.log("plan:", plan);
 
-  // ===== 💎 Pro（月）=====
-  if (plan.type === "pro") {
-    el.innerHTML = `
-      <div style="padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;">
-        💎 <b>Pro会员</b>（剩余 ${plan.days} 天）｜无限使用
-      </div>
-    `;
-    return;
-  }
+// ❗只保留这个
+const user = currentUser;
+
+// ===== 💎 Pro（月）=====
+if (user?.isPro) {
+  el.innerHTML = `
+    <div style="padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;">
+      👑 <b>Pro会员</b>（剩余 ${plan.days} 天）｜无限使用
+    </div>
+  `;
+  return;
+}
 
   // ===== 🚀 Executive（7天）=====
   if (plan.type === "exec") {
@@ -614,8 +685,11 @@ async function loadStats() {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-  await updateUsageUI();
-  updateButtonUI();
+  await fetchUser();
+await updateUsageUI();
+updateButtonUI();
+
+setInterval(fetchUser, 5000);
   loadStats();
 
   // ✅ 统一获取 DOM（关键）
@@ -854,12 +928,29 @@ function showUpgradeModal() {
 // ===== Stripe =====
     async function payStripeExec() {
       try {
-        const res = await fetch("/api/stripe-exec", {
-          method: "POST",
-          body: JSON.stringify({
-            email: userEmail
-          })
-        });
+        async function payStripeExec() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("请先登录");
+    return;
+  }
+
+  const res = await fetch("/api/stripe-exec", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  });
+
+  const data = await res.json();
+
+  if (data.url) {
+    window.location.href = data.url;
+  } else {
+    alert("支付创建失败");
+  }
+}
 
     // 👉 先用 text（防止 JSON 解析报错）
     const text = await res.text();
