@@ -58,108 +58,104 @@ img { max-width: 400px; border-radius: 10px; }
 </div>
 
 <script>
-
-//////////////////////////////////////////////////
-// ✅ 唯一用户状态（核心修复）
-//////////////////////////////////////////////////
-
+// ── 唯一用户状态 ──────────────────────────────
 const UserStore = {
-  data: { isPro: false, remaining: 0, allowed: true, credits: 0 },
+  data: { isPro: false, remaining: 0, allowed: true },
 
   async init() {
     try {
       const res = await fetch("/api/user");
-      const data = await res.json();
-
+      if (!res.ok) throw new Error("user api fail");
+      const d = await res.json();
       this.data = {
-        isPro: data?.isPro ?? false,
-        remaining: data?.remaining ?? 0,
-        allowed: data?.allowed ?? true,
-        credits: data?.credits ?? 0
+        isPro:     !!d?.isPro,
+        remaining: d?.remaining ?? 0,
+        allowed:   d?.allowed  ?? true
       };
-
     } catch {
-      this.data = { isPro: false, remaining: 0, allowed: true, credits: 0 };
+      // 网络失败时保持上次数据，不重置
     }
-
     updateUI();
   }
 };
 
-//////////////////////////////////////////////////
-// ✅ UI（稳定）
-//////////////////////////////////////////////////
-
+// ── UI 更新 ───────────────────────────────────
 function updateUI() {
-  const u = UserStore.data;
-  const box = document.getElementById("usageText");
-  const btn = document.getElementById("btn");
+  const { isPro, remaining, allowed } = UserStore.data;
 
+  const box = document.getElementById("usageText");
   if (box) {
-    box.innerText = u.isPro
-      ? "👑 Pro会员（无限）"
-      : `⚡ 剩余 ${u.remaining} 次`;
+    box.textContent = isPro
+      ? "👑 Pro 会员（无限次）"
+      : `⚡ 今日剩余 ${remaining} 次`;
   }
 
+  const btn = document.getElementById("btn");
   if (btn) {
-    btn.disabled = !u.allowed && !u.isPro;
-    btn.innerText = u.isPro ? "🚀 无限识别" : "开始识别";
+    const canUse = isPro || allowed;
+    btn.disabled  = !canUse;
+    btn.textContent = isPro ? "🚀 识别（Pro 无限）" : "开始识别";
   }
 }
 
-//////////////////////////////////////////////////
-// ✅ 识别逻辑（修复稳定）
-//////////////////////////////////////////////////
-
+// ── 图片预览 ──────────────────────────────────
 let currentFile = null;
 let isProcessing = false;
 
 document.getElementById("file").addEventListener("change", (e) => {
-  currentFile = e.target.files[0];
-  if (currentFile) {
-    document.getElementById("preview").innerHTML =
-      `<img src="${URL.createObjectURL(currentFile)}">`;
+  currentFile = e.target.files?.[0] ?? null;
+  const preview = document.getElementById("preview");
+  if (preview) {
+    preview.innerHTML = currentFile
+      ? `<img src="${URL.createObjectURL(currentFile)}" alt="预览图">`
+      : "";
   }
 });
 
+// ── 识别主逻辑 ────────────────────────────────
 document.getElementById("btn").addEventListener("click", async () => {
-
   if (isProcessing) return;
+
+  if (!currentFile) {
+    alert("请先选择图片");
+    return;
+  }
+
+  const btn    = document.getElementById("btn");
+  const result = document.getElementById("result");
+
   isProcessing = true;
+  if (btn) { btn.disabled = true; btn.textContent = "识别中…"; }
+  if (result) result.textContent = "";
 
   try {
-    if (!currentFile) {
-      alert("请选择图片");
-      return;
-    }
+    const form = new FormData();
+    form.append("image", currentFile);
 
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      body: currentFile
-    });
+    const res = await fetch("/api/analyze", { method: "POST", body: form });
 
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
-    document.getElementById("result").innerText =
-      JSON.stringify(data, null, 2);
+    if (result) {
+      // 根据实际 API 返回字段调整，这里优先显示 data.result 文本
+      result.textContent = data?.result ?? JSON.stringify(data, null, 2);
+    }
 
-    await UserStore.init();
+    // 刷新用量（不阻塞 UI）
+    UserStore.init();
 
   } catch (e) {
-    alert("识别失败");
+    console.error("识别失败:", e);
+    alert("识别失败，请稍后重试");
   } finally {
     isProcessing = false;
+    updateUI(); // 恢复按钮状态
   }
 });
 
-//////////////////////////////////////////////////
-// ✅ 初始化
-//////////////////////////////////////////////////
-
-document.addEventListener("DOMContentLoaded", () => {
-  UserStore.init();
-});
-
+// ── 初始化 ────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => UserStore.init());
 </script>
 
 <footer class="footer">
