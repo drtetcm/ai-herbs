@@ -46,12 +46,17 @@ export default async function handler(req, res) {
       typeof user.expires === "number" &&
       user.expires > Date.now();
 
-    return res.json({
-      plan: isActive ? "pro" : "free",
-      isPro: isActive,
-      remaining: isActive ? 9999 : 30,
-      allowed: true
-    });
+    const days = isActive
+  ? Math.ceil((user.expires - Date.now()) / (1000 * 60 * 60 * 24))
+  : 0;
+
+return res.json({
+  plan: isActive ? "pro" : "free",
+  isPro: isActive,
+  remaining: isActive ? 9999 : 30,
+  days,
+  allowed: true
+});
 
   } catch (err) {
     console.error("❌ KV error:", err);
