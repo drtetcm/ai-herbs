@@ -1,14 +1,11 @@
 export default async function handler(req, res) {
-  const email = decodeURIComponent(req.query.email || "")
-    .trim()
-    .toLowerCase();
+  const email = req.headers["x-user-email"];
 
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
   const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
 
   const key = `user:${email}`;
 
-  // ===== ✅ 默认返回（统一结构）=====
   const defaultUser = {
     plan: "free",
     isPro: false,
@@ -16,19 +13,17 @@ export default async function handler(req, res) {
     allowed: true
   };
 
-  // ❌ 没 email
+  // ❌ 未登录
   if (!email) {
-    return res.json(defaultUser);
+    return res.status(401).json({ error: "Not logged in" });
   }
 
-  // ❌ KV 未配置
   if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
     console.warn("⚠️ KV 未配置");
     return res.json(defaultUser);
   }
 
   try {
-    // ===== 🔥 读取 KV =====
     const r = await fetch(`${KV_REST_API_URL}/get/${key}`, {
       headers: {
         Authorization: `Bearer ${KV_REST_API_TOKEN}`
@@ -40,7 +35,6 @@ export default async function handler(req, res) {
 
     let user = null;
 
-    // ===== ✅ 正确解析（单层 JSON）=====
     if (raw) {
       try {
         user = JSON.parse(raw);
@@ -50,16 +44,13 @@ export default async function handler(req, res) {
       }
     }
 
-    // 🔍 调试（建议保留一段时间）
-    console.log("👤 KV原始:", raw);
-    console.log("👤 解析后:", user);
+    console.log("👤 email:", email);
+    console.log("👤 KV:", user);
 
-    // ❌ 没用户
     if (!user) {
       return res.json(defaultUser);
     }
 
-    // ===== 🔥 会员判断（最终稳定写法）=====
     const isActive =
       typeof user.expires === "number" &&
       user.expires > Date.now();
