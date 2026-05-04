@@ -1,148 +1,81 @@
-import { verifyToken } from "../lib/auth"
+import { buffer } from "micro"
+import Stripe from "stripe"
+import { kv } from "@vercel/kv"
 
-function getUserEmail(req) {
-  const auth = req.headers.authorization
-
-  if (!auth || !auth.startsWith("Bearer ")) {
-    return null
-  }
-
-  try {
-    const token = auth.slice(7)
-    const payload = verifyToken(token)
-    return payload?.email || null
-  } catch {
-    return null
-  }
-}
-
-import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export const config = {
   api: {
     bodyParser: false,
   },
-};
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+}
 
 export default async function handler(req, res) {
-  const buf = await buffer(req);
-  const sig = req.headers["stripe-signature"];
+  const sig = req.headers["stripe-signature"]
 
-  let event;
+  let event
 
-  // ===== 1. 验证 webhook =====
   try {
+    const buf = await buffer(req)
+
     event = stripe.webhooks.constructEvent(
       buf,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
-    );
+    )
   } catch (err) {
-    console.error("❌ Webhook error:", err.message);
-    return res.status(400).send("Webhook Error");
+    console.error("❌ webhook verify failed:", err.message)
+    return res.status(400).send(`Webhook Error: ${err.message}`)
   }
 
-  // ===== 2. 支付完成 =====
+  console.log("📦 event:", event.type)
+
+  // ⭐⭐⭐ 只处理支付成功
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
+    const session = event.data.object
 
-    const rawEmail =
-      session.metadata?.email ||
-      session.customer_details?.email ||
-      session.customer_email ||
-      "unknown";
+    // ✅ 优先 customer_email
+    let email = session.customer_email
 
-    const email = rawEmail.trim().toLowerCase();
-    const key = `user:${email}`;
+    // ✅ fallback：metadata（更稳）
+    if (!email && session.metadata?.email) {
+      email = session.metadata.email
+    }
 
-    console.log("📧 email:", email);
+    console.log("💰 payment success, email:", email)
 
-    if (!email || email === "unknown") {
-      console.warn("⚠️ 无效 email");
-      return res.status(200).json({ received: true });
+    if (!email) {
+      console.error("❌ no email in session")
+      return res.json({ received: true })
     }
 
     try {
-      // ===== 🔥 读取现有数据（安全版）=====
-      let existingUser = null;
+      const key = `user:${email}`
 
-      const existingRes = await fetch(
-        `${process.env.KV_REST_API_URL}/get/${key}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-          },
+      let user = await kv.get(key)
+
+      console.log("👤 before:", user)
+
+      if (!user) {
+        user = {
+          email,
+          plan: "free",
+          createdAt: Date.now()
         }
-      );
-
-      if (existingRes.ok) {
-        const json = await existingRes.json();
-
-        if (json.result) {
-          try {
-            existingUser = JSON.parse(json.result);
-          } catch {
-            existingUser = null;
-          }
-        }
-      } else {
-        console.warn("⚠️ KV读取失败:", key);
       }
 
-      // ===== 🔥 计算新过期时间（支持续费）=====
-      const now = Date.now();
+      // ⭐⭐⭐ 升级
+      user.plan = "pro"
+      user.expires = Date.now() + 7 * 24 * 60 * 60 * 1000 // 7天
 
-      const baseExpire =
-        existingUser &&
-        typeof existingUser.expires === "number" &&
-        existingUser.expires > now
-          ? existingUser.expires   // 🔥 在原基础上续
-          : now;
+      await kv.set(key, user)
 
-      const newExpire = baseExpire + 30 * 24 * 60 * 60 * 1000;
-
-      const userData = {
-        plan: "pro",
-        expires: newExpire,
-      };
-
-      // ===== 🔥 写入 KV =====
-      const writeRes = await fetch(
-        `${process.env.KV_REST_API_URL}/set/${key}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            value: JSON.stringify(userData),
-          }),
-        }
-      );
-
-      if (!writeRes.ok) {
-        throw new Error("KV写入失败");
-      }
-
-      console.log("🔥 写入成功:", key);
-      console.log("🧾 expires:", newExpire);
+      console.log("✅ upgraded:", user)
 
     } catch (err) {
-      console.error("❌ webhook处理失败:", err);
+      console.error("❌ KV error:", err)
     }
   }
 
-  return res.status(200).json({ received: true });
-}
-
-// ===== buffer =====
-async function buffer(readable) {
-  const chunks = [];
-  for await (const chunk of readable) {
-    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
-  }
-  return Buffer.concat(chunks);
+  res.json({ received: true })
 }
