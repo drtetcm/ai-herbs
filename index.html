@@ -324,7 +324,7 @@ input[type="file"] {
   <br><br>
 
   <button id="btn">开始识别</button>
-  <div id="usageText" style="margin-top:10px;font-size:13px;color:#666;"></div>
+  <div id="usageText" style="margin-top:10px;"></div>
 
   <div id="preview"></div>
   <div id="result"></div>
@@ -394,13 +394,25 @@ let currentUser = null;
 
 async function fetchUser() {
   try {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.warn("⚠️ 没有 token");
+      window.currentUser = null;
+      return;
+    }
+
     const res = await fetch("/api/user", {
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("token")
+        Authorization: "Bearer " + token
       }
     });
 
-    if (!res.ok) throw new Error("API failed");
+    if (res.status === 401) {
+      console.warn("⚠️ 未登录");
+      window.currentUser = null;
+      return;
+    }
 
     const data = await res.json();
 
@@ -539,97 +551,33 @@ function updateButtonUI() {
 async function updateUsageUI() {
   const user = window.currentUser;
 
-  if (!user) {
-    console.warn("⚠️ user not ready");
-    return;
-  }
-
   const el = document.getElementById("usageText");
 
   if (!el) {
-    console.warn("⚠️ 找不到 usageText");
+    console.warn("⚠️ usageText 不存在");
     return;
   }
 
-  // ✅ 修复1：补 plan
-  const plan = getUserPlan();
+  if (!user) {
+    el.innerHTML = "⏳ 加载中...";
+    return;
+  }
 
-  // ===== Pro =====
-  if (user?.isPro) {
-    const days = plan.days ?? 0;
-
+  // Pro
+  if (user.isPro) {
     el.innerHTML = `
       <div style="padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;">
-        👑 <b>Pro会员</b>（剩余 ${days} 天）｜无限使用
+        👑 Pro会员｜无限使用
       </div>
     `;
     return;
   }
 
-  // ===== Executive =====
-  if (plan.type === "exec") {
-    el.innerHTML = `
-      <div style="padding:10px;border-radius:10px;background:#eff6ff;color:#1d4ed8;">
-        🚀 <b>Executive</b>（剩余 ${plan.days} 天）｜无限使用
-      </div>
-    `;
-    return;
-  }
-
-  // ===== 普通用户 =====
-  const credits = user?.credits ?? 0;
-
-  let data;
-  try {
-    data = await getUsageData();
-  } catch {
-    data = { remaining: 0 };
-  }
-
-  let freeLeft = Number(data?.remaining);
-  if (isNaN(freeLeft) || freeLeft < 0) freeLeft = 0;
-
-  const isLow = freeLeft === 0 && credits === 0;
-
-  const color = isLow ? "#fef2f2" : "#f9fafb";
-  const textColor = isLow ? "#dc2626" : "#374151";
-
+  // 免费
   el.innerHTML = `
-    <div style="padding:10px;border-radius:10px;background:${color};color:${textColor};">
-      
-      🆓 今日免费：<b>${freeLeft}</b> 次
-      &nbsp;｜&nbsp;
-      ⚡ 次数包：<b>${credits}</b> 次
-
-      ${isLow ? `
-        <br/>
-        <span style="font-size:12px;">⚠️ 免费次数已用完</span>
-
-        <br/>
-        <button onclick="showUpgradeModal()" style="
-          margin-top:8px;
-          padding:12px;
-          border:none;
-          border-radius:10px;
-          background:linear-gradient(135deg,#2563eb,#1d4ed8);
-          color:#fff;
-          font-size:15px;
-          font-weight:600;
-          width:100%;
-          box-shadow:0 4px 12px rgba(0,0,0,0.15);
-        ">
-          🚀 立即解锁无限识别
-          <br/>
-          <span style="font-size:12px;opacity:0.9;">
-            ⚠️ 今日已用完 · 推荐7天体验
-          </span>
-        </button>
-      ` : ''}
-
-    </div>
+    🆓 今日免费：${user.remaining ?? 0} 次
   `;
 }
-
 
 async function loadStats() {
   try {
@@ -653,9 +601,7 @@ async function loadStats() {
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("🚀 init");
 
-  try {
-    await fetchUser();
-  } catch {}
+  await fetchUser();
 
   updateUsageUI();
   updateButtonUI();
