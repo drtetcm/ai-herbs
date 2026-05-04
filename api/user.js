@@ -1,5 +1,7 @@
 export default async function handler(req, res) {
-  const email = (req.query.email || "").trim().toLowerCase();
+  const email = decodeURIComponent(req.query.email || "")
+    .trim()
+    .toLowerCase();
   const key = `user:${email}`;
 
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
