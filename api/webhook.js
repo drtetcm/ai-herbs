@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   let event;
 
-  // ✅ 1. 校验 webhook
+  // ✅ 1. 校验 webhook（必须最先）
   try {
     event = stripe.webhooks.constructEvent(
       buf,
@@ -30,11 +30,19 @@ export default async function handler(req, res) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
+    // 🔥 多来源 email（最稳）
     const email =
       session.customer_details?.email ||
       session.customer_email ||
       session.metadata?.email ||
       "unknown";
+
+    // 🔥 强力调试（关键）
+    console.log("📧 email来源调试:", {
+      customer_details: session.customer_details?.email,
+      customer_email: session.customer_email,
+      metadata: session.metadata,
+    });
 
     console.log("📦 session:", session);
     console.log("✅ 支付成功:", email);
@@ -46,7 +54,13 @@ export default async function handler(req, res) {
     }
 
     try {
-      // ✅ 写入 KV（⚠️ 正确格式：必须包 value）
+      // 🔥 构造用户数据
+      const userData = {
+        plan: "pro",
+        expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
+      };
+
+      // ✅ 写入 KV（正确格式）
       await fetch(`${process.env.KV_REST_API_URL}/set/user:${email}`, {
         method: "POST",
         headers: {
@@ -54,21 +68,19 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          value: JSON.stringify({
-            plan: "pro",
-            expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
-          }),
+          value: JSON.stringify(userData),
         }),
       });
 
       console.log("🔥 已写入 KV:", email);
+      console.log("🧾 用户数据:", userData);
 
     } catch (err) {
       console.error("❌ KV写入失败:", err);
     }
   }
 
-  // ✅ Stripe 要求必须返回 200
+  // ✅ 必须返回 200（Stripe 要求）
   return res.status(200).json({ received: true });
 }
 
