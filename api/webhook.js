@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   let event;
 
-  // ✅ 1. 校验 webhook（必须最先）
+  // ✅ 1. 校验 webhook
   try {
     event = stripe.webhooks.constructEvent(
       buf,
@@ -30,7 +30,6 @@ export default async function handler(req, res) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
 
-    // 🔥 多来源 email（最稳）
     const rawEmail =
       session.customer_details?.email ||
       session.customer_email ||
@@ -38,58 +37,43 @@ export default async function handler(req, res) {
       "unknown";
 
     const email = rawEmail.trim().toLowerCase();
-
     const key = `user:${email}`;
 
-    // 🔥 强力调试（关键）
-    console.log("📧 email来源调试:", {
-      customer_details: session.customer_details?.email,
-      customer_email: session.customer_email,
-      metadata: session.metadata,
-    });
+    console.log("📧 email来源:", rawEmail);
+    console.log("✅ 标准化email:", email);
 
-    console.log("📦 session:", session);
-    console.log("✅ 支付成功:", email);
-
-    // ❗防止无效 email
     if (!email || email === "unknown") {
       console.warn("⚠️ 无法获取 email");
       return res.status(200).json({ received: true });
     }
 
     try {
-      // 🔥 构造用户数据
       const userData = {
         plan: "pro",
         expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
       };
 
-      // ✅ 写入 KV（正确格式）
+      // ✅ 正确写入（无嵌套）
       await fetch(`${process.env.KV_REST_API_URL}/set/${key}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          plan: "pro",
-          expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
-        }),
+        body: JSON.stringify(userData),
       });
 
-      console.log("🔥 已写入 KV:", email);
-      console.log("🧾 用户数据:", userData);
+      console.log("🔥 已写入 KV:", key);
+      console.log("🧾 数据:", userData);
 
     } catch (err) {
       console.error("❌ KV写入失败:", err);
     }
   }
 
-  // ✅ 必须返回 200（Stripe 要求）
   return res.status(200).json({ received: true });
 }
 
-// ✅ buffer函数（必须保留）
 async function buffer(readable) {
   const chunks = [];
   for await (const chunk of readable) {

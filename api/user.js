@@ -12,18 +12,10 @@ export default async function handler(req, res) {
     allowed: true
   };
 
-  // ❌ 没 email
-  if (!email) {
-    return res.json(defaultUser);
-  }
-
-  // ❌ 没 KV（本地/异常环境）
-  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
-    return res.json(defaultUser);
-  }
+  if (!email) return res.json(defaultUser);
+  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) return res.json(defaultUser);
 
   try {
-    // 🔥 从 KV 读取
     const r = await fetch(`${KV_REST_API_URL}/get/${key}`, {
       headers: {
         Authorization: `Bearer ${KV_REST_API_TOKEN}`
@@ -32,16 +24,24 @@ export default async function handler(req, res) {
 
     const json = await r.json();
 
-    const user = json.result
-      ? JSON.parse(json.result)
-      : null;
+    let user = null;
 
-    // ❌ 没用户
-    if (!user) {
-      return res.json(defaultUser);
+    if (json.result) {
+      try {
+        // ✅ 新格式（推荐）
+        user = JSON.parse(json.result);
+      } catch {
+        try {
+          // ✅ 兼容旧格式（你之前的 bug）
+          user = JSON.parse(JSON.parse(json.result));
+        } catch {
+          user = null;
+        }
+      }
     }
 
-    // 🔥 过期判断
+    if (!user) return res.json(defaultUser);
+
     const isActive =
       user.expires &&
       Number.isFinite(user.expires) &&
