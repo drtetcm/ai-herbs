@@ -582,19 +582,23 @@ async function updateButtonUI() {
   }
 }
 
-async function updateUsageUI() {
+function updateUsageUI() {
+  const user = window.currentUser;
 
-  const el = document.getElementById("usageText");
-  if (!el) return;
+  if (!user) {
+    console.warn("⚠️ user not ready");
+    return;
+  }
 
-  const plan = getUserPlan();
-console.log("plan:", plan);
+  const el = document.getElementById("usageText") || document.getElementById("usage-box");
 
-// ❗只保留这个
-const user = currentUser;
+  if (!el) {
+    console.warn("⚠️ 找不到 usageText / usage-box");
+    return;
+  }
 
-// ===== 💎 Pro（月）=====
 if (user?.isPro) {
+  const days = user.days ?? 0;
   el.innerHTML = `
     <div style="padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;">
       👑 <b>Pro会员</b>（剩余 ${plan.days} 天）｜无限使用
@@ -603,7 +607,6 @@ if (user?.isPro) {
   return;
 }
 
-  // ===== 🚀 Executive（7天）=====
   if (plan.type === "exec") {
     el.innerHTML = `
       <div style="padding:10px;border-radius:10px;background:#eff6ff;color:#1d4ed8;">
@@ -613,6 +616,10 @@ if (user?.isPro) {
     return;
   }
 
+  el.innerHTML = `
+    🆓 今日免费：${user.remaining ?? 0} 次
+  `;
+  }  
 const credits = user?.credits ?? 0;
 
 const data = await getUsageData();
@@ -666,7 +673,7 @@ el.innerHTML = `
 
   </div>
 `;
-}
+
 
 async function loadStats() {
   try {
