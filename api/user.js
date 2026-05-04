@@ -1,5 +1,6 @@
 export default async function handler(req, res) {
-  const email = req.query.email;
+  const email = (req.query.email || "").trim().toLowerCase();
+  const key = `user:${email}`;
 
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
   const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
@@ -11,14 +12,18 @@ export default async function handler(req, res) {
     allowed: true
   };
 
+  // ❌ 没 email
   if (!email) {
+    return res.json(defaultUser);
+  }
+
+  // ❌ 没 KV（本地/异常环境）
+  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
     return res.json(defaultUser);
   }
 
   try {
     // 🔥 从 KV 读取
-    const key = `user:${email}`;
-
     const r = await fetch(`${KV_REST_API_URL}/get/${key}`, {
       headers: {
         Authorization: `Bearer ${KV_REST_API_TOKEN}`
@@ -31,12 +36,16 @@ export default async function handler(req, res) {
       ? JSON.parse(json.result)
       : null;
 
+    // ❌ 没用户
     if (!user) {
       return res.json(defaultUser);
     }
 
     // 🔥 过期判断
-    const isActive = Date.now() < user.expires;
+    const isActive =
+      user.expires &&
+      Number.isFinite(user.expires) &&
+      Date.now() < user.expires;
 
     return res.json({
       plan: isActive ? "pro" : "free",
