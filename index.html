@@ -324,8 +324,9 @@ input[type="file"] {
   <br><br>
 
   <button id="btn">开始识别</button>
+  <div id="usage-box" style="margin-top:10px;font-size:13px;color:#666;"></div>
 
-  <div id="usageText" style="margin-top:10px;font-size:13px;color:#666;">
+  <div id="usage-box" style="margin-top:10px;font-size:13px;color:#666;">
   🆓 今日免费：2 次（立即体验）
   </div>
 
@@ -560,7 +561,7 @@ function updateUsageUI() {
     return;
   }
 
-  const el = document.getElementById("usageText") || document.getElementById("usage-box");
+  const el = document.getElementById("usage-box") || document.getElementById("usage-box");
 
   if (!el) {
     console.warn("⚠️ 找不到 usageText / usage-box");
@@ -667,8 +668,8 @@ async function loadStats() {
 document.addEventListener("DOMContentLoaded", async () => {
 
   await fetchUser();
-await updateUsageUI();
-updateButtonUI();
+  updateUsageUI();
+  updateButtonUI();
 
 setInterval(fetchUser, 5000);
   loadStats();
