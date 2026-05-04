@@ -1,6 +1,28 @@
-export default async function handler(req, res) {
-  const email = req.headers["x-user-email"];
+import { verifyToken } from "../lib/auth";
 
+export default async function handler(req, res) {
+  // ✅ 从 Authorization 解析用户
+  const auth = req.headers.authorization;
+
+  if (!auth || !auth.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  let email = null;
+
+  try {
+    const token = auth.slice(7);
+    const payload = verifyToken(token);
+    email = payload?.email;
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+
+  if (!email) {
+    return res.status(401).json({ error: "No email" });
+  }
+
+  // ===== KV 部分 =====
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
   const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
 
@@ -10,35 +32,31 @@ export default async function handler(req, res) {
     plan: "free",
     isPro: false,
     remaining: 2,
-    allowed: true
+    allowed: true,
   };
-
-  if (!email) {
-    return res.status(401).json({ error: "Not logged in" });
-  }
 
   try {
     const r = await fetch(`${KV_REST_API_URL}/get/${key}`, {
       headers: {
-        Authorization: `Bearer ${KV_REST_API_TOKEN}`
-      }
+        Authorization: `Bearer ${KV_REST_API_TOKEN}`,
+      },
     });
 
     const json = await r.json();
-    let user = json.result;
+    const raw = json.result;
 
-    // ✅ 关键修复（兼容 string / object）
-    if (typeof user === "string") {
+    let user = null;
+
+    if (raw) {
       try {
-        user = JSON.parse(user);
+        user = JSON.parse(raw);
       } catch (e) {
-        console.error("❌ JSON parse error:", user);
-        user = null;
+        user = raw;
       }
     }
 
     console.log("👤 email:", email);
-    console.log("👤 user:", user);
+    console.log("👤 KV:", user);
 
     if (!user) {
       return res.json(defaultUser);
@@ -52,7 +70,7 @@ export default async function handler(req, res) {
       plan: isActive ? "pro" : "free",
       isPro: isActive,
       remaining: isActive ? 9999 : 2,
-      allowed: true
+      allowed: true,
     });
 
   } catch (err) {
