@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 
 </script>
 
@@ -344,7 +345,7 @@ const UserStore = {
   },
 
   updateUI() {
-    updateUsageUI(this.data);
+  
     updateButtonUI(this.data);
   }
 };
@@ -352,22 +353,6 @@ const UserStore = {
 //////////////////////////////////////////////////
 // ✅ UI 更新（稳定版）
 //////////////////////////////////////////////////
-
-function updateUsageUI(user) {
-  const el = document.getElementById("usageText");
-  if (!el) return;
-
-  if (!user) {
-    el.innerText = "⏳ 加载中...";
-    return;
-  }
-
-  if (user.isPro) {
-    el.innerHTML = "👑 Pro会员｜无限使用";
-  } else {
-    el.innerHTML = `🆓 今日剩余：${user.remaining ?? 0} 次`;
-  }
-}
 
 function updateButtonUI(user) {
   const btn = document.getElementById("btn");
