@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   let event;
 
-  // ✅ 1. 验证 webhook
+  // ✅ 1. 校验 webhook
   try {
     event = stripe.webhooks.constructEvent(
       buf,
@@ -33,8 +33,10 @@ export default async function handler(req, res) {
     const email =
       session.customer_details?.email ||
       session.customer_email ||
+      session.metadata?.email ||
       "unknown";
 
+    console.log("📦 session:", session);
     console.log("✅ 支付成功:", email);
 
     // ❗防止无效 email
@@ -44,7 +46,7 @@ export default async function handler(req, res) {
     }
 
     try {
-      // ✅ 写入 KV（永久存储）
+      // ✅ 写入 KV（⚠️ 正确格式：必须包 value）
       await fetch(`${process.env.KV_REST_API_URL}/set/user:${email}`, {
         method: "POST",
         headers: {
@@ -52,8 +54,10 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          plan: "pro",
-          expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
+          value: JSON.stringify({
+            plan: "pro",
+            expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
+          }),
         }),
       });
 
@@ -64,11 +68,11 @@ export default async function handler(req, res) {
     }
   }
 
-  // ✅ 必须返回 200（Stripe 要求）
+  // ✅ Stripe 要求必须返回 200
   return res.status(200).json({ received: true });
 }
 
-// ✅ buffer函数
+// ✅ buffer函数（必须保留）
 async function buffer(readable) {
   const chunks = [];
   for await (const chunk of readable) {
