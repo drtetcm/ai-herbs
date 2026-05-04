@@ -1,3 +1,21 @@
+import { verifyToken } from "../lib/auth"
+
+function getUserEmail(req) {
+  const auth = req.headers.authorization
+
+  if (!auth || !auth.startsWith("Bearer ")) {
+    return null
+  }
+
+  try {
+    const token = auth.slice(7)
+    const payload = verifyToken(token)
+    return payload?.email || null
+  } catch {
+    return null
+  }
+}
+
 import Stripe from "stripe";
 
 export const config = {

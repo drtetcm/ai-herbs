@@ -1,3 +1,21 @@
+import { verifyToken } from "../lib/auth"
+
+function getUserEmail(req) {
+  const auth = req.headers.authorization
+
+  if (!auth || !auth.startsWith("Bearer ")) {
+    return null
+  }
+
+  try {
+    const token = auth.slice(7)
+    const payload = verifyToken(token)
+    return payload?.email || null
+  } catch {
+    return null
+  }
+}
+
 export default async function handler(req, res) {
 
   const KV_REST_API_URL = process.env.KV_REST_API_URL;
