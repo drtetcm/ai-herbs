@@ -971,7 +971,12 @@ btn.onclick = async () => {
     console.log("是否有次数包:", hasCredits);
 
     // ===== 3. 拦截逻辑（最终版）=====
-    if (!isExecutive() && !isPro() && !hasCredits) {
+    if (
+      usageData.remaining <= 0 &&
+      !isExecutive() &&
+      !isPro() &&
+      !hasCredits
+      ) {
       console.log("🚫 被拦截：弹升级");
       showUpgradeModal();
       isProcessing = false;

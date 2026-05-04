@@ -38,6 +38,7 @@ export default async function handler(req, res) {
 
   res.status(200).json({ received: true });
 }
+}
 
 async function buffer(readable) {
   const chunks = [];
