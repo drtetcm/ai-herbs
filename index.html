@@ -1,20 +1,4 @@
-function updateUI(user) {
-  const box = document.getElementById("usageText")
 
-  if (!box) {
-    console.error("❌ 找不到 usageText")
-    return
-  }
-
-  if (user.isPro) {
-    box.innerText = "🔥 Pro会员（无限使用）"
-  } else {
-    box.innerText = `⚡ 剩余 ${user.remaining} 次`
-  }
-}
-
-// 页面加载自动执行
-loadUser()
 </script>
 
 <!DOCTYPE html>
