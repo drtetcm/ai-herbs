@@ -522,7 +522,7 @@ async function getUsageData() {
 async function updateButtonUI() {
 
   // ===== 🔥 最高优先级：Executive =====
-  if (isExecutive()) {
+  if (user?.isPro) {
     btn.innerHTML = "🚀 无限识别中";
     btn.disabled = false;
 
@@ -545,7 +545,7 @@ async function updateButtonUI() {
     const user = getUser();
 
     // 🔥 关键：加入前端 Executive 判断
-    const isProUser = isPro() || isExecutive() || data?.isPro;
+    const isProUser = isPro() || user?.isPro() || data?.isPro;
 
     // ✅ 1️⃣ Pro / Executive（最高优先级）
     if (isProUser) {
@@ -1042,7 +1042,7 @@ btn.onclick = async () => {
 
     // 🔥 统一身份（最优先）
     const isProUser = isPro();
-    const isExecUser = isExecutive();
+    const isExecUser = user?.isPro();
     const hasCredits = user?.credits > 0;
 
     let usageData = {
@@ -1051,7 +1051,7 @@ btn.onclick = async () => {
 };
 
     // 👉 ❗ 只有普通用户才请求 usage
-    if (!isExecutive() && !isPro() && !hasCredits) {
+    if (!user?.isPro() && !isPro() && !hasCredits) {
       try {
         usageData = await getUsageData();
       } catch (e) {
@@ -1068,7 +1068,7 @@ btn.onclick = async () => {
     // ===== 3. 拦截逻辑（最终版）=====
     if (
       usageData.remaining <= 0 &&
-      !isExecutive() &&
+      !user?.isPro() &&
       !isPro() &&
       !hasCredits
     ) {
