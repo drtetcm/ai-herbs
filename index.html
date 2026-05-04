@@ -308,691 +308,176 @@ input[type="file"] {
 
 <script>
 
-window.onerror = function(msg, url, line) {
-  console.error("JS错误:", msg, "行:", line);
+//////////////////////////////////////////////////
+// ✅ 全局唯一用户状态（核心重构）
+//////////////////////////////////////////////////
+
+const UserStore = {
+  data: {
+    isPro: false,
+    remaining: 0,
+    allowed: true,
+    credits: 0
+  },
+
+  async init() {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.warn("⚠️ 无 token，使用默认用户");
+        this.setSafe({});
+        return;
+      }
+
+      const res = await fetch("/api/user", {
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      if (!res.ok) {
+        this.setSafe({});
+        return;
+      }
+
+      const data = await res.json();
+      this.setSafe(data);
+
+    } catch (e) {
+      console.warn("⚠️ initUser失败", e);
+      this.setSafe({});
+    }
+  },
+
+  setSafe(data) {
+    this.data = {
+      isPro: data?.isPro ?? false,
+      remaining: data?.remaining ?? 0,
+      allowed: data?.allowed ?? true,
+      credits: data?.credits ?? 0
+    };
+
+    this.updateUI();
+  },
+
+  updateUI() {
+    updateUsageUI(this.data);
+    updateButtonUI(this.data);
+  }
 };
 
-function safeParse(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return {};
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-}
-
-let updatingUI = false;
-
 //////////////////////////////////////////////////
-// 🔒 收费系统
+// ✅ UI 更新（稳定版）
 //////////////////////////////////////////////////
 
-// ===== 固定用户ID（防止变化）=====
-function getUserId() {
-  let id = localStorage.getItem("user_id");
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem("user_id", id);
-  }
-  return id;
-}
+function updateUsageUI(user) {
+  const el = document.getElementById("usageText");
+  if (!el) return;
 
-function getUser() {
-  return {
-    usage: (() => {
-      try {
-        const raw = localStorage.getItem("usage");
-        if (!raw) return {};
-        return JSON.parse(raw);
-      } catch (e) {
-        return {};
-      }
-    })(),
-
-    pdfPaid: localStorage.getItem("pdf_paid") === "true",
-    execExpire: Number(localStorage.getItem("execExpire") || 0),
-    proExpire: Number(localStorage.getItem("proExpire") || 0),
-    credits: Number(localStorage.getItem("credits") || 0)
-  };
-}
-
-let currentUser = null;
-
-async function fetchUser() {
-  try {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      console.warn("⚠️ 没有 token");
-      window.currentUser = null;
-      return;
-    }
-
-    const res = await fetch("/api/user", {
-      headers: {
-        Authorization: "Bearer " + token
-      }
-    });
-
-    if (res.status === 401) {
-      console.warn("⚠️ 未登录");
-      window.currentUser = null;
-      return;
-    }
-
-    const data = await res.json();
-
-    window.currentUser = data;
-
-  } catch (e) {
-    console.warn("⚠️ fetchUser失败", e);
-    window.currentUser = null;
-  }
-}
-
-function activateExecutive(days) {
-  const expire = Date.now() + days * 24 * 60 * 60 * 1000;
-  localStorage.setItem("execExpire", expire);
-
-  alert("🚀 Executive 已开通！");
-  updateUsageUI();
-}
-
-function activatePro(days) {
-  const expire = Date.now() + days * 24 * 60 * 60 * 1000;
-  localStorage.setItem("proExpire", expire);
-
-  alert("💎 Pro 已开通！");
-  updateUsageUI();
-}
-
-function getRemainingDays(expire) {
-  if (!expire) return 0;
-
-  const diff = expire - Date.now();
-
-  if (diff <= 0) return 0;
-
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
-function getUserPlan() {
-  const user = getUser();
-
-  if (Date.now() < user.proExpire) {
-    return {
-      type: "pro",
-      days: getRemainingDays(user.proExpire)
-    };
-  }
-
-  if (Date.now() < user.execExpire) {
-    return {
-      type: "exec",
-      days: getRemainingDays(user.execExpire)
-    };
-  }
-
-  return {
-    type: "free",
-    days: 0
-  };
-}
-
-async function getUsageData() {
-  try {
-    const user = getUser();
-
-    const res = await fetch("/api/usage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: getUserId(),
-        email: localStorage.getItem("user_email") || "",
-        execExpire: user?.execExpire || 0
-      })
-    });
-
-    if (!res.ok) {
-      console.warn("usage接口异常 status:", res.status);
-      return { remaining: 0, allowed: true, isPro: false };
-    }
-
-    const text = await res.text();
-
-    // ✅ 防止返回非JSON
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.warn("usage返回非JSON:", text);
-      return { remaining: 0, allowed: true, isPro: false };
-    }
-
-    // ✅ 强制兜底（核心）
-    return {
-      allowed: data?.allowed ?? true,
-      isPro: data?.isPro ?? false,
-      remaining:
-        typeof data?.remaining === "number"
-          ? data.remaining
-          : 0
-    };
-
-  } catch (e) {
-    console.warn("usage请求失败", e);
-    return { remaining: 0, allowed: true, isPro: false };
-  }
-}
-
-function updateButtonUI() {
-  const user = window.currentUser;
-
-  if (!user) return;
-
-  const btn =
-    document.getElementById("submit-btn") ||
-    document.getElementById("btn");
-
-  if (!btn) {
-    console.warn("⚠️ 找不到按钮");
+  if (!user) {
+    el.innerText = "⏳ 加载中...";
     return;
   }
 
-  if (!user.allowed) {
+  if (user.isPro) {
+    el.innerHTML = "👑 Pro会员｜无限使用";
+  } else {
+    el.innerHTML = `🆓 今日剩余：${user.remaining ?? 0} 次`;
+  }
+}
+
+function updateButtonUI(user) {
+  const btn = document.getElementById("btn");
+  if (!btn) return;
+
+  if (!user) {
+    btn.disabled = true;
+    btn.innerText = "加载中...";
+    return;
+  }
+
+  if (!user.allowed && !user.isPro) {
     btn.disabled = true;
     btn.innerText = "⚠️ 次数已用完";
     return;
   }
 
   btn.disabled = false;
-
-  if (user.isPro) {
-    btn.innerText = "🚀 无限识别中";
-  } else {
-    btn.innerText = "开始识别";
-  }
+  btn.innerText = user.isPro ? "🚀 无限识别中" : "开始识别";
 }
 
-async function updateUsageUI() {
-  const user = window.currentUser;
+//////////////////////////////////////////////////
+// ✅ Usage API（统一返回结构）
+//////////////////////////////////////////////////
 
-  const el = document.getElementById("usageText");
-
-  if (!el) {
-    console.warn("⚠️ usageText 不存在");
-    return;
-  }
-
-  if (!user) {
-    el.innerHTML = "⏳ 加载中...";
-    return;
-  }
-
-  // Pro
-  if (user.isPro) {
-    el.innerHTML = `
-      <div style="padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;">
-        👑 Pro会员｜无限使用
-      </div>
-    `;
-    return;
-  }
-
-  // 免费
-  el.innerHTML = `
-    🆓 今日免费：${user.remaining ?? 0} 次
-  `;
-}
-
-async function loadStats() {
+async function getUsageData() {
   try {
-    const res = await fetch("/api/stats");
-    const data = await res.json();
+    const res = await fetch("/api/usage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: getUserId()
+      })
+    });
 
-    const el = document.getElementById("globalStats");
-    if (el) {
-      const displayCount = Math.max(data.total || 0, 38).toLocaleString();
-
-      el.innerHTML = `
-        🔥 已有 <b>1,200+</b> 用户使用<br/>
-        今日已有 <b>${displayCount}</b> 次识别
-      `;
-    }
-  } catch (e) {
-    console.warn("stats加载失败");
-  }
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  console.log("🚀 init");
-
-  await fetchUser();
-
-  updateUsageUI();
-  updateButtonUI();
-
-  setInterval(fetchUser, 5000);
-});
-
-function checkUsage() {
-  return true;
-}
-
-function activatePro(days) {
-  const expire = Date.now() + days * 24 * 60 * 60 * 1000;
-  localStorage.setItem("pro_expire", expire);
-  alert("已开通成功！");
-
-  // ✅ 关键：刷新UI
-  updateUsageUI();
-}
-
-function buyCredits(n) {
-  const current = Number(localStorage.getItem("credits") || 0);
-  localStorage.setItem("credits", current + n);
-  alert(`🎉 已获得 ${n} 次识别`);
-}
-
-function closeModal() {
-  const m = document.getElementById("payModal");
-  if (m) m.remove();
-}
-
-function showUpgradeModal() {
-
-  if (document.getElementById("payModal")) return;
-  
-  const modal = document.createElement("div");
-
-  modal.innerHTML = `
-  <div style="
-    position:fixed;
-    top:0;left:0;right:0;bottom:0;
-    background:rgba(0,0,0,0.5);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-  ">
-    <div style="
-      background:#fff;
-      padding:20px;
-      border-radius:12px;
-      width:90%;
-      max-width:320px;
-      text-align:center;
-    ">
-      <h3>🔒 今天免费次数已用完</h3>
-      <p style="font-size:13px;color:#666;">
-        升级后解锁：
-        <br/>✔ 无限识别
-        <br/>✔ 专业分析报告
-      </p>
-
-      <!-- ===== 套餐区 ===== -->
-
-      <!-- 7天无限 -->
-      <div style="margin-top:15px;text-align:center">
-
-        <div style="font-weight:bold;margin-bottom:6px">
-          🚀 RM 9.99 / 7天（无限）🔥推荐
-        </div>
-
-        <button onclick="payStripeExec()" 
-          style="width:100%;
-          margin-bottom:6px;
-          padding:10px;
-          border-radius:8px;
-          background:#635bff;
-          color:white;
-          border:none;">
-          💳 信用卡 / Apple Pay / Google Pay
-        </button>
-
-        <button onclick="payToyyibExec()" 
-          style="width:100%;
-          padding:10px;
-          border-radius:8px;
-          background:#16a34a;
-          color:white;
-          border:none;">
-          📱 TnG / DuitNow / FPX
-        </button>
-
-      </div>
-
-      <!-- 月会员 -->
-        <div style="margin-top:15px;text-align:center">
-
-          <div style="font-weight:bold;margin-bottom:6px">
-            💎 RM 29.99 / 月（无限）
-          </div>
-
-          <button onclick="payStripeMonthly()" 
-            style="width:100%;
-            margin-bottom:6px;
-            padding:10px;
-            border-radius:8px;
-            background:#635bff;
-            color:white;
-            border:none;">
-            💳 信用卡 / Apple Pay / Google Pay
-          </button>
-
-          <button onclick="payToyyibMonthly()" 
-            style="width:100%;
-            padding:10px;
-            border-radius:8px;
-            background:#16a34a;
-            color:white;
-            border:none;">
-            📱 TnG / DuitNow / FPX
-          </button>
-
-        </div>
-
-      <!-- 10次包 -->
-      <div style="margin-top:15px;text-align:center">
-
-        <div style="font-weight:bold;margin-bottom:6px">
-          ⚡ RM 5.99 / 10次（按次使用）
-        </div>
-
-        <div style="margin:10px 0;text-align:center;font-size:13px;color:#666;">         
-            适合偶尔使用       
-        </div>
-
-        <button onclick="payStripeCredits()" 
-          style="width:100%;
-          margin-bottom:6px;
-          padding:10px;
-          border-radius:8px;
-          background:#635bff;
-          color:white;
-          border:none;">
-          💳 信用卡 / Apple Pay / Google Pay
-        </button>
-
-        <button onclick="payToyyibCredits()" 
-            style="width:100%;
-            padding:10px;
-            border-radius:8px;
-            background:#16a34a;
-            color:white;
-            border:none;">
-            📱 TnG / DuitNow / FPX
-        </button>
-
-       </div>
-
-      <!-- 分隔 -->
-          <div style="margin:14px 0;text-align:center;color:#999;font-size:13px">
-          或使用优惠码（10次免费）
-          </div>
-
-      <!-- 优惠码 -->
-        <input id="promoCode" placeholder="输入优惠码"
-          style="width:100%;text-align:center;padding:10px;border-radius:6px;border:1px solid #ddd;" />
-
-      <button onclick="applyPromoCode()" 
-        style="width:100%;
-        margin-top:8px;
-        padding:12px;
-        border:none;
-        border-radius:10px;
-        background:#f59e0b;
-        color:#fff;">
-        🎁 使用优惠码
-      </button>
-
-        <div id="globalStats" style="
-        font-size:12px;
-        color:#999;
-        margin-top:10px;
-        text-align:center;
-        line-height:1.6;
-        ">
-        🔥 已有 <b>1,200+</b> 用户使用<br/>
-        今日已有 <b id="todayCount">--</b> 次识别
-        </div> 
-
-      <button onclick="closeModal()" 
-        style="background:#eee;color:#333;margin-top:8px;">
-        取消
-      </button>
-    </div>
-  </div>
-  `;
-
-  modal.id = "payModal";
-  document.body.appendChild(modal);
-
-  setTimeout(async () => {
-    try {
-      const res = await fetch("/api/stats");
-      const data = await res.json();
-
-      const count = Math.max(data?.total || 0, 38);
-
-      const el = document.getElementById("todayCount");
-      if (el) {
-        el.innerText = count.toLocaleString();
-      }
-
-    } catch (e) {
-      // 兜底（永不显示 --）
-      const el = document.getElementById("todayCount");
-      if (el) {
-        el.innerText = "38";
-      }
-    }
-  }, 50);
-}
-
-// ===== Stripe =====
-    async function payStripeExec() {
-      try {
-        async function payStripeExec() {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    alert("请先登录");
-    return;
-  }
-
-  const res = await fetch("/api/stripe-exec", {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + token
-    }
-  });
-
-  const data = await res.json();
-
-  if (data.url) {
-    window.location.href = data.url;
-  } else {
-    alert("支付创建失败");
-  }
-}
-
-    // 👉 先用 text（防止 JSON 解析报错）
     const text = await res.text();
 
-    let data;
+    let data = {};
     try {
       data = JSON.parse(text);
-    } catch {
-      console.warn("返回不是JSON，可能已跳转");
-      return;
-    }
+    } catch {}
 
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert("支付创建失败");
-    }
+    return {
+      allowed: data?.allowed ?? true,
+      isPro: data?.isPro ?? false,
+      remaining: data?.remaining ?? 0
+    };
 
-  } catch (e) {
-    console.error(e);
-    alert("支付异常");
+  } catch {
+    return { allowed: true, isPro: false, remaining: 0 };
   }
 }
 
-    function payStripeMonthly() {
-      alert("Stripe 月（下一步接入）");
-    }
-
-    function payStripeCredits() {
-      alert("Stripe 10次（下一步接入）");
-    }
-
-// ===== Toyyib =====
-    function payToyyibExec() {
-      alert("TnG 7天（下一步接入）");
-    }
-
-    function payToyyibMonthly() {
-      alert("TnG 月（下一步接入）");
-    }
-
-    function payToyyibCredits() {
-      alert("TnG 10次（下一步接入）");
-    }
-
-
 //////////////////////////////////////////////////
-// 📸 主逻辑
+// ✅ 按钮逻辑（唯一绑定，彻底修复重复绑定问题）
 //////////////////////////////////////////////////
 
-const fileInput = document.getElementById("file");
-const preview = document.getElementById("preview");
-const resultDiv = document.getElementById("result");
 const btn = document.getElementById("btn");
 
-let currentFile = null;
+btn.addEventListener("click", handleClick);
+
 let isProcessing = false;
+let currentFile = null;
 
-fileInput.addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+async function handleClick() {
 
-  currentFile = file;
-  preview.innerHTML = `<img src="${URL.createObjectURL(file)}" />`;
-});
-
-btn.onclick = async () => {
-  console.log("🔥 点击开始识别");
-
-  if (isProcessing) {
-    console.warn("⚠️ 正在处理中，阻止重复点击");
-    return;
-  }
-
+  if (isProcessing) return;
   isProcessing = true;
-  console.log("🚀 开始识别流程");
 
   try {
-
-    // ===== 1. 检查图片 =====
     if (!currentFile) {
       alert("请选择图片");
-      isProcessing = false;
       return;
     }
 
-    // ===== 2. 身份优先判断（关键修复）=====
-    const user = window.currentUser || {};
+    const user = UserStore.data;
 
-    // 🔥 统一身份（最优先）
-    const isProUser = user?.isPro === true;
-    const hasCredits = (user?.credits ?? 0) > 0;
+    // 👉 统一 usage 判断
+    let usage = user;
 
-    let usageData = {
-      isPro: false,
-      remaining: 0
-};
+    if (!user.isPro && user.credits <= 0) {
+      usage = await getUsageData();
+    }
 
-    // 👉 ❗ 只有普通用户才请求 usage
-    if (!user?.isPro && !hasCredits) {
-      try {
-        usageData = await getUsageData();
-      } catch (e) {
-        console.warn("⚠️ usage获取失败，使用兜底");
-      }
-}
-
-    // 🔍 调试日志
-    console.log("usageData:", usageData);
-    console.log("user:", user);
-    console.log("是否Pro:", isProUser);
-    console.log("是否有次数包:", hasCredits);
-
-    // ===== 3. 拦截逻辑（最终版）=====
-    if (
-      usageData.remaining <= 0 &&
-      !user?.isPro && 
-      !hasCredits
-    ) {
-      console.log("🚫 被拦截：弹升级");
+    if (!usage.allowed && !user.isPro && user.credits <= 0) {
       showUpgradeModal();
-      isProcessing = false;
       return;
     }
 
-    // ===== 4. 前端使用逻辑 =====
-    const today = new Date().toDateString();
-
-    let usage = safeParse("usage");
-    if (usage.date !== today) {
-      usage = { date: today, count: 0 };
-    }
-
-    // 🔥 关键修复：Pro / Exec 不扣次数
-    if (!isProUser) {
-
-      if (hasCredits) {
-        // 👉 用次数包
-        localStorage.setItem("credits", user?.credits ?? 0 - 1);
-
-      } else {
-        // 👉 免费次数
-        usage.count++;
-        localStorage.setItem("usage", JSON.stringify(usage));
-      }
-    }
-
-    // ===== UI loading =====
+    // 👉 UI loading
     btn.disabled = true;
 
-    resultDiv.innerHTML = `
-      <div class="loading-box">
-        <div class="spinner"></div>
-        <div class="loading-title">AI 正在识别中</div>
-        <div class="loading-sub" id="loadingText">准备中...</div>
-        <div class="loading-progress">
-          <div class="loading-bar" id="loadingBar"></div>
-        </div>
-        
-        <div class="loading-steps">
-            <div class="loading-step" id="s1">📷 上传图片</div>
-            <div class="loading-step" id="s2">🧠 AI识别</div>
-            <div class="loading-step" id="s3">🔍 特征分析</div>
-            <div class="loading-step" id="s4">📊 质量评估</div>
-            <div class="loading-step" id="s5">📄 生成报告</div>
-        </div>
-        
-      </div>
-    `;
-
-    setTimeout(() => startLoadingAnimation(), 50);
-
-    // ===== 压缩图片 =====
     const base64 = await compress(currentFile);
 
-    // ===== 识别 =====
     const res = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1002,368 +487,72 @@ btn.onclick = async () => {
       })
     });
 
-    if (!res.ok) {
-      throw new Error("AI服务异常（analyze失败）");
-    }
-
     const text = await res.text();
 
-    let data;
+    let data = {};
     try {
       data = JSON.parse(text);
     } catch {
-      throw new Error("API返回不是JSON");
+      throw new Error("返回格式错误");
     }
 
     if (!data.success) throw new Error(data.error);
 
-    stopLoadingAnimation();
-
-    // ===== 后端计数 =====
-    try {
-      await fetch("/api/increment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: getUserId() })
-      });
-
-      await updateUsageUI();
-    } catch {}
-
     render(data.data);
 
-    await updateUsageUI();
-    await updateButtonUI();
-    loadStats();
+    // 👉 刷新用户状态（关键）
+    await UserStore.init();
 
   } catch (err) {
-
     console.error(err);
-    stopLoadingAnimation();
-    resultDiv.innerHTML = `<div class="card">❌ ${err.message}</div>`;
-
+    alert(err.message);
   } finally {
-
     isProcessing = false;
-    updateButtonUI();
-
+    updateButtonUI(UserStore.data);
   }
-};
-
-//////////////////////////////////////////////////
-// 📦 图片压缩
-//////////////////////////////////////////////////
-
-function compress(file) {
-  return new Promise((resolve, reject) => {
-
-    const img = new Image();
-    const reader = new FileReader();
-
-    reader.onload = e => {
-      img.src = e.target.result;
-    };
-
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-
-      const scale = Math.min(1, 800 / img.width);
-
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      resolve(canvas.toDataURL("image/jpeg", 0.7));
-    };
-
-    img.onerror = () => {
-      reject(new Error("图片格式不支持（建议用JPG）"));
-    };
-
-    reader.onerror = () => {
-      reject(new Error("读取图片失败"));
-    };
-
-    reader.readAsDataURL(file);
-  });
 }
 
 //////////////////////////////////////////////////
-// 📄 PDF（唯一正确版本）
+// ✅ 文件监听（保留）
 //////////////////////////////////////////////////
 
-async function generatePDF() {
+const fileInput = document.getElementById("file");
+const preview = document.getElementById("preview");
 
-  const report = document.getElementById("report");
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-  if (!report) {
-    alert("报告不存在");
-    return;
+  currentFile = file;
+  preview.innerHTML = `<img src="${URL.createObjectURL(file)}" />`;
+});
+
+//////////////////////////////////////////////////
+// ✅ 初始化（唯一入口）
+//////////////////////////////////////////////////
+
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log("🚀 App Init");
+
+  await UserStore.init();
+
+  // 👉 定时刷新（但不会覆盖状态结构）
+  setInterval(() => {
+    UserStore.init();
+  }, 10000);
+});
+
+//////////////////////////////////////////////////
+// ✅ 工具函数（保留）
+//////////////////////////////////////////////////
+
+function getUserId() {
+  let id = localStorage.getItem("user_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("user_id", id);
   }
-
-  try {
-
-    // ===== 1️⃣ 用 html2canvas 转成图片 =====
-    const canvas = await html2canvas(report, {
-      scale: 2,
-      useCORS: true,
-      scrollY: -(window.scrollY || 0)
-    });
-
-    const imgData = canvas.toDataURL("image/jpeg", 0.95);
-
-    // ===== 2️⃣ 创建PDF =====
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    const pageWidth = 210;
-    const pageHeight = 297;
-
-    // 图片尺寸换算
-    const imgWidth = pageWidth;
-    const imgHeight = canvas.height * pageWidth / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    // ===== 3️⃣ 第一页 =====
-    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    // ===== 4️⃣ 自动分页 =====
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-
-    // ===== 5️⃣ 下载 =====
-    pdf.save("DRTE-中药检测报告.pdf");
-
-  } catch (err) {
-    console.error("PDF失败:", err);
-    alert("PDF生成失败");
-  }
-} 
-
-function downloadPDF() {
-
-  if (!window.latestData) {
-    alert("请先识别");
-    return;
-  }
-
-  // 👉 直接调用生成
-  generatePDF();
-}
-
-//////////////////////////////////////////////////
-// 🎨 UI
-//////////////////////////////////////////////////
-
-function render(d) {
-
-  window.latestData = d;
-
-  const score = d.quality?.score || 0;
-
-  const color =
-    score > 80 ? "#22c55e" :
-    score > 60 ? "#f59e0b" :
-    "#ef4444";
-
-  const level =
-    score > 80 ? "优质" :
-    score > 60 ? "合格" :
-    "风险";
-
-  resultDiv.innerHTML = `
-    <div id="report" class="card" style="background:#fff;">
- 
-        <p style="margin:4px 0;font-size:12px;color:#666;">
-          报告编号：DRTE-${Date.now()}
-        </p>
-        
-        <p style="margin:0;font-size:12px;color:#666;">
-          检测日期：${new Date().toLocaleDateString()}
-        </p>
-
-        <!-- 基本信息 -->
-        <div style="margin-bottom:16px;">
-        <h3>📌 药材名称：${d.name}</h3>
-        <p>置信度：<b>${(d.confidence * 100).toFixed(1)}%</b></p>
-        </div>
-
-        <!-- 评分模块 -->
-        <div style="margin-bottom:16px;">
-        <p>质量评分：<b>${score}</b>（${level}）</p>
-
-        <div class="progress">
-          <div class="bar" style="width:${score}%;background:${color}"></div>
-        </div>
-
-        <!-- 状态标签 -->
-        <div style="
-        padding:10px;
-        border-radius:8px;
-        background:${d.quality?.is_normal ? "#e6ffed" : "#ffe6e6"};
-        margin-bottom:16px;
-        ">
-        
-        <b style="
-          color:${d.quality?.is_normal ? "green" : "red"};
-          font-size:16px;
-        ">
-          ${d.quality?.is_normal ? "✔ 正常药材" : "⚠ 存在风险"}
-        </b>
-      </div>
-
-      <!-- 特征分析 -->
-      <div style="margin-bottom:16px;">
-        <h3>🔍 特征分析</h3>
-        <ul>
-          <li>形状：${d.features?.shape || "-"}</li>
-          <li>颜色：${d.features?.color || "-"}</li>
-          <li>质地：${d.features?.texture || "-"}</li>
-          <li>大小：${d.features?.size || "-"}</li>
-        </ul>
-      </div>
-
-      <!-- 问题列表 -->
-      ${
-        (d.quality?.problems || []).length > 0
-        ? `
-        <div style="margin-bottom:16px;">
-          <h3>⚠ 发现问题</h3>
-          <ul>
-            ${d.quality.problems.map(p => `<li>${p}</li>`).join("")}
-          </ul>
-        </div>
-        `
-        : ""
-      }
-
-      <!-- 专业说明 -->
-      <div style="margin-bottom:16px;">
-        <h3>📄 AI分析说明</h3>
-        <p style="line-height:1.6;">
-          ${d.quality?.reason || "暂无详细说明"}
-        </p>
-      </div>
-
-      <!-- 建议（商业关键） -->
-      <div style="
-        padding:12px;
-        border-radius:8px;
-        background:#f0f9ff;
-        margin-bottom:16px;
-      ">
-        <h3>💡 使用建议</h3>
-        <p>
-          ${
-            d.quality?.is_normal
-            ? "该药材外观符合常规标准，可正常使用。"
-            : "建议谨慎使用，可能存在质量问题，必要时咨询专业人士。"
-          }
-        </p>
-      </div>
-
-      <h2>📋 中药材检测报告</h2>
-
-    
-      <!-- 操作按钮 -->
-      <button onclick="downloadPDF()" style="margin-bottom:10px;">
-        📄 下载PDF报告
-      </button>
-
-      <button onclick="location.reload()" style="background:#6b7280;">
-        🔄 重新识别
-      </button>
-
-      <!-- 免责声明 -->
-      <div style="margin-top:15px;font-size:12px;color:#888;">
-        ⚠ 本报告由AI生成，仅供参考，不作为医疗依据
-      </div>
-
-    </div>
-
-    
-  `;
-}
-
-
-//////////////////////////////////////////////////
-// 🚀 高级 Loading 动画
-//////////////////////////////////////////////////
-
-let loadingTimer = null;
-
-function startLoadingAnimation() {
-
-  const steps = [
-    { id: "s1", text: "图片上传中..." },
-    { id: "s2", text: "AI识别中..." },
-    { id: "s3", text: "分析特征..." },
-    { id: "s4", text: "评估质量..." },
-    { id: "s5", text: "生成报告..." }
-  ];
-
-  let progress = 0;
-  let currentStep = 0;
-
-  loadingTimer = setInterval(() => {
-
-    const bar = document.getElementById("loadingBar");
-    const text = document.getElementById("loadingText");
-
-    // ❗关键防护：DOM还没渲染就跳过
-    if (!bar || !text) return;
-
-    // 👉 进度增长
-    if (progress < 90) {
-      progress += (100 - progress) * 0.08;
-      bar.style.width = progress + "%";
-    }
-
-    // 👉 步骤推进
-    if (currentStep < steps.length) {
-
-      const stepEl = document.getElementById(steps[currentStep].id);
-
-      if (stepEl) {
-        stepEl.classList.add("active");
-        text.innerText = steps[currentStep].text;
-
-        setTimeout(() => {
-          stepEl.classList.remove("active");
-          stepEl.classList.add("done");
-          stepEl.innerText = "✔ " + stepEl.innerText;
-        }, 500);
-      }
-
-      currentStep++;
-    }
-
-  }, 900);
-}
-
-function stopLoadingAnimation() {
-  clearInterval(loadingTimer);
-
-  const bar = document.getElementById("loadingBar");
-  if (bar) bar.style.width = "100%";
-
-  // 👉 平滑结束（关键高级感）
-  setTimeout(() => {
-    const box = document.querySelector(".loading-box");
-    if (box) {
-      box.style.transition = "opacity 0.4s";
-      box.style.opacity = "0";
-    }
-  }, 300);
+  return id;
 }
 
 </script>
