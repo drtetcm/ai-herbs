@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-  <meta charset="UTF-8" />
-  <title>DRTE HerbAI</title>
-
 <script>
 async function loadUser() {
   const token = localStorage.getItem("token")
@@ -32,7 +26,7 @@ async function loadUser() {
 }
 
 function updateUI(user) {
-  const box = document.querySelector(".usageText")
+  const box = document.getElementById("usageText")
 
   if (!box) {
     console.error("❌ 找不到 usageText")
@@ -937,12 +931,11 @@ btn.onclick = async () => {
     }
 
     // ===== 2. 身份优先判断（关键修复）=====
-    const user = getUser();
+    const user = window.currentUser || {};
 
     // 🔥 统一身份（最优先）
-    const isProUser = isPro();
-    const isExecUser = user?.isPro();
-    const hasCredits = user?.credits > 0;
+    const isProUser = user?.isPro === true;
+    const hasCredits = (user?.credits ?? 0) > 0;
 
     let usageData = {
       isPro: false,
@@ -950,7 +943,7 @@ btn.onclick = async () => {
 };
 
     // 👉 ❗ 只有普通用户才请求 usage
-    if (!user?.isPro() && !isPro() && !hasCredits) {
+    if (!user?.isPro && !hasCredits) {
       try {
         usageData = await getUsageData();
       } catch (e) {
@@ -967,8 +960,7 @@ btn.onclick = async () => {
     // ===== 3. 拦截逻辑（最终版）=====
     if (
       usageData.remaining <= 0 &&
-      !user?.isPro() &&
-      !isPro() &&
+      !user?.isPro && 
       !hasCredits
     ) {
       console.log("🚫 被拦截：弹升级");
