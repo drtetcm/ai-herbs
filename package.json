@@ -2,6 +2,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.9",
     "@vercel/kv": "^3.0.0",
+    "jsonwebtoken": "^9.0.3",
     "stripe": "^22.1.0"
   }
 }
