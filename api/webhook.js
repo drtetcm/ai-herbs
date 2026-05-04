@@ -9,6 +9,25 @@ export const config = {
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
+  // 临时用户存储（后面换数据库）
+  global.users = global.users || {};
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+
+    const email =
+      session.customer_details?.email ||
+      session.customer_email ||
+      "unknown";
+
+    console.log("✅ 支付成功:", email);
+
+  // 🔥 写入会员
+  global.users[email] = {
+      plan: "pro",
+      expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  };
+}
   const buf = await buffer(req);
   const sig = req.headers["stripe-signature"];
 
