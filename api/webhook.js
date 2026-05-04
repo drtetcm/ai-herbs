@@ -31,11 +31,15 @@ export default async function handler(req, res) {
     const session = event.data.object;
 
     // 🔥 多来源 email（最稳）
-    const email =
+    const rawEmail =
       session.customer_details?.email ||
       session.customer_email ||
       session.metadata?.email ||
       "unknown";
+
+    const email = rawEmail.trim().toLowerCase();
+
+    const key = `user:${email}`;
 
     // 🔥 强力调试（关键）
     console.log("📧 email来源调试:", {
@@ -61,14 +65,15 @@ export default async function handler(req, res) {
       };
 
       // ✅ 写入 KV（正确格式）
-      await fetch(`${process.env.KV_REST_API_URL}/set/user:${email}`, {
+      await fetch(`${process.env.KV_REST_API_URL}/set/${key}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          value: JSON.stringify(userData),
+          plan: "pro",
+          expires: Date.now() + 30 * 24 * 60 * 60 * 1000,
         }),
       });
 
