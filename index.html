@@ -1,83 +1,51 @@
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>DRTE HerbAI™</title>
 
-<link rel="icon" type="image/png" href="https://d1yei2z3i6k35z.cloudfront.net/thumb_150/699aeed15c77a_DRTE_favicon.png" />
-
 <style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
-  margin: 0;
-  background: #f5f6f8;
-}
-.container {
-  max-width: 720px;
-  margin: auto;
-  padding: 16px;
-  text-align: center;
-}
-button {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border: none;
-  border-radius: 10px;
-  background: #007bff;
-  color: #fff;
-}
-button:disabled { background: #aaa; }
-img { max-width: 400px; border-radius: 10px; }
-.footer {
-  background: #0f172a;
-  color: #cbd5f5;
-  margin-top: 40px;
-  padding: 30px 15px;
-  text-align: center;
-}
+body { font-family: Arial; text-align: center; padding: 20px; }
+button { padding: 10px 20px; font-size: 16px; }
+img { max-width: 300px; margin-top: 10px; }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>DRTE HerbAI™</h1>
-  <h2>📸 AI 中药智能识别系统</h2>
+<h1>DRTE HerbAI™</h1>
+<h2>📸 AI 中药识别</h2>
 
-  <input type="file" id="file" accept="image/*" />
-  <br><br>
+<input type="file" id="file" accept="image/*"><br><br>
 
-  <button id="btn">开始识别</button>
-  <div id="usageText"></div>
+<button id="btn">开始识别</button>
 
-  <div id="preview"></div>
-  <div id="result"></div>
-</div>
+<div id="usageText"></div>
+<div id="preview"></div>
+<pre id="result"></pre>
 
 <script>
-
 //////////////////////////////////////////////////
-// ✅ 唯一用户状态（核心修复）
+// ✅ 用户状态（已修复 token）
 //////////////////////////////////////////////////
 
 const UserStore = {
-  data: { isPro: false, remaining: 0, allowed: true, credits: 0 },
+  state: { isPro: false, remaining: 0, allowed: true, credits: 0 },
 
   async init() {
     try {
       const token = localStorage.getItem("token");
 
-const res = await fetch("/api/user", {
-  headers: {
-    Authorization: "Bearer " + token
-  }
-});
+      const res = await fetch("/api/user", {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      });
+
       const data = await res.json();
 
-      this.data = {
+      this.state = {
         isPro: data?.isPro ?? false,
         remaining: data?.remaining ?? 0,
         allowed: data?.allowed ?? true,
@@ -85,7 +53,7 @@ const res = await fetch("/api/user", {
       };
 
     } catch {
-      this.data = { isPro: false, remaining: 0, allowed: true, credits: 0 };
+      this.state = { isPro: false, remaining: 0, allowed: true, credits: 0 };
     }
 
     updateUI();
@@ -93,69 +61,83 @@ const res = await fetch("/api/user", {
 };
 
 //////////////////////////////////////////////////
-// ✅ UI（稳定）
+// ✅ UI
 //////////////////////////////////////////////////
 
 function updateUI() {
-  const u = UserStore.data;
-  const box = document.getElementById("usageText");
-  const btn = document.getElementById("btn");
+  const u = UserStore.state;
 
+  const box = document.getElementById("usageText");
   if (box) {
     box.innerText = u.isPro
-      ? "👑 Pro会员（无限）"
+      ? "👑 Pro会员（无限使用）"
       : `⚡ 剩余 ${u.remaining} 次`;
   }
 
+  const btn = document.getElementById("btn");
   if (btn) {
     btn.disabled = !u.allowed && !u.isPro;
-    btn.innerText = u.isPro ? "🚀 无限识别" : "开始识别";
   }
 }
 
 //////////////////////////////////////////////////
-// ✅ 识别逻辑（修复稳定）
+// ✅ 文件选择
 //////////////////////////////////////////////////
 
 let currentFile = null;
-let isProcessing = false;
 
 document.getElementById("file").addEventListener("change", (e) => {
   currentFile = e.target.files[0];
+
   if (currentFile) {
     document.getElementById("preview").innerHTML =
       `<img src="${URL.createObjectURL(currentFile)}">`;
   }
 });
 
+//////////////////////////////////////////////////
+// ✅ 关键修复：analyze 上传（完全正确版本）
+//////////////////////////////////////////////////
+
 document.getElementById("btn").addEventListener("click", async () => {
 
-  if (isProcessing) return;
-  isProcessing = true;
-
-  try {
-    if (!currentFile) {
-      alert("请选择图片");
-      return;
-    }
-
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      body: currentFile
-    });
-
-    const data = await res.json();
-
-    document.getElementById("result").innerText =
-      JSON.stringify(data, null, 2);
-
-    await UserStore.init();
-
-  } catch (e) {
-    alert("识别失败");
-  } finally {
-    isProcessing = false;
+  if (!currentFile) {
+    alert("请选择图片");
+    return;
   }
+
+  const reader = new FileReader();
+
+  reader.onload = async function () {
+    try {
+      const base64 = reader.result.split(",")[1];
+
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          imageBase64: base64,
+          mediaType: currentFile.type
+        })
+      });
+
+      const data = await res.json();
+
+      document.getElementById("result").innerText =
+        JSON.stringify(data, null, 2);
+
+      // 🔥 刷新用户状态（未来扣次数用）
+      await UserStore.init();
+
+    } catch (err) {
+      console.error(err);
+      alert("识别失败");
+    }
+  };
+
+  reader.readAsDataURL(currentFile);
 });
 
 //////////////////////////////////////////////////
@@ -165,12 +147,7 @@ document.getElementById("btn").addEventListener("click", async () => {
 document.addEventListener("DOMContentLoaded", () => {
   UserStore.init();
 });
-
 </script>
-
-<footer class="footer">
-  DRTE HerbAI™ · AI 中药识别
-</footer>
 
 </body>
 </html>
