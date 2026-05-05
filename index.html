@@ -11,7 +11,6 @@ button { padding: 10px 20px; font-size: 16px; }
 button:disabled { background: #aaa; }
 img { max-width: 300px; margin-top: 10px; }
 
-/* 🔥 弹窗样式 */
 #upgradeModal {
   display:none;
   position:fixed;
@@ -45,7 +44,6 @@ img { max-width: 300px; margin-top: 10px; }
 <div id="preview"></div>
 <pre id="result"></pre>
 
-<!-- 🔥 升级弹窗 -->
 <div id="upgradeModal">
   <div class="box">
     <h3>🚀 升级 Pro</h3>
@@ -56,7 +54,7 @@ img { max-width: 300px; margin-top: 10px; }
       立即升级
     </button>
 
-    <button onclick="hideUpgradeModal()" style="margin-top:10px;background:#eee;color:#333;">
+    <button onclick="hideUpgradeModal()" style="margin-top:10px;background:#eee;">
       取消
     </button>
   </div>
@@ -68,14 +66,17 @@ img { max-width: 300px; margin-top: 10px; }
 //////////////////////////////////////////////////
 
 const UserStore = {
-  state: { isPro: false, remaining: 0, allowed: true, credits: 0 },
+  state: { isPro: false, remaining: 0, allowed: true },
 
   async init() {
     try {
       const token = localStorage.getItem("token");
 
       const res = await fetch("/api/user", {
-        headers: { Authorization: "Bearer " + token }
+        headers: {
+          Authorization: "Bearer " + token,
+          "x-user-id": getUserId()   // 🔥 关键修复
+        }
       });
 
       const data = await res.json();
@@ -83,12 +84,11 @@ const UserStore = {
       this.state = {
         isPro: data?.isPro ?? false,
         remaining: data?.remaining ?? 0,
-        allowed: data?.allowed ?? true,
-        credits: data?.credits ?? 0
+        allowed: data?.allowed ?? true
       };
 
     } catch {
-      this.state = { isPro: false, remaining: 0, allowed: true, credits: 0 };
+      this.state = { isPro: false, remaining: 0, allowed: true };
     }
 
     updateUI();
@@ -116,7 +116,7 @@ function updateUI() {
 }
 
 //////////////////////////////////////////////////
-// 弹窗控制
+// 弹窗
 //////////////////////////////////////////////////
 
 function showUpgradeModal() {
@@ -156,14 +156,15 @@ document.getElementById("file").addEventListener("change", (e) => {
 });
 
 //////////////////////////////////////////////////
-// 点击识别
+// 点击识别（带 loading）
 //////////////////////////////////////////////////
 
-document.getElementById("btn").addEventListener("click", async () => {
+const btn = document.getElementById("btn");
+
+btn.addEventListener("click", async () => {
 
   const user = UserStore.state;
 
-  // 🔥 改成弹窗（不再 alert）
   if (!user.isPro && user.remaining <= 0) {
     showUpgradeModal();
     return;
@@ -173,6 +174,9 @@ document.getElementById("btn").addEventListener("click", async () => {
     alert("请选择图片");
     return;
   }
+
+  btn.disabled = true;
+  btn.innerText = "识别中...";
 
   const reader = new FileReader();
 
@@ -191,7 +195,6 @@ document.getElementById("btn").addEventListener("click", async () => {
 
       const data = await res.json();
 
-      // 扣次数
       await fetch("/api/increment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -206,31 +209,24 @@ document.getElementById("btn").addEventListener("click", async () => {
       await UserStore.init();
 
     } catch (err) {
-      console.error(err);
       alert("识别失败");
     }
+
+    btn.disabled = false;
+    btn.innerText = "开始识别";
   };
 
   reader.readAsDataURL(currentFile);
 });
 
 //////////////////////////////////////////////////
-// 支付按钮
+// 支付
 //////////////////////////////////////////////////
 
 document.getElementById("upgradeBtn").addEventListener("click", async () => {
-  try {
-    const res = await fetch("/api/stripe-exec", {
-      method: "POST"
-    });
-
-    const data = await res.json();
-
-    window.location.href = data.url;
-
-  } catch {
-    alert("支付失败");
-  }
+  const res = await fetch("/api/stripe-exec", { method: "POST" });
+  const data = await res.json();
+  window.location.href = data.url;
 });
 
 //////////////////////////////////////////////////
