@@ -8,6 +8,7 @@
 <style>
 body { font-family: Arial; text-align: center; padding: 20px; }
 button { padding: 10px 20px; font-size: 16px; }
+button:disabled { background: #aaa; }
 img { max-width: 300px; margin-top: 10px; }
 </style>
 </head>
@@ -27,7 +28,7 @@ img { max-width: 300px; margin-top: 10px; }
 
 <script>
 //////////////////////////////////////////////////
-// ✅ 用户状态（已修复 token）
+// ✅ 用户状态（唯一来源）
 //////////////////////////////////////////////////
 
 const UserStore = {
@@ -61,7 +62,7 @@ const UserStore = {
 };
 
 //////////////////////////////////////////////////
-// ✅ UI
+// ✅ UI 更新（稳定）
 //////////////////////////////////////////////////
 
 function updateUI() {
@@ -81,6 +82,19 @@ function updateUI() {
 }
 
 //////////////////////////////////////////////////
+// ✅ 用户ID（用于 usage）
+//////////////////////////////////////////////////
+
+function getUserId() {
+  let id = localStorage.getItem("user_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("user_id", id);
+  }
+  return id;
+}
+
+//////////////////////////////////////////////////
 // ✅ 文件选择
 //////////////////////////////////////////////////
 
@@ -96,10 +110,18 @@ document.getElementById("file").addEventListener("change", (e) => {
 });
 
 //////////////////////////////////////////////////
-// ✅ 关键修复：analyze 上传（完全正确版本）
+// ✅ 点击识别（完整正确流程）
 //////////////////////////////////////////////////
 
 document.getElementById("btn").addEventListener("click", async () => {
+
+  // 🔥 第3步：点击前限制（核心）
+  const user = UserStore.state;
+
+  if (!user.isPro && user.remaining <= 0) {
+    alert("今日次数已用完，请升级Pro");
+    return;
+  }
 
   if (!currentFile) {
     alert("请选择图片");
@@ -125,10 +147,21 @@ document.getElementById("btn").addEventListener("click", async () => {
 
       const data = await res.json();
 
+      // 🔥 第2步：扣次数（核心）
+      await fetch("/api/increment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: getUserId()
+        })
+      });
+
       document.getElementById("result").innerText =
         JSON.stringify(data, null, 2);
 
-      // 🔥 刷新用户状态（未来扣次数用）
+      // 🔥 刷新用户状态
       await UserStore.init();
 
     } catch (err) {
