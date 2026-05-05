@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-  <title>支付成功</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>支付成功</title>
 </head>
 
 <body style="
@@ -11,38 +12,68 @@
   font-family:sans-serif;
 ">
 
-  <h2>✅ 支付成功</h2>
+  <h2>🎉 支付成功</h2>
   <p id="status">正在同步会员状态...</p>
 
   <script>
-    (function () {
+    async function checkProStatus() {
       try {
-        console.log("🎉 支付成功页面");
+        const token = localStorage.getItem("token");
 
-        // ===== ❗不再写任何会员数据 =====
-        // 会员由 webhook + KV 控制
+        const res = await fetch("/api/user", {
+          headers: {
+            Authorization: "Bearer " + token
+          }
+        });
 
-        // ===== 清理旧数据（关键）=====
-        localStorage.removeItem("execExpire");
-        localStorage.removeItem("userPlan");
+        const data = await res.json();
 
-        console.log("🧹 已清理旧会员缓存");
+        return data?.isPro === true;
 
-        // ===== 提示 =====
-        document.getElementById("status").innerText =
-          "会员已激活，正在返回首页...";
-
-        // ===== 强制刷新（关键）=====
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 1200);
-
-      } catch (e) {
-        console.error("❌ 页面异常:", e);
-        document.getElementById("status").innerText =
-          "状态同步失败，请刷新页面";
+      } catch {
+        return false;
       }
-    })();
+    }
+
+    async function waitForUpgrade() {
+      const statusEl = document.getElementById("status");
+
+      let attempts = 0;
+      const maxAttempts = 5;
+
+      while (attempts < maxAttempts) {
+        statusEl.innerText = `正在同步会员状态...（${attempts + 1}/5）`;
+
+        const isPro = await checkProStatus();
+
+        if (isPro) {
+          statusEl.innerText = "✅ 会员已激活，正在返回首页...";
+          
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1000);
+
+          return;
+        }
+
+        // 等1秒再试
+        await new Promise(r => setTimeout(r, 1000));
+        attempts++;
+      }
+
+      // 超时兜底
+      statusEl.innerText = "⚠️ 状态同步中，请稍后刷新首页";
+      
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
+    }
+
+    // 清理旧缓存（保留）
+    localStorage.removeItem("execExpire");
+    localStorage.removeItem("userPlan");
+
+    waitForUpgrade();
   </script>
 
 </body>
