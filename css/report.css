@@ -1,0 +1,211 @@
+/* 页面 */
+
+body {
+  margin: 0;
+  background: #f3f4f6;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+/* 主容器 */
+
+.report-container {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 16px;
+}
+
+/* 卡片 */
+
+.report-card {
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+/* 顶部 */
+
+.report-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.report-logo {
+  font-size: 42px;
+}
+
+.report-title {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.report-subtitle {
+  color: #6b7280;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+/* 第一行 */
+
+.report-grid-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* 信息 */
+
+.info-label {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.herb-name {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.herb-scientific {
+  font-size: 22px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* 指标 */
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+}
+
+.metric-card {
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.metric-value {
+  font-size: 36px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+/* 风险 */
+
+.risk-badge {
+  display: inline-block;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+.risk-low {
+  background: #16a34a;
+}
+
+.risk-medium {
+  background: #ca8a04;
+}
+
+.risk-high {
+  background: #dc2626;
+}
+
+/* section */
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.section-content {
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 18px;
+  line-height: 1.8;
+}
+
+/* 外观特征 */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 14px;
+}
+
+.feature-item {
+  background: #f9fafb;
+  border-radius: 14px;
+  padding: 14px;
+  line-height: 1.6;
+}
+
+/* section间距 */
+
+.section-spacing {
+  margin-top: 20px;
+}
+
+/* AI说明 */
+
+.analysis-text {
+  max-width: 900px;
+  word-break: break-word;
+}
+
+/* 手机 */
+
+@media (max-width: 768px) {
+
+  .report-container {
+    padding: 10px;
+  }
+
+  .report-grid-top {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-title {
+    font-size: 28px;
+  }
+
+  .herb-name {
+    font-size: 32px;
+  }
+
+  .herb-scientific {
+    font-size: 18px;
+  }
+
+  .metric-value {
+    font-size: 28px;
+  }
+
+  .report-card,
+  .metric-card {
+    padding: 16px;
+  }
+
+}
