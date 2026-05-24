@@ -10,24 +10,46 @@ export function setupUpload() {
 
     const file = imageInput.files[0];
 
+    // 未上传图片
     if (!file) {
-      result.innerText = "请上传图片";
+
+      result.innerHTML = `
+        <div style="color:red;">
+          请上传药材图片
+        </div>
+      `;
+
       return;
+
     }
 
-    result.innerText = "开始分析...";
+    // 分析中提示
+    result.innerHTML = `
+      <div style="
+        padding:20px;
+        font-size:18px;
+      ">
+        ⏳ AI正在验药分析，请稍候...
+      </div>
+    `;
 
     try {
 
-      const data = await analyzeHerb(file);
+      // 调用AI分析
+      const html = await analyzeHerb(file);
 
-      result.innerText = JSON.stringify(data, null, 2);
+      // 渲染HTML
+      result.innerHTML = html;
 
     } catch (error) {
 
       console.error(error);
 
-      result.innerText = "分析失败";
+      result.innerHTML = `
+        <div style="color:red;">
+          ❌ 分析失败
+        </div>
+      `;
 
     }
 
