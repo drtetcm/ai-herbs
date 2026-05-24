@@ -40,12 +40,16 @@ export default async function handler(req, res) {
 
       try {
 
+        // 获取上传图片
         const imageFile = files.image[0];
 
+        // 读取图片
         const imageBuffer = fs.readFileSync(imageFile.filepath);
 
+        // 转Base64
         const base64Image = imageBuffer.toString("base64");
 
+        // Claude Vision 分析
         const response = await anthropic.messages.create({
 
           model: "claude-sonnet-4-6",
@@ -69,18 +73,48 @@ export default async function handler(req, res) {
                 {
                   type: "text",
                   text: `
+你是专业中药材鉴定AI。
+
 请分析这张中药材图片。
 
-请输出：
+严格按照以下JSON格式输出。
 
-1. 药材名称
-2. 可信度
-3. 外观特征
-4. 真伪风险
-5. 质量等级
-6. 分析原因
+不要输出任何解释文字。
+不要输出Markdown。
+不要输出 \`\`\`json
+只能输出纯JSON。
 
-请尽量专业。
+JSON格式：
+
+{
+  "药材名称": "",
+  "学名": "",
+  "可信度": "",
+  "规格": "",
+  "真假风险": "",
+  "质量等级": "",
+  "外观特征": [],
+  "分析说明": ""
+}
+
+要求：
+
+1. 外观特征必须是数组
+2. 可信度使用百分比，例如：
+   "92%"
+3. 真假风险只能填写：
+   "低"
+   "中"
+   "高"
+4. 质量等级只能填写：
+   "优质"
+   "良好"
+   "一般"
+   "较差"
+5. 如果无法判断，请填写：
+   "未知"
+
+只输出JSON。
 `
                 }
 
@@ -90,11 +124,18 @@ export default async function handler(req, res) {
 
         });
 
+        // Claude返回文字
+        const rawText = response.content[0].text;
+
+        // 转JSON
+        const parsedResult = JSON.parse(rawText);
+
+        // 返回结果
         return res.status(200).json({
 
           status: "success",
 
-          result: response.content[0].text
+          result: parsedResult
 
         });
 
