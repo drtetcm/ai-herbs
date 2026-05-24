@@ -40,19 +40,47 @@ export default async function handler(req, res) {
 
       try {
 
+        // 获取上传图片
         const imageFile = files.image[0];
 
+        // 读取图片
         const imageBuffer = fs.readFileSync(imageFile.filepath);
 
+        // 转Base64
         const base64Image = imageBuffer.toString("base64");
 
+        // Claude Vision
         const response = await anthropic.messages.create({
 
-          model: "claude-sonnet-4-6",
+          model: "claude-sonnet-4-20250514",
 
           max_tokens: 1000,
 
           temperature: 0,
+
+          system: `
+你是专业中药材鉴定AI引擎。
+
+你的唯一任务：
+
+分析中药材图片，
+并返回标准JSON。
+
+禁止输出：
+
+- Markdown
+- 标题
+- 解释
+- 分析报告
+- 代码块
+- \`\`\`
+
+只能输出合法JSON。
+
+如果无法判断：
+
+填写 "未知"
+`,
 
           messages: [
             {
@@ -71,42 +99,20 @@ export default async function handler(req, res) {
                 {
                   type: "text",
                   text: `
-你是专业中药材鉴定AI。
+请分析这张中药材图片。
 
-分析这张药材图片。
-
-必须返回合法JSON。
-
-禁止Markdown。
-禁止解释。
-禁止标题。
-禁止 \`\`\`.
-
-只能返回JSON对象。
-
-格式如下：
+返回格式：
 
 {
-  "药材名称": "string",
-  "学名": "string",
-  "可信度": "90%",
-  "规格": "string",
-  "真假风险": "低",
-  "质量等级": "良好",
-  "外观特征": [
-    "特征1",
-    "特征2"
-  ],
-  "分析说明": "string"
+  "药材名称": "",
+  "学名": "",
+  "可信度": "",
+  "规格": "",
+  "真假风险": "",
+  "质量等级": "",
+  "外观特征": [],
+  "分析说明": ""
 }
-
-如果无法识别：
-
-请填写：
-
-"未知"
-
-只输出JSON。
 `
                 }
 
@@ -116,6 +122,7 @@ export default async function handler(req, res) {
 
         });
 
+        // Claude原始返回
         const rawText = response.content[0].text;
 
         console.log("Claude原始返回：", rawText);
@@ -133,8 +140,10 @@ export default async function handler(req, res) {
 
         }
 
+        // JSON解析
         const parsedResult = JSON.parse(jsonMatch[0]);
 
+        // 返回成功结果
         return res.status(200).json({
 
           status: "success",
