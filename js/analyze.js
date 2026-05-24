@@ -9,11 +9,8 @@ export async function analyzeHerb(file) {
     formData.append("image", file);
 
     const response = await fetch("/api/analyze", {
-
       method: "POST",
-
       body: formData
-
     });
 
     const data = await response.json();
