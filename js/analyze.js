@@ -1,16 +1,36 @@
 export async function analyzeHerb(file) {
 
-  const formData = new FormData();
+  console.log("上传文件:", file);
 
-  formData.append("image", file);
+  try {
 
-  const response = await fetch("/api/analyze", {
-    method: "POST",
-    body: formData
-  });
+    const formData = new FormData();
 
-  const data = await response.json();
+    formData.append("image", file);
 
-  return data;
+    const response = await fetch("/api/analyze", {
+
+      method: "POST",
+
+      body: formData
+
+    });
+
+    const data = await response.json();
+
+    console.log("API返回:", data);
+
+    return data;
+
+  } catch (error) {
+
+    console.error("上传失败:", error);
+
+    return {
+      status: "error",
+      message: error.message
+    };
+
+  }
 
 }
