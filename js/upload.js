@@ -1,3 +1,5 @@
+import { analyzeHerb } from "./analyze.js";
+
 export function setupUpload() {
 
   const imageInput = document.getElementById("imageInput");
@@ -15,7 +17,19 @@ export function setupUpload() {
 
     result.innerText = "开始分析...";
 
-    console.log(file);
+    try {
+
+      const data = await analyzeHerb(file);
+
+      result.innerText = JSON.stringify(data, null, 2);
+
+    } catch (error) {
+
+      console.error(error);
+
+      result.innerText = "分析失败";
+
+    }
 
   });
 
