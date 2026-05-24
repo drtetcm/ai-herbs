@@ -21,7 +21,13 @@ export async function analyzeHerb(file) {
     if (data.status === "error") {
 
       return `
-        <div style="color:red;">
+        <div style="
+          background:#fff5f5;
+          color:#dc2626;
+          padding:16px;
+          border-radius:12px;
+          margin-top:20px;
+        ">
           ❌ 验药失败：${data.message}
         </div>
       `;
@@ -31,9 +37,19 @@ export async function analyzeHerb(file) {
     // 获取结果
     const herb = data.result;
 
-    // 外观特征HTML
+    // 外观特征
     const featuresHTML = herb["外观特征"]
-      .map(item => `<li>${item}</li>`)
+      .map(item => `
+        <div style="
+          background:#f5f5f5;
+          padding:10px 14px;
+          border-radius:10px;
+          margin-bottom:10px;
+          font-size:15px;
+        ">
+          • ${item}
+        </div>
+      `)
       .join("");
 
     // 风险颜色
@@ -49,53 +65,230 @@ export async function analyzeHerb(file) {
 
     // 返回HTML
     return `
+
       <div style="
+        max-width:720px;
+        margin:30px auto;
         background:#ffffff;
-        padding:24px;
-        border-radius:16px;
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
-        margin-top:20px;
-        line-height:1.8;
-        font-family:sans-serif;
+        padding:32px;
+        border-radius:24px;
+        box-shadow:0 8px 30px rgba(0,0,0,0.08);
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        color:#111827;
       ">
 
-        <h2 style="margin-bottom:20px;">
-          🌿 AI验药报告
-        </h2>
+        <div style="
+          text-align:center;
+          margin-bottom:32px;
+        ">
 
-        <p><strong>药材名称：</strong>${herb["药材名称"]}</p>
-
-        <p><strong>学名：</strong>${herb["学名"]}</p>
-
-        <p><strong>可信度：</strong>${herb["可信度"]}</p>
-
-        <p>
-          <strong>真假风险：</strong>
-          <span style="
-            color:white;
-            background:${riskColor};
-            padding:4px 10px;
-            border-radius:8px;
+          <div style="
+            font-size:42px;
+            margin-bottom:10px;
           ">
-            ${herb["真假风险"]}
-          </span>
-        </p>
+            🌿
+          </div>
 
-        <p><strong>质量等级：</strong>${herb["质量等级"]}</p>
+          <h1 style="
+            font-size:32px;
+            margin:0;
+          ">
+            AI验药报告
+          </h1>
 
-        <p><strong>规格：</strong>${herb["规格"]}</p>
+        </div>
 
-        <h3>外观特征</h3>
+        <!-- 基础信息 -->
 
-        <ul>
+        <div style="
+          display:grid;
+          gap:18px;
+        ">
+
+          <div>
+            <div style="
+              font-size:13px;
+              color:#6b7280;
+              margin-bottom:4px;
+            ">
+              药材名称
+            </div>
+
+            <div style="
+              font-size:28px;
+              font-weight:700;
+            ">
+              ${herb["药材名称"]}
+            </div>
+          </div>
+
+          <div>
+            <div style="
+              font-size:13px;
+              color:#6b7280;
+              margin-bottom:4px;
+            ">
+              学名
+            </div>
+
+            <div style="
+              font-size:18px;
+            ">
+              ${herb["学名"]}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 数据卡片 -->
+
+        <div style="
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+          gap:16px;
+          margin-top:30px;
+        ">
+
+          <div style="
+            background:#f9fafb;
+            padding:18px;
+            border-radius:16px;
+          ">
+            <div style="
+              color:#6b7280;
+              font-size:13px;
+              margin-bottom:8px;
+            ">
+              可信度
+            </div>
+
+            <div style="
+              font-size:28px;
+              font-weight:700;
+            ">
+              ${herb["可信度"]}
+            </div>
+          </div>
+
+          <div style="
+            background:#f9fafb;
+            padding:18px;
+            border-radius:16px;
+          ">
+            <div style="
+              color:#6b7280;
+              font-size:13px;
+              margin-bottom:8px;
+            ">
+              真伪风险
+            </div>
+
+            <div>
+              <span style="
+                background:${riskColor};
+                color:white;
+                padding:6px 12px;
+                border-radius:999px;
+                font-size:14px;
+                font-weight:600;
+              ">
+                ${herb["真假风险"]}
+              </span>
+            </div>
+          </div>
+
+          <div style="
+            background:#f9fafb;
+            padding:18px;
+            border-radius:16px;
+          ">
+            <div style="
+              color:#6b7280;
+              font-size:13px;
+              margin-bottom:8px;
+            ">
+              质量等级
+            </div>
+
+            <div style="
+              font-size:24px;
+              font-weight:700;
+            ">
+              ${herb["质量等级"]}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 规格 -->
+
+        <div style="
+          margin-top:30px;
+        ">
+
+          <h2 style="
+            font-size:20px;
+            margin-bottom:14px;
+          ">
+            规格信息
+          </h2>
+
+          <div style="
+            background:#f9fafb;
+            padding:18px;
+            border-radius:16px;
+            line-height:1.7;
+          ">
+            ${herb["规格"]}
+          </div>
+
+        </div>
+
+        <!-- 外观特征 -->
+
+        <div style="
+          margin-top:30px;
+        ">
+
+          <h2 style="
+            font-size:20px;
+            margin-bottom:14px;
+          ">
+            外观特征
+          </h2>
+
           ${featuresHTML}
-        </ul>
 
-        <h3>分析说明</h3>
+        </div>
 
-        <p>
-          ${herb["分析说明"]}
-        </p>
+        <!-- 分析说明 -->
+
+        <div style="
+          margin-top:30px;
+        ">
+
+          <h2 style="
+            font-size:20px;
+            margin-bottom:14px;
+          ">
+            AI分析说明
+          </h2>
+
+          <div style="
+            background:#f9fafb;
+            padding:20px;
+            border-radius:16px;
+            line-height:1.8;
+            font-size:15px;
+          ">
+            ${herb["分析说明"]}
+          </div>
+
+        </div>
 
       </div>
     `;
@@ -105,7 +298,13 @@ export async function analyzeHerb(file) {
     console.error("上传失败:", error);
 
     return `
-      <div style="color:red;">
+      <div style="
+        background:#fff5f5;
+        color:#dc2626;
+        padding:16px;
+        border-radius:12px;
+        margin-top:20px;
+      ">
         ❌ 系统错误：${error.message}
       </div>
     `;
