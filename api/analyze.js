@@ -81,60 +81,104 @@ export default async function handler(req, res) {
           imageBuffer.toString("base64");
 
         // =========================
-        // PROMPT
+        // INDUSTRIAL PROMPT
         // =========================
 
         const prompt = `
-请分析用户上传的中药材图片。
+You are an industrial herbal material inspection AI.
 
-你必须返回JSON。
+Your task is NOT only to identify herbs.
 
-禁止Markdown。
+You must FIRST determine whether the uploaded image is actually a herbal material.
 
-JSON结构：
+Return STRICT JSON ONLY.
 
-{
-  "herb_name": "",
-  "confidence": 0,
-  "image_quality_score": 0,
-  "image_blur_level": "",
-  "lighting_quality": "",
-  "visibility_score": 0,
-  "quality_grade": "",
-  "risk_level": "",
-  "fake_probability": 0,
-  "mold_risk": 0,
-  "sulfur_fumigation_risk": 0,
-  "issues_detected": [],
-  "expert_summary": "",
-  "recommendation": ""
-}
+NO markdown.
+NO explanation.
+NO code block.
 
-规则：
+Rules:
 
-1. herb_name无法确认：
-返回：
-"未知"
+1. Determine if the object is herbal-like.
 
-2. confidence:
+2. Detect object type.
+
+Allowed object_type values:
+- herb
+- powder
+- plastic
+- food
+- packaging
+- table
+- human_hand
+- animal
+- unknown
+
+3. If image is not clearly herbal:
+- set is_herb_like = false
+- increase unknown_probability
+
+4. If image quality is poor:
+- reduce confidence
+- increase unknown_probability
+
+5. unknown_probability:
+0-20 = likely herb
+20-50 = suspicious
+50-100 = likely NOT herb
+
+6. confidence:
 0-100
 
-3. risk_level:
-只能：
+7. risk_level:
+ONLY:
 LOW
 MEDIUM
 HIGH
 UNKNOWN
 
-4. expert_summary:
-必须专业。
+8. herb_name:
+If uncertain:
+return:
+"未知"
 
-5. recommendation:
-必须明确。
+Return JSON:
 
-6. 不允许输出解释文字。
+{
+  "herb_name": "",
 
-只能输出JSON。
+  "confidence": 0,
+
+  "is_herb_like": true,
+
+  "object_type": "herb",
+
+  "unknown_probability": 0,
+
+  "image_quality_score": 0,
+
+  "image_blur_level": "LOW",
+
+  "lighting_quality": "GOOD",
+
+  "visibility_score": 0,
+
+  "quality_grade": "A",
+
+  "risk_level": "LOW",
+
+  "fake_probability": 0,
+
+  "mold_risk": 0,
+
+  "sulfur_fumigation_risk": 0,
+
+  "issues_detected": [],
+
+  "expert_summary": "",
+
+  "recommendation": ""
+}
 `;
 
         // =========================
@@ -146,13 +190,21 @@ UNKNOWN
 
             model: "claude-sonnet-4-6",
 
-            max_tokens: 1800,
+            max_tokens: 2000,
 
             temperature: 0,
 
             system: `
-你是工业级AI中药材鉴定系统。
+你是工业级AI中药材风控系统。
+
+你的第一任务：
+判断图片是不是药材。
+
+不是药材时：
+必须提高 unknown_probability。
+
 严格输出JSON。
+
 禁止Markdown。
 禁止代码块。
 禁止解释。
@@ -249,6 +301,59 @@ UNKNOWN
         }
 
         // =========================
+        // SAFE DEFAULTS
+        // =========================
+
+        parsed.is_herb_like ??= true;
+
+        parsed.object_type ??= "unknown";
+
+        parsed.unknown_probability ??= 0;
+
+        // =========================
+        // HARD UNKNOWN DETECTION
+        // =========================
+
+        let forceUnknown = false;
+
+        if (
+          parsed.is_herb_like === false
+        ) {
+
+          forceUnknown = true;
+
+        }
+
+        if (
+          Number(parsed.unknown_probability) >= 60
+        ) {
+
+          forceUnknown = true;
+
+        }
+
+        const nonHerbalObjects = [
+
+          "plastic",
+          "food",
+          "table",
+          "human_hand",
+          "animal",
+          "packaging"
+
+        ];
+
+        if (
+          nonHerbalObjects.includes(
+            parsed.object_type
+          )
+        ) {
+
+          forceUnknown = true;
+
+        }
+
+        // =========================
         // NORMALIZE
         // =========================
 
@@ -259,6 +364,17 @@ UNKNOWN
 
           confidence:
             Number(parsed.confidence || 0),
+
+          is_herb_like:
+            Boolean(parsed.is_herb_like),
+
+          object_type:
+            parsed.object_type || "unknown",
+
+          unknown_probability:
+            Number(
+              parsed.unknown_probability || 0
+            ),
 
           image_quality_score:
             Number(parsed.image_quality_score || 0),
@@ -298,7 +414,10 @@ UNKNOWN
 
           recommendation:
             parsed.recommendation ||
-            "暂无建议"
+            "暂无建议",
+
+          force_unknown:
+            forceUnknown
 
         };
 
@@ -307,52 +426,67 @@ UNKNOWN
         // =========================
 
         const riskResult =
-  calculateRisk({
+          calculateRisk({
 
-    confidence:
-      normalizedResult.confidence,
+            confidence:
+              normalizedResult.confidence,
 
-    visibility:
-      normalizedResult.visibility_score,
+            visibility:
+              normalizedResult.visibility_score,
 
-    clarity:
-      normalizedResult.image_blur_level,
+            clarity:
+              normalizedResult.image_blur_level,
 
-    lighting:
-      normalizedResult.lighting_quality,
+            lighting:
+              normalizedResult.lighting_quality,
 
-    herb_name:
-      normalizedResult.herb_name,
+            herb_name:
+              normalizedResult.herb_name,
 
-    abnormal:
-      normalizedResult.issues_detected
-        ?.join(" ") || ""
+            abnormal:
+              normalizedResult.issues_detected
+                ?.join(" ") || "",
 
-  });
+            unknown_probability:
+              normalizedResult.unknown_probability,
 
-/* =========================
-   APPLY RISK RESULT
-========================= */
+            object_type:
+              normalizedResult.object_type,
 
-normalizedResult.risk_level =
-  riskResult.riskLevel;
+            force_unknown:
+              normalizedResult.force_unknown
 
-normalizedResult.total_risk_score =
-  riskResult.totalRisk;
+          });
 
-/* =========================
-   UNKNOWN MODE
-========================= */
+        // =========================
+        // APPLY RISK
+        // =========================
 
-if (riskResult.isUnknown) {
+        normalizedResult.risk_level =
+          riskResult.riskLevel;
 
-  normalizedResult.herb_name =
-    "未知";
+        normalizedResult.total_risk_score =
+          riskResult.totalRisk;
 
-  normalizedResult.quality_grade =
-    "无法评级";
+        // =========================
+        // UNKNOWN MODE
+        // =========================
 
-}
+        if (
+          riskResult.isUnknown ||
+          normalizedResult.force_unknown
+        ) {
+
+          normalizedResult.herb_name =
+            "未知对象";
+
+          normalizedResult.risk_level =
+            "HIGH";
+
+          normalizedResult.quality_grade =
+            "无法评级";
+
+        }
 
         // =========================
         // REPORT
@@ -362,8 +496,20 @@ if (riskResult.isUnknown) {
 药材名称：
 ${normalizedResult.herb_name}
 
+对象类型：
+${normalizedResult.object_type}
+
+是否药材：
+${normalizedResult.is_herb_like ? "是" : "否"}
+
+未知对象概率：
+${normalizedResult.unknown_probability}%
+
 风险等级：
 ${normalizedResult.risk_level}
+
+总风险：
+${normalizedResult.total_risk_score}%
 
 AI置信度：
 ${normalizedResult.confidence}%
@@ -415,6 +561,15 @@ ${normalizedResult.recommendation}
           visibility:
             `${normalizedResult.visibility_score}%`,
 
+          unknown_probability:
+            normalizedResult.unknown_probability,
+
+          object_type:
+            normalizedResult.object_type,
+
+          is_herb_like:
+            normalizedResult.is_herb_like,
+
           result:
             normalizedResult
 
@@ -422,7 +577,10 @@ ${normalizedResult.recommendation}
 
       } catch (visionError) {
 
-        console.error("VISION ERROR:", visionError);
+        console.error(
+          "VISION ERROR:",
+          visionError
+        );
 
         return res.status(500).json({
 
