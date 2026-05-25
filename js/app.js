@@ -88,7 +88,15 @@ imageInput.addEventListener("change", () => {
   uploadText.textContent =
     file.name;
 
-  /* reset state */
+  resetUI();
+
+});
+
+/* -------------------------------- */
+/* RESET UI */
+/* -------------------------------- */
+
+function resetUI() {
 
   result.innerHTML = "";
 
@@ -111,7 +119,7 @@ imageInput.addEventListener("change", () => {
 
   loading.classList.add("hidden");
 
-});
+}
 
 /* -------------------------------- */
 /* ANALYZE */
@@ -169,7 +177,7 @@ analyzeBtn.addEventListener("click", async () => {
 });
 
 /* -------------------------------- */
-/* LOADING SYSTEM */
+/* LOADING */
 /* -------------------------------- */
 
 function startLoading() {
@@ -224,15 +232,56 @@ function stopLoading() {
 }
 
 /* -------------------------------- */
-/* RESULT RENDER */
+/* RESULT */
 /* -------------------------------- */
 
 function renderResult(data) {
 
-  const report =
-    data.report ||
-    data.message ||
-    "No AI report returned.";
+  const candidatesText =
+    formatCandidates(
+      data.possible_candidates
+    );
+
+  const report = `
+药材名称：
+${data.herb_name || "未知"}
+
+候选药材：
+${candidatesText}
+
+识别依据：
+${data.identification_basis || "暂无"}
+
+视觉特征分析：
+${data.visual_analysis || "暂无"}
+
+对象类型：
+${data.object_type || "unknown"}
+
+是否药材：
+${data.is_herb_like ? "是" : "否"}
+
+未知对象概率：
+${data.unknown_probability || 0}%
+
+风险等级：
+${data.risk || "UNKNOWN"}
+
+总风险：
+${data.totalRisk || 0}%
+
+AI置信度：
+${data.confidence || 0}%
+
+图片清晰度：
+${data.clarity || "--"}
+
+光线质量：
+${data.lighting || "--"}
+
+可见度：
+${data.visibility || "--"}%
+`;
 
   result.innerHTML = `
     <div class="report-content">
@@ -243,6 +292,45 @@ function renderResult(data) {
   renderRisk(data);
 
   renderQuality(data);
+
+}
+
+/* -------------------------------- */
+/* FORMAT CANDIDATES */
+/* -------------------------------- */
+
+function formatCandidates(candidates) {
+
+  if (
+    !candidates ||
+    !Array.isArray(candidates)
+  ) {
+
+    return "无";
+
+  }
+
+  return candidates
+
+    .map(item => {
+
+      if (
+        typeof item === "string"
+      ) {
+
+        return item;
+      }
+
+      return `
+${item.herb_name || "未知"}
+（匹配度 ${
+  item.match_score || 0
+}%）
+`;
+
+    })
+
+    .join("、");
 
 }
 
@@ -267,7 +355,7 @@ function formatReport(text) {
 }
 
 /* -------------------------------- */
-/* RISK SYSTEM */
+/* RISK */
 /* -------------------------------- */
 
 function renderRisk(data) {
@@ -282,7 +370,8 @@ function renderRisk(data) {
 
   ).toUpperCase();
 
-  let score = 12;
+  let score =
+    Number(data.totalRisk || 12);
 
   let badgeClass =
     "risk-low";
@@ -290,8 +379,6 @@ function renderRisk(data) {
   if (
     risk.includes("HIGH")
   ) {
-
-    score = 88;
 
     badgeClass =
       "risk-high";
@@ -302,8 +389,6 @@ function renderRisk(data) {
     risk.includes("MEDIUM")
   ) {
 
-    score = 56;
-
     badgeClass =
       "risk-medium";
 
@@ -313,10 +398,14 @@ function renderRisk(data) {
     risk.includes("UNKNOWN")
   ) {
 
-    score = 72;
-
     badgeClass =
-      "risk-medium";
+      "risk-high";
+
+  }
+
+  if (score > 100) {
+
+    score = 100;
 
   }
 
@@ -335,7 +424,7 @@ function renderRisk(data) {
 }
 
 /* -------------------------------- */
-/* QUALITY SYSTEM */
+/* QUALITY */
 /* -------------------------------- */
 
 function renderQuality(data) {
@@ -354,9 +443,7 @@ function renderQuality(data) {
 
   visibilityValue.textContent =
 
-    data.visibility ||
-
-    "--";
+    `${data.visibility || "--"}%`;
 
   confidenceValue.textContent =
 
