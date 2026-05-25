@@ -93,7 +93,7 @@ export async function analyzeHerb(file) {
 
           <!-- 药材信息 -->
 
-          <div class="card">
+          <div class="card risk-card">
 
             <div class="card-label">
               药材名称
@@ -111,7 +111,7 @@ export async function analyzeHerb(file) {
 
           <!-- 可信度 -->
 
-          <div class="card">
+          <div class="card risk-card">
 
             <div class="card-label">
               可信度
@@ -125,7 +125,7 @@ export async function analyzeHerb(file) {
 
           <!-- 风险 -->
 
-          <div class="card">
+          <div class="card risk-card">
 
             <div class="card-label">
               真伪风险
@@ -143,7 +143,7 @@ export async function analyzeHerb(file) {
 
           <!-- 质量 -->
 
-          <div class="card">
+          <div class="card risk-card">
 
             <div class="card-label">
               质量等级
@@ -201,6 +201,10 @@ export async function analyzeHerb(file) {
             AI分析说明
           </h2>
 
+          <div class="ai-tag">
+            AI VISION ANALYSIS
+          </div>
+          
           <div class="analysis-box">
 
             ${herb["分析说明"]}
