@@ -5,7 +5,7 @@ body {
   background:
     linear-gradient(
       180deg,
-      #edf2ff 0%,
+      #eef2ff 0%,
       #f8fafc 100%
     );
 
@@ -19,16 +19,225 @@ body {
 }
 
 /* =========================
-   Container
+   Upload Page
+========================= */
+
+.upload-page {
+
+  min-height: 100vh;
+
+  padding:
+    42px 20px 80px;
+
+  box-sizing: border-box;
+}
+
+/* =========================
+   Upload Header
+========================= */
+
+.upload-logo {
+
+  font-size: 44px;
+
+  margin-bottom: 10px;
+}
+
+.upload-title {
+
+  margin: 0;
+
+  font-size: 56px;
+
+  font-weight: 800;
+
+  letter-spacing: -2px;
+
+  color: #0f172a;
+}
+
+.upload-subtitle {
+
+  margin-top: 14px;
+
+  font-size: 20px;
+
+  color: #475569;
+}
+
+/* =========================
+   Upload Card
+========================= */
+
+.upload-card {
+
+  margin-top: 32px;
+
+  background: white;
+
+  border-radius: 28px;
+
+  padding: 28px;
+
+  box-shadow:
+    0 10px 30px rgba(15,23,42,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.7);
+
+  max-width: 520px;
+}
+
+/* =========================
+   Upload Dropzone
+========================= */
+
+.upload-dropzone {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border:
+    2px dashed #cbd5e1;
+
+  border-radius: 22px;
+
+  padding: 42px 24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8fafc,
+      #ffffff
+    );
+
+  cursor: pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+.upload-dropzone:hover {
+
+  border-color: #2563eb;
+
+  background:
+    #f8fbff;
+}
+
+.upload-icon {
+
+  font-size: 52px;
+
+  margin-bottom: 14px;
+}
+
+.upload-text {
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+  color: #0f172a;
+}
+
+.upload-hint {
+
+  margin-top: 10px;
+
+  font-size: 14px;
+
+  color: #64748b;
+}
+
+/* Hide Native Input */
+
+#imageInput {
+
+  display: none;
+}
+
+/* =========================
+   Button
+========================= */
+
+#analyzeBtn {
+
+  width: 100%;
+
+  margin-top: 20px;
+
+  border: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    );
+
+  color: white;
+
+  border-radius: 18px;
+
+  padding: 18px;
+
+  font-size: 17px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+#analyzeBtn:hover {
+
+  transform: translateY(-2px);
+
+  opacity: 0.95;
+}
+
+/* =========================
+   Loading
+========================= */
+
+#loading {
+
+  margin-top: 24px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #2563eb;
+}
+
+/* =========================
+   Result
+========================= */
+
+#result {
+
+  width: 100%;
+}
+
+/* =========================
+   Report Container
 ========================= */
 
 .report-container {
 
-  max-width: 1200px;
+  max-width: 1280px;
 
-  margin: 24px auto;
-
-  padding: 0 18px;
+  margin: 40px auto 0;
 }
 
 /* =========================
@@ -41,23 +250,21 @@ body {
     linear-gradient(
       135deg,
       #0f172a,
-      #1e293b
+      #172554
     );
 
-  border-radius: 24px;
+  border-radius: 28px;
 
-  padding: 28px 34px;
+  padding: 30px 36px;
 
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 
   box-shadow:
-    0 10px 32px rgba(15,23,42,0.14);
+    0 12px 34px rgba(15,23,42,0.16);
 
   display: flex;
 
   align-items: center;
-
-  justify-content: space-between;
 }
 
 .header-left {
@@ -71,27 +278,27 @@ body {
 
 .header-logo {
 
-  font-size: 42px;
+  font-size: 48px;
 }
 
 .header-title h1 {
 
   margin: 0;
 
-  font-size: 34px;
+  font-size: 48px;
 
   font-weight: 800;
 
   color: white;
 
-  letter-spacing: -1px;
+  letter-spacing: -2px;
 }
 
 .header-title p {
 
   margin-top: 8px;
 
-  font-size: 14px;
+  font-size: 16px;
 
   color: rgba(255,255,255,0.68);
 }
@@ -105,9 +312,9 @@ body {
   display: grid;
 
   grid-template-columns:
-    400px 1fr;
+    420px 1fr;
 
-  gap: 22px;
+  gap: 24px;
 
   margin-bottom: 24px;
 }
@@ -122,9 +329,9 @@ body {
 
   background: white;
 
-  border-radius: 24px;
+  border-radius: 28px;
 
-  min-height: 400px;
+  min-height: 420px;
 
   box-shadow:
     0 10px 30px rgba(15,23,42,0.08);
@@ -150,13 +357,13 @@ body {
   background:
     linear-gradient(
       135deg,
-      #111827,
-      #1e293b
+      #0f172a,
+      #172554
     );
 
-  border-radius: 24px;
+  border-radius: 28px;
 
-  padding: 34px;
+  padding: 38px;
 
   color: white;
 
@@ -167,7 +374,7 @@ body {
   justify-content: center;
 
   box-shadow:
-    0 10px 30px rgba(15,23,42,0.14);
+    0 10px 30px rgba(15,23,42,0.16);
 }
 
 .hero-badge {
@@ -186,37 +393,37 @@ body {
 
   border-radius: 999px;
 
-  padding: 8px 14px;
+  padding: 8px 16px;
 
-  font-size: 11px;
+  font-size: 12px;
 
   font-weight: 700;
 
   letter-spacing: 1px;
 
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .hero-name {
 
   margin: 0;
 
-  font-size: 44px;
+  font-size: 64px;
 
   font-weight: 800;
 
-  line-height: 1.1;
+  line-height: 1.05;
 
-  letter-spacing: -1px;
+  letter-spacing: -3px;
 }
 
 .hero-latin {
 
-  margin-top: 12px;
+  margin-top: 14px;
 
-  font-size: 16px;
+  font-size: 18px;
 
-  color: rgba(255,255,255,0.68);
+  color: rgba(255,255,255,0.72);
 }
 
 /* =========================
@@ -227,9 +434,9 @@ body {
 
   display: flex;
 
-  gap: 16px;
+  gap: 18px;
 
-  margin-top: 28px;
+  margin-top: 32px;
 }
 
 .hero-stat {
@@ -242,25 +449,23 @@ body {
   border:
     1px solid rgba(255,255,255,0.08);
 
-  border-radius: 18px;
+  border-radius: 20px;
 
-  padding: 18px;
+  padding: 22px;
 }
 
 .hero-stat-label {
 
-  font-size: 12px;
+  font-size: 13px;
 
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.65);
 
-  margin-bottom: 10px;
-
-  letter-spacing: 1px;
+  margin-bottom: 12px;
 }
 
 .hero-stat-value {
 
-  font-size: 30px;
+  font-size: 48px;
 
   font-weight: 800;
 }
@@ -274,9 +479,9 @@ body {
   display: grid;
 
   grid-template-columns:
-    1fr 280px;
+    1fr 300px;
 
-  gap: 22px;
+  gap: 24px;
 
   margin-bottom: 24px;
 }
@@ -291,7 +496,7 @@ body {
 
   flex-direction: column;
 
-  gap: 22px;
+  gap: 24px;
 }
 
 /* =========================
@@ -320,9 +525,9 @@ body {
       #f8fafc
     );
 
-  border-radius: 22px;
+  border-radius: 26px;
 
-  padding: 22px;
+  padding: 24px;
 
   box-shadow:
     0 8px 22px rgba(15,23,42,0.05);
@@ -330,8 +535,6 @@ body {
   border:
     1px solid #e2e8f0;
 }
-
-/* Risk Side */
 
 .risk-side {
 
@@ -346,32 +549,26 @@ body {
     1px solid #fecaca;
 }
 
-/* =========================
-   Side Typography
-========================= */
-
 .side-label {
 
-  font-size: 12px;
+  font-size: 13px;
 
   font-weight: 700;
 
-  letter-spacing: 1px;
-
-  text-transform: uppercase;
-
   color: #64748b;
+
+  letter-spacing: 1px;
 }
 
 .side-value {
 
-  margin-top: 14px;
+  margin-top: 16px;
 
-  font-size: 28px;
+  font-size: 48px;
 
   font-weight: 800;
 
-  color: #0f172a;
+  letter-spacing: -2px;
 }
 
 /* =========================
@@ -388,15 +585,15 @@ body {
 
   justify-content: center;
 
-  min-width: 90px;
+  min-width: 100px;
 
-  padding: 10px 18px;
+  padding: 12px 22px;
 
   border-radius: 999px;
 
   color: white;
 
-  font-size: 14px;
+  font-size: 16px;
 
   font-weight: 700;
 }
@@ -414,7 +611,7 @@ body {
 }
 
 /* =========================
-   Section
+   Sections
 ========================= */
 
 .section {
@@ -422,32 +619,84 @@ body {
   background:
     rgba(255,255,255,0.94);
 
-  border-radius: 24px;
+  border-radius: 28px;
 
-  padding: 24px;
+  padding: 32px;
 
   box-shadow:
     0 8px 22px rgba(15,23,42,0.05);
 
   border:
-    1px solid rgba(255,255,255,0.6);
+    1px solid rgba(255,255,255,0.7);
 }
 
 .section-title {
 
-  margin: 0 0 18px;
+  margin: 0 0 22px;
 
-  font-size: 22px;
+  font-size: 28px;
 
   font-weight: 800;
 
-  letter-spacing: -0.5px;
-
-  color: #0f172a;
+  letter-spacing: -1px;
 }
 
 /* =========================
-   Feature List
+   AI Tag
+========================= */
+
+.ai-tag {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  background: #dbeafe;
+
+  color: #1d4ed8;
+
+  border-radius: 999px;
+
+  padding: 8px 16px;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 20px;
+}
+
+/* =========================
+   Analysis
+========================= */
+
+.analysis-box {
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8fafc,
+      #ffffff
+    );
+
+  border-left:
+    5px solid #2563eb;
+
+  border-radius: 20px;
+
+  padding: 28px;
+
+  font-size: 17px;
+
+  line-height: 2;
+
+  color: #1e293b;
+}
+
+/* =========================
+   Features
 ========================= */
 
 .feature-list {
@@ -457,7 +706,7 @@ body {
   grid-template-columns:
     1fr 1fr;
 
-  gap: 14px;
+  gap: 18px;
 }
 
 .feature-item {
@@ -472,11 +721,11 @@ body {
   border:
     1px solid #e2e8f0;
 
-  border-radius: 16px;
+  border-radius: 20px;
 
-  padding: 16px;
+  padding: 22px;
 
-  font-size: 15px;
+  font-size: 16px;
 
   line-height: 1.8;
 
@@ -499,67 +748,13 @@ body {
   border:
     1px solid #e2e8f0;
 
-  border-radius: 16px;
+  border-radius: 18px;
 
   padding: 18px;
 
   font-size: 16px;
 
   line-height: 1.8;
-}
-
-/* =========================
-   AI Tag
-========================= */
-
-.ai-tag {
-
-  display: inline-flex;
-
-  align-items: center;
-
-  background: #dbeafe;
-
-  color: #1d4ed8;
-
-  border-radius: 999px;
-
-  padding: 7px 14px;
-
-  font-size: 11px;
-
-  font-weight: 800;
-
-  letter-spacing: 1px;
-
-  margin-bottom: 18px;
-}
-
-/* =========================
-   Analysis
-========================= */
-
-.analysis-box {
-
-  background:
-    linear-gradient(
-      180deg,
-      #f8fafc,
-      #ffffff
-    );
-
-  border-left:
-    4px solid #2563eb;
-
-  border-radius: 16px;
-
-  padding: 22px;
-
-  font-size: 15px;
-
-  line-height: 2;
-
-  color: #1e293b;
 }
 
 /* =========================
@@ -585,6 +780,11 @@ body {
     grid-template-columns:
       1fr 1fr 1fr;
   }
+
+  .hero-name {
+
+    font-size: 52px;
+  }
 }
 
 /* =========================
@@ -593,44 +793,110 @@ body {
 
 @media (max-width: 768px) {
 
-  .report-container {
+  .upload-page {
 
-    padding: 0 14px;
+    padding:
+      24px 16px 60px;
+  }
+
+  .upload-title {
+
+    font-size: 34px;
+
+    letter-spacing: -1px;
+  }
+
+  .upload-subtitle {
+
+    font-size: 16px;
+  }
+
+  .upload-card {
+
+    padding: 22px;
+
+    border-radius: 24px;
+  }
+
+  .upload-dropzone {
+
+    padding: 28px 18px;
+  }
+
+  .upload-icon {
+
+    font-size: 42px;
+  }
+
+  .upload-text {
+
+    font-size: 18px;
   }
 
   .report-header {
 
-    padding: 24px 20px;
-  }
+    padding: 24px;
 
-  .header-logo {
-
-    font-size: 36px;
+    border-radius: 24px;
   }
 
   .header-title h1 {
 
-    font-size: 28px;
+    font-size: 30px;
+  }
+
+  .header-title p {
+
+    font-size: 14px;
+  }
+
+  .hero-layout {
+
+    grid-template-columns: 1fr;
+
+    gap: 18px;
   }
 
   .hero-image-card {
 
-    min-height: 280px;
+    min-height: 240px;
   }
 
   .hero-summary {
 
-    padding: 24px;
+    padding: 26px;
   }
 
   .hero-name {
 
-    font-size: 34px;
+    font-size: 42px;
+  }
+
+  .hero-latin {
+
+    font-size: 15px;
   }
 
   .hero-stats {
 
     flex-direction: column;
+
+    gap: 14px;
+  }
+
+  .hero-stat {
+
+    padding: 18px;
+  }
+
+  .hero-stat-value {
+
+    font-size: 34px;
+  }
+
+  .dashboard-layout {
+
+    grid-template-columns: 1fr;
   }
 
   .dashboard-side {
@@ -638,9 +904,49 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .section {
+
+    padding: 24px;
+  }
+
+  .section-title {
+
+    font-size: 24px;
+  }
+
+  .analysis-box {
+
+    padding: 22px;
+
+    font-size: 16px;
+
+    line-height: 1.9;
+  }
+
   .feature-list {
 
     grid-template-columns: 1fr;
+  }
+
+  .feature-item {
+
+    padding: 18px;
+
+    font-size: 15px;
+  }
+
+  .side-value {
+
+    font-size: 34px;
+  }
+
+  .risk-low,
+  .risk-medium,
+  .risk-high {
+
+    min-width: 90px;
+
+    padding: 10px 18px;
   }
 }
 
@@ -650,23 +956,62 @@ body {
 
 @media (max-width: 480px) {
 
-  .hero-name {
+  .upload-title {
 
     font-size: 28px;
   }
 
-  .hero-stat-value {
+  .upload-subtitle {
 
-    font-size: 26px;
+    font-size: 15px;
   }
 
-  .side-value {
+  .hero-summary {
 
-    font-size: 24px;
+    padding: 22px;
+  }
+
+  .hero-name {
+
+    font-size: 34px;
+  }
+
+  .hero-image-card {
+
+    min-height: 220px;
   }
 
   .section {
 
+    padding: 20px;
+  }
+
+  .section-title {
+
+    font-size: 22px;
+  }
+
+  .analysis-box {
+
     padding: 18px;
+
+    font-size: 15px;
+  }
+
+  .feature-item {
+
+    padding: 16px;
+
+    font-size: 15px;
+  }
+
+  .side-card {
+
+    padding: 20px;
+  }
+
+  .side-value {
+
+    font-size: 30px;
   }
 }

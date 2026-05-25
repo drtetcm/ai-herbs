@@ -47,15 +47,51 @@
 
     <div class="upload-card">
 
+      <!-- Upload Area -->
+
+      <label
+        for="imageInput"
+        class="upload-dropzone"
+      >
+
+        <div class="upload-icon">
+          📸
+        </div>
+
+        <div class="upload-text">
+          上传药材图片
+        </div>
+
+        <div class="upload-hint">
+          支持 JPG / PNG
+        </div>
+
+      </label>
+
+      <!-- Hidden Input -->
+
       <input
         type="file"
         id="imageInput"
         accept="image/*"
       />
 
+      <!-- Analyze Button -->
+
       <button id="analyzeBtn">
         开始AI验药
       </button>
+
+    </div>
+
+    <!-- Loading -->
+
+    <div
+      id="loading"
+      style="display:none;"
+    >
+
+      AI正在分析药材图片...
 
     </div>
 
