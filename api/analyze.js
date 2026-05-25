@@ -1,5 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
+
 import formidable from "formidable";
+
 import fs from "fs";
 
 import { calculateRisk }
@@ -18,7 +20,7 @@ const anthropic = new Anthropic({
 export default async function handler(req, res) {
 
   // =========================
-  // Method Check
+  // METHOD CHECK
   // =========================
 
   if (req.method !== "POST") {
@@ -33,7 +35,7 @@ export default async function handler(req, res) {
   try {
 
     // =========================
-    // Parse FormData
+    // PARSE FORM
     // =========================
 
     const form = formidable({});
@@ -42,7 +44,7 @@ export default async function handler(req, res) {
 
       if (err) {
 
-        console.error("Form Parse Error:", err);
+        console.error("FORM ERROR:", err);
 
         return res.status(500).json({
           status: "error",
@@ -54,10 +56,10 @@ export default async function handler(req, res) {
       try {
 
         // =========================
-        // Get Image
+        // IMAGE
         // =========================
 
-        const imageFile = files.image[0];
+        const imageFile = files.image?.[0];
 
         if (!imageFile) {
 
@@ -69,251 +71,344 @@ export default async function handler(req, res) {
         }
 
         // =========================
-        // Get Prompt
+        // IMAGE BASE64
         // =========================
 
-        const prompt = fields.prompt?.[0] || `
+        const imageBuffer =
+          fs.readFileSync(imageFile.filepath);
+
+        const base64Image =
+          imageBuffer.toString("base64");
+
+        // =========================
+        // PROMPT
+        // =========================
+
+        const prompt = `
 请分析用户上传的中药材图片。
-`;
 
-        console.log("收到Prompt:", prompt);
+你必须返回JSON。
 
-        // =========================
-        // Read Image
-        // =========================
+禁止Markdown。
 
-        const imageBuffer = fs.readFileSync(imageFile.filepath);
+JSON结构：
 
-        const base64Image = imageBuffer.toString("base64");
+{
+  "herb_name": "",
+  "confidence": 0,
+  "image_quality_score": 0,
+  "image_blur_level": "",
+  "lighting_quality": "",
+  "visibility_score": 0,
+  "quality_grade": "",
+  "risk_level": "",
+  "fake_probability": 0,
+  "mold_risk": 0,
+  "sulfur_fumigation_risk": 0,
+  "issues_detected": [],
+  "expert_summary": "",
+  "recommendation": ""
+}
 
-        // =========================
-        // Claude Vision Request
-        // =========================
+规则：
 
-        const response = await anthropic.messages.create({
-
-          model: "claude-sonnet-4-6",
-
-          max_tokens: 1500,
-
-          temperature: 0,
-
-          system: `
-你是企业级 AI中药材鉴定引擎。
-
-你的唯一任务：
-
-分析药材图片，
-并严格输出JSON。
-
-禁止：
-
-- Markdown
-- 标题
-- 代码块
-- 解释文字
-- \`\`\`
-
-只能输出合法JSON。
-
-如果无法确定：
-
-必须明确写：
-
+1. herb_name无法确认：
+返回：
 "未知"
 
-禁止编造。
+2. confidence:
+0-100
+
+3. risk_level:
+只能：
+LOW
+MEDIUM
+HIGH
+UNKNOWN
+
+4. expert_summary:
+必须专业。
+
+5. recommendation:
+必须明确。
+
+6. 不允许输出解释文字。
+
+只能输出JSON。
+`;
+
+        // =========================
+        // CLAUDE REQUEST
+        // =========================
+
+        const response =
+          await anthropic.messages.create({
+
+            model: "claude-sonnet-4-20250514",
+
+            max_tokens: 1800,
+
+            temperature: 0,
+
+            system: `
+你是工业级AI中药材鉴定系统。
+严格输出JSON。
+禁止Markdown。
+禁止代码块。
+禁止解释。
 `,
 
-          messages: [
-            {
-              role: "user",
-              content: [
+            messages: [
 
-                // =========================
-                // Image
-                // =========================
+              {
+                role: "user",
 
-                {
-                  type: "image",
-                  source: {
-                    type: "base64",
-                    media_type: imageFile.mimetype,
-                    data: base64Image
+                content: [
+
+                  {
+                    type: "image",
+
+                    source: {
+                      type: "base64",
+
+                      media_type:
+                        imageFile.mimetype,
+
+                      data: base64Image
+                    }
+                  },
+
+                  {
+                    type: "text",
+
+                    text: prompt
                   }
-                },
 
-                // =========================
-                // Prompt Engine
-                // =========================
+                ]
+              }
 
-                {
-                  type: "text",
-                  text: prompt
-                }
+            ]
 
-              ]
-            }
-          ]
-
-        });
+          });
 
         // =========================
-        // Claude Raw Response
+        // RAW TEXT
         // =========================
 
-        const rawText = response.content[0].text;
+        const rawText =
+          response.content?.[0]?.text || "";
 
-        console.log("Claude原始返回:", rawText);
+        console.log("RAW:", rawText);
 
         // =========================
-        // Extract JSON
+        // JSON EXTRACT
         // =========================
 
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        const jsonMatch =
+          rawText.match(/\{[\s\S]*\}/);
 
         if (!jsonMatch) {
 
-          console.error("AI未返回JSON");
-
           return res.status(500).json({
+
             status: "error",
-            message: "AI没有返回JSON",
+
+            message: "AI did not return JSON",
+
             raw: rawText
+
           });
 
         }
 
         // =========================
-        // Parse JSON
+        // PARSE JSON
         // =========================
 
-        let parsedResult;
+        let parsed;
 
         try {
 
-          parsedResult = JSON.parse(jsonMatch[0]);
+          parsed =
+            JSON.parse(jsonMatch[0]);
 
         } catch (jsonError) {
 
-          console.error("JSON解析失败:", jsonError);
+          console.error(jsonError);
 
           return res.status(500).json({
+
             status: "error",
-            message: "AI JSON格式错误",
+
+            message: "Invalid AI JSON",
+
             raw: rawText
+
           });
 
         }
 
         // =========================
-        // Normalize Fields
+        // NORMALIZE
         // =========================
 
         const normalizedResult = {
 
           herb_name:
-            parsedResult.herb_name || "未知",
+            parsed.herb_name || "未知",
 
           confidence:
-            parsedResult.confidence || 0,
+            Number(parsed.confidence || 0),
 
           image_quality_score:
-            parsedResult.image_quality_score || 0,
+            Number(parsed.image_quality_score || 0),
 
           image_blur_level:
-            parsedResult.image_blur_level || "UNKNOWN",
+            parsed.image_blur_level || "UNKNOWN",
 
           lighting_quality:
-            parsedResult.lighting_quality || "UNKNOWN",
+            parsed.lighting_quality || "UNKNOWN",
 
           visibility_score:
-            parsedResult.visibility_score || 0,
+            Number(parsed.visibility_score || 0),
 
           quality_grade:
-            parsedResult.quality_grade || "UNKNOWN",
+            parsed.quality_grade || "UNKNOWN",
 
           risk_level:
-            parsedResult.risk_level || "LOW",
+            parsed.risk_level || "LOW",
 
           fake_probability:
-            parsedResult.fake_probability || 0,
+            Number(parsed.fake_probability || 0),
 
           mold_risk:
-            parsedResult.mold_risk || 0,
+            Number(parsed.mold_risk || 0),
 
           sulfur_fumigation_risk:
-            parsedResult.sulfur_fumigation_risk || 0,
-
-          color_analysis:
-            parsedResult.color_analysis || "暂无",
-
-          texture_analysis:
-            parsedResult.texture_analysis || "暂无",
-
-          slice_pattern_analysis:
-            parsedResult.slice_pattern_analysis || "暂无",
+            Number(parsed.sulfur_fumigation_risk || 0),
 
           issues_detected:
-            parsedResult.issues_detected || [],
+            Array.isArray(parsed.issues_detected)
+              ? parsed.issues_detected
+              : [],
 
           expert_summary:
-            parsedResult.expert_summary || "暂无分析",
+            parsed.expert_summary ||
+            "暂无分析",
 
           recommendation:
-            parsedResult.recommendation || "暂无建议"
+            parsed.recommendation ||
+            "暂无建议"
 
         };
 
         // =========================
-// Risk Engine
-// =========================
+        // RISK ENGINE
+        // =========================
 
-const riskResult =
-  calculateRisk(normalizedResult);
+        const riskResult =
+          calculateRisk(normalizedResult);
 
-// 覆盖风险等级
+        normalizedResult.risk_level =
+          riskResult.riskLevel;
 
-normalizedResult.risk_level =
-  riskResult.riskLevel;
-
-// 综合风险评分
-
-normalizedResult.total_risk_score =
-  riskResult.totalRisk;
-
-// Unknown Mode
-
-if (riskResult.isUnknown) {
-
-  normalizedResult.herb_name = "未知";
-
-  normalizedResult.quality_grade =
-    "无法评级";
-
-}
-
-        console.log("标准化结果:", normalizedResult);
+        normalizedResult.total_risk_score =
+          riskResult.totalRisk;
 
         // =========================
-        // Success Response
+        // UNKNOWN MODE
+        // =========================
+
+        if (riskResult.isUnknown) {
+
+          normalizedResult.herb_name =
+            "未知";
+
+          normalizedResult.quality_grade =
+            "无法评级";
+
+          normalizedResult.risk_level =
+            "UNKNOWN";
+
+        }
+
+        // =========================
+        // REPORT
+        // =========================
+
+        const report = `
+药材名称：
+${normalizedResult.herb_name}
+
+风险等级：
+${normalizedResult.risk_level}
+
+AI置信度：
+${normalizedResult.confidence}%
+
+图片质量：
+${normalizedResult.quality_grade}
+
+模糊等级：
+${normalizedResult.image_blur_level}
+
+光线质量：
+${normalizedResult.lighting_quality}
+
+可见度：
+${normalizedResult.visibility_score}%
+
+异常问题：
+${normalizedResult.issues_detected.join("、") || "未发现"}
+
+专家分析：
+${normalizedResult.expert_summary}
+
+AI建议：
+${normalizedResult.recommendation}
+`;
+
+        // =========================
+        // RESPONSE
         // =========================
 
         return res.status(200).json({
 
           status: "success",
 
-          result: normalizedResult
+          report,
+
+          risk:
+            normalizedResult.risk_level,
+
+          confidence:
+            normalizedResult.confidence,
+
+          clarity:
+            normalizedResult.image_blur_level,
+
+          lighting:
+            normalizedResult.lighting_quality,
+
+          visibility:
+            `${normalizedResult.visibility_score}%`,
+
+          result:
+            normalizedResult
 
         });
 
       } catch (visionError) {
 
-        console.error("Claude Vision Error:", visionError);
+        console.error("VISION ERROR:", visionError);
 
         return res.status(500).json({
+
           status: "error",
-          message: visionError.message
+
+          message:
+            visionError.message
+
         });
 
       }
@@ -322,11 +417,15 @@ if (riskResult.isUnknown) {
 
   } catch (error) {
 
-    console.error("Server Error:", error);
+    console.error("SERVER ERROR:", error);
 
     return res.status(500).json({
+
       status: "error",
-      message: error.message
+
+      message:
+        error.message
+
     });
 
   }
