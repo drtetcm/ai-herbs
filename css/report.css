@@ -24,11 +24,11 @@ body {
 
 .report-container {
 
-  max-width: 1400px;
+  max-width: 1200px;
 
-  margin: 28px auto;
+  margin: 24px auto;
 
-  padding: 0 20px;
+  padding: 0 18px;
 }
 
 /* =========================
@@ -44,14 +44,14 @@ body {
       #1e293b
     );
 
-  border-radius: 28px;
+  border-radius: 24px;
 
-  padding: 34px 40px;
+  padding: 28px 34px;
 
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 
   box-shadow:
-    0 14px 40px rgba(15,23,42,0.18);
+    0 10px 32px rgba(15,23,42,0.14);
 
   display: flex;
 
@@ -71,14 +71,14 @@ body {
 
 .header-logo {
 
-  font-size: 48px;
+  font-size: 42px;
 }
 
 .header-title h1 {
 
   margin: 0;
 
-  font-size: 42px;
+  font-size: 34px;
 
   font-weight: 800;
 
@@ -91,9 +91,9 @@ body {
 
   margin-top: 8px;
 
-  font-size: 15px;
+  font-size: 14px;
 
-  color: rgba(255,255,255,0.72);
+  color: rgba(255,255,255,0.68);
 }
 
 /* =========================
@@ -105,31 +105,29 @@ body {
   display: grid;
 
   grid-template-columns:
-    460px 1fr;
+    400px 1fr;
 
-  gap: 24px;
+  gap: 22px;
 
   margin-bottom: 24px;
 }
 
 /* =========================
-   Left Image
+   Image
 ========================= */
 
 .hero-image-card {
-
-  position: relative;
 
   overflow: hidden;
 
   background: white;
 
-  border-radius: 28px;
+  border-radius: 24px;
 
-  min-height: 460px;
+  min-height: 400px;
 
   box-shadow:
-    0 14px 40px rgba(15,23,42,0.10);
+    0 10px 30px rgba(15,23,42,0.08);
 }
 
 .herb-image {
@@ -152,13 +150,13 @@ body {
   background:
     linear-gradient(
       135deg,
-      #0f172a,
+      #111827,
       #1e293b
     );
 
-  border-radius: 28px;
+  border-radius: 24px;
 
-  padding: 40px;
+  padding: 34px;
 
   color: white;
 
@@ -169,7 +167,7 @@ body {
   justify-content: center;
 
   box-shadow:
-    0 14px 40px rgba(15,23,42,0.16);
+    0 10px 30px rgba(15,23,42,0.14);
 }
 
 .hero-badge {
@@ -188,46 +186,50 @@ body {
 
   border-radius: 999px;
 
-  padding: 9px 16px;
+  padding: 8px 14px;
 
-  font-size: 12px;
+  font-size: 11px;
 
   font-weight: 700;
 
   letter-spacing: 1px;
 
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .hero-name {
 
   margin: 0;
 
-  font-size: 58px;
+  font-size: 44px;
 
   font-weight: 800;
 
-  line-height: 1.05;
+  line-height: 1.1;
 
-  letter-spacing: -2px;
+  letter-spacing: -1px;
 }
 
 .hero-latin {
 
-  margin-top: 14px;
+  margin-top: 12px;
 
-  font-size: 18px;
+  font-size: 16px;
 
   color: rgba(255,255,255,0.68);
 }
+
+/* =========================
+   Hero Stats
+========================= */
 
 .hero-stats {
 
   display: flex;
 
-  gap: 18px;
+  gap: 16px;
 
-  margin-top: 36px;
+  margin-top: 28px;
 }
 
 .hero-stat {
@@ -240,121 +242,102 @@ body {
   border:
     1px solid rgba(255,255,255,0.08);
 
-  border-radius: 20px;
+  border-radius: 18px;
 
-  padding: 22px;
+  padding: 18px;
 }
 
 .hero-stat-label {
 
-  font-size: 13px;
+  font-size: 12px;
 
   color: rgba(255,255,255,0.6);
 
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 
   letter-spacing: 1px;
 }
 
 .hero-stat-value {
 
-  font-size: 42px;
+  font-size: 30px;
 
   font-weight: 800;
 }
 
 /* =========================
-   Dashboard Grid
+   Dashboard Layout
 ========================= */
 
-.top-grid {
+.dashboard-layout {
 
   display: grid;
 
   grid-template-columns:
-    repeat(4, 1fr);
+    1fr 280px;
 
-  gap: 18px;
+  gap: 22px;
 
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 /* =========================
-   Cards
+   Main
 ========================= */
 
-.card {
+.dashboard-main {
 
-  position: relative;
+  display: flex;
 
-  overflow: hidden;
+  flex-direction: column;
 
-  background:
-    rgba(255,255,255,0.92);
-
-  backdrop-filter: blur(8px);
-
-  border-radius: 22px;
-
-  padding: 24px;
-
-  box-shadow:
-    0 8px 24px rgba(15,23,42,0.06);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  gap: 22px;
 }
 
-.card:hover {
+/* =========================
+   Side
+========================= */
 
-  transform: translateY(-4px);
+.dashboard-side {
 
-  box-shadow:
-    0 18px 36px rgba(15,23,42,0.10);
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
 }
 
-.card::before {
+/* =========================
+   Side Card
+========================= */
 
-  content: "";
-
-  display: block;
-
-  height: 5px;
-
-  border-radius: 999px;
-
-  margin:
-    -24px
-    -24px
-    18px;
-}
-
-/* Top Color */
-
-.top-grid .card:nth-child(1)::before {
-  background: #2563eb;
-}
-
-.top-grid .card:nth-child(2)::before {
-  background: #16a34a;
-}
-
-.top-grid .card:nth-child(3)::before {
-  background: #dc2626;
-}
-
-.top-grid .card:nth-child(4)::before {
-  background: #7c3aed;
-}
-
-/* Risk */
-
-.risk-card {
+.side-card {
 
   background:
     linear-gradient(
-      135deg,
+      180deg,
+      #ffffff,
+      #f8fafc
+    );
+
+  border-radius: 22px;
+
+  padding: 22px;
+
+  box-shadow:
+    0 8px 22px rgba(15,23,42,0.05);
+
+  border:
+    1px solid #e2e8f0;
+}
+
+/* Risk Side */
+
+.risk-side {
+
+  background:
+    linear-gradient(
+      180deg,
       #fff5f5,
       #ffffff
     );
@@ -364,44 +347,31 @@ body {
 }
 
 /* =========================
-   Typography
+   Side Typography
 ========================= */
 
-.card-label {
+.side-label {
 
-  font-size: 13px;
+  font-size: 12px;
 
   font-weight: 700;
 
-  text-transform: uppercase;
-
   letter-spacing: 1px;
 
-  color: #64748b;
+  text-transform: uppercase;
 
-  margin-bottom: 16px;
+  color: #64748b;
 }
 
-.card-value {
+.side-value {
 
-  font-size: 42px;
+  margin-top: 14px;
+
+  font-size: 28px;
 
   font-weight: 800;
 
-  line-height: 1.1;
-
-  letter-spacing: -1px;
-
   color: #0f172a;
-}
-
-.card-sub {
-
-  margin-top: 10px;
-
-  font-size: 15px;
-
-  color: #475569;
 }
 
 /* =========================
@@ -426,7 +396,7 @@ body {
 
   color: white;
 
-  font-size: 15px;
+  font-size: 14px;
 
   font-weight: 700;
 }
@@ -444,47 +414,73 @@ body {
 }
 
 /* =========================
-   Sections
+   Section
 ========================= */
 
 .section {
 
   background:
-    rgba(255,255,255,0.92);
-
-  backdrop-filter: blur(8px);
+    rgba(255,255,255,0.94);
 
   border-radius: 24px;
 
-  padding: 28px;
-
-  margin-bottom: 22px;
+  padding: 24px;
 
   box-shadow:
-    0 8px 24px rgba(15,23,42,0.06);
+    0 8px 22px rgba(15,23,42,0.05);
 
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.section:hover {
-
-  transform: translateY(-4px);
-
-  box-shadow:
-    0 18px 36px rgba(15,23,42,0.10);
+  border:
+    1px solid rgba(255,255,255,0.6);
 }
 
 .section-title {
 
-  margin: 0 0 20px;
+  margin: 0 0 18px;
 
-  font-size: 26px;
+  font-size: 22px;
 
   font-weight: 800;
 
   letter-spacing: -0.5px;
+
+  color: #0f172a;
+}
+
+/* =========================
+   Feature List
+========================= */
+
+.feature-list {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 14px;
+}
+
+.feature-item {
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8fafc,
+      #ffffff
+    );
+
+  border:
+    1px solid #e2e8f0;
+
+  border-radius: 16px;
+
+  padding: 16px;
+
+  font-size: 15px;
+
+  line-height: 1.8;
+
+  color: #0f172a;
 }
 
 /* =========================
@@ -503,60 +499,13 @@ body {
   border:
     1px solid #e2e8f0;
 
-  border-radius: 18px;
-
-  padding: 20px;
-
-  font-size: 17px;
-
-  line-height: 1.8;
-}
-
-/* =========================
-   Features
-========================= */
-
-.feature-list {
-
-  display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap: 16px;
-}
-
-.feature-item {
-
-  background:
-    linear-gradient(
-      180deg,
-      #f8fafc,
-      #ffffff
-    );
-
-  border:
-    1px solid #e2e8f0;
-
-  border-radius: 18px;
+  border-radius: 16px;
 
   padding: 18px;
 
-  font-size: 15px;
+  font-size: 16px;
 
   line-height: 1.8;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.feature-item:hover {
-
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 10px 24px rgba(15,23,42,0.06);
 }
 
 /* =========================
@@ -575,9 +524,9 @@ body {
 
   border-radius: 999px;
 
-  padding: 8px 14px;
+  padding: 7px 14px;
 
-  font-size: 12px;
+  font-size: 11px;
 
   font-weight: 800;
 
@@ -600,13 +549,13 @@ body {
     );
 
   border-left:
-    5px solid #2563eb;
+    4px solid #2563eb;
 
-  border-radius: 18px;
+  border-radius: 16px;
 
-  padding: 24px;
+  padding: 22px;
 
-  font-size: 16px;
+  font-size: 15px;
 
   line-height: 2;
 
@@ -617,27 +566,24 @@ body {
    Tablet
 ========================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1000px) {
 
   .hero-layout {
 
     grid-template-columns: 1fr;
   }
 
-  .hero-image-card {
-
-    min-height: 340px;
-  }
-
-  .top-grid {
-
-    grid-template-columns:
-      1fr 1fr;
-  }
-
-  .feature-list {
+  .dashboard-layout {
 
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-side {
+
+    display: grid;
+
+    grid-template-columns:
+      1fr 1fr 1fr;
   }
 }
 
@@ -654,39 +600,32 @@ body {
 
   .report-header {
 
-    padding: 26px 22px;
-
-    border-radius: 22px;
+    padding: 24px 20px;
   }
 
   .header-logo {
 
-    font-size: 38px;
+    font-size: 36px;
   }
 
   .header-title h1 {
 
-    font-size: 30px;
+    font-size: 28px;
   }
 
-  .header-title p {
+  .hero-image-card {
 
-    font-size: 13px;
+    min-height: 280px;
   }
 
   .hero-summary {
 
-    padding: 28px;
+    padding: 24px;
   }
 
   .hero-name {
 
-    font-size: 38px;
-  }
-
-  .hero-latin {
-
-    font-size: 15px;
+    font-size: 34px;
   }
 
   .hero-stats {
@@ -694,29 +633,14 @@ body {
     flex-direction: column;
   }
 
-  .hero-stat-value {
-
-    font-size: 32px;
-  }
-
-  .top-grid {
+  .dashboard-side {
 
     grid-template-columns: 1fr;
   }
 
-  .card-value {
+  .feature-list {
 
-    font-size: 32px;
-  }
-
-  .section {
-
-    padding: 22px;
-  }
-
-  .section-title {
-
-    font-size: 22px;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -726,55 +650,23 @@ body {
 
 @media (max-width: 480px) {
 
-  .hero-image-card {
-
-    min-height: 260px;
-  }
-
-  .hero-summary {
-
-    padding: 22px;
-  }
-
   .hero-name {
 
-    font-size: 30px;
-  }
-
-  .hero-stat {
-
-    padding: 18px;
+    font-size: 28px;
   }
 
   .hero-stat-value {
 
-    font-size: 28px;
+    font-size: 26px;
   }
 
-  .card {
+  .side-value {
 
-    padding: 20px;
-  }
-
-  .card-value {
-
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .section {
 
     padding: 18px;
-  }
-
-  .feature-item {
-
-    padding: 14px;
-  }
-
-  .analysis-box {
-
-    padding: 18px;
-
-    font-size: 15px;
   }
 }
