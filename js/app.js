@@ -8,8 +8,6 @@ const analyzeBtn = document.getElementById("analyzeBtn");
 
 const result = document.getElementById("result");
 
-const loading = document.getElementById("loading");
-
 // 点击开始AI验药
 
 analyzeBtn.addEventListener("click", async () => {
@@ -31,181 +29,203 @@ analyzeBtn.addEventListener("click", async () => {
 
   result.innerHTML = "";
 
-  // 显示 Loading
+  // 上传后立即显示图片
 
-  loading.style.display = "flex";
+  const imageUrl = URL.createObjectURL(file);
 
-  // 初始化 Loading 内容
+  // Preview + Timeline
 
-  loading.innerHTML = "";
+  result.innerHTML = `
+
+    <div class="preview-loading">
+
+      <!-- 图片 -->
+
+      <div class="preview-card">
+
+        <img
+          src="${imageUrl}"
+          alt="药材图片"
+          class="preview-image"
+        />
+
+      </div>
+
+      <!-- AI Timeline -->
+
+      <div id="loading">
+
+      </div>
+
+    </div>
+
+  `;
+
+  // 获取 loading DOM
+
+  const loading =
+    document.getElementById("loading");
 
   // AI步骤
 
   const loadingSteps = [
 
     "📸 药材图片已上传",
+
     "🧠 AI验药分析完成",
+
     "🔍 AI视觉特征识别完成",
+
     "📑 AI正在形成报告..."
 
   ];
 
-  // 当前步骤索引
+  // 当前步骤
 
   let currentStep = 0;
 
-  // 添加步骤函数
+  // 添加步骤
 
-  const appendStep = (text, isLast = false) => {
+  const appendStep = (
+    text,
+    isActive = false
+  ) => {
 
-    const step = document.createElement("div");
+    const step =
+      document.createElement("div");
 
     step.className = "loading-step";
 
-    if (isLast) {
+    step.innerHTML = `
 
-      step.innerHTML = `
-        <span class="loading-icon active">
-          ⏳
-        </span>
+      <span class="loading-icon ${isActive ? "active" : "done"}">
 
-        <span>
-          ${text}
-        </span>
-      `;
+        ${isActive ? "⏳" : "✅"}
 
-    } else {
+      </span>
 
-      step.innerHTML = `
-        <span class="loading-icon done">
-          ✅
-        </span>
+      <span>
 
-        <span>
-          ${text}
-        </span>
-      `;
-    }
+        ${text}
+
+      </span>
+
+    `;
 
     loading.appendChild(step);
   };
 
-  // 第一步
+  // 第一条
 
-  appendStep(loadingSteps[0]);
+  appendStep(
+    loadingSteps[0]
+  );
 
-  // 动态增加步骤
+  // Timeline推进
 
-  const loadingInterval = setInterval(() => {
+  const loadingInterval =
+    setInterval(() => {
 
-    currentStep++;
+      currentStep++;
 
-    // 清除上一个 active
+      // 上一个 active → done
 
-    const previousActive = document.querySelector(
-      ".loading-icon.active"
-    );
+      const previousActive =
+        document.querySelector(
+          ".loading-icon.active"
+        );
 
-    if (previousActive) {
+      if (previousActive) {
 
-      previousActive.classList.remove("active");
+        previousActive.classList.remove(
+          "active"
+        );
 
-      previousActive.classList.add("done");
+        previousActive.classList.add(
+          "done"
+        );
 
-      previousActive.innerHTML = "✅";
-    }
+        previousActive.innerHTML = "✅";
+      }
 
-    // 添加新步骤
+      // 添加下一条
 
-    if (currentStep < loadingSteps.length) {
+      if (
+        currentStep <
+        loadingSteps.length
+      ) {
 
-      const isLast =
-        currentStep === loadingSteps.length - 1;
+        const isLast =
+          currentStep ===
+          loadingSteps.length - 1;
 
-      appendStep(
-        loadingSteps[currentStep],
-        isLast
-      );
-    }
+        appendStep(
+          loadingSteps[currentStep],
+          isLast
+        );
+      }
 
-  }, 1600);
+    }, 1600);
+
+  // 滚动
+
+  result.scrollIntoView({
+    behavior: "smooth"
+  });
 
   try {
 
-    // 上传后立即显示图片
-
-    const imageUrl = URL.createObjectURL(file);
-
-    result.innerHTML = `
-
-      <div class="preview-loading">
-
-        <div class="preview-card">
-
-          <img
-            src="${imageUrl}"
-            alt="药材图片"
-            class="preview-image"
-          />
-
-        </div>
-
-      </div>
-
-    `;
-
-    // 平滑滚动
-
-    result.scrollIntoView({
-      behavior: "smooth"
-    });
-
     // AI分析
 
-    const reportHTML = await analyzeHerb(file);
+    const reportHTML =
+      await analyzeHerb(file);
 
-    // 停止 Loading
+    // 停止 Timeline
 
-    clearInterval(loadingInterval);
-
-    // 最后步骤完成
-
-    const finalActive = document.querySelector(
-      ".loading-icon.active"
+    clearInterval(
+      loadingInterval
     );
+
+    // 最后 active → done
+
+    const finalActive =
+      document.querySelector(
+        ".loading-icon.active"
+      );
 
     if (finalActive) {
 
-      finalActive.classList.remove("active");
+      finalActive.classList.remove(
+        "active"
+      );
 
-      finalActive.classList.add("done");
+      finalActive.classList.add(
+        "done"
+      );
 
       finalActive.innerHTML = "✅";
     }
 
-    // 稍微停顿，增强完成感
+    // 延迟增强完成感
 
     setTimeout(() => {
 
-      loading.style.display = "none";
+      // 最终报告
 
-      // 显示最终报告
-
-      result.innerHTML = reportHTML;
-
-      // 自动滚动到报告
+      result.innerHTML =
+        reportHTML;
 
       result.scrollIntoView({
         behavior: "smooth"
       });
 
-    }, 800);
+    }, 900);
 
   } catch (error) {
 
-    clearInterval(loadingInterval);
-
-    loading.style.display = "none";
+    clearInterval(
+      loadingInterval
+    );
 
     result.innerHTML = `
 
