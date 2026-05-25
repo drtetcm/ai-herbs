@@ -307,30 +307,52 @@ UNKNOWN
         // =========================
 
         const riskResult =
-          calculateRisk(normalizedResult);
+  calculateRisk({
 
-        normalizedResult.risk_level =
-          riskResult.riskLevel;
+    confidence:
+      normalizedResult.confidence,
 
-        normalizedResult.total_risk_score =
-          riskResult.totalRisk;
+    visibility:
+      normalizedResult.visibility_score,
 
-        // =========================
-        // UNKNOWN MODE
-        // =========================
+    clarity:
+      normalizedResult.image_blur_level,
 
-        if (riskResult.isUnknown) {
+    lighting:
+      normalizedResult.lighting_quality,
 
-          normalizedResult.herb_name =
-            "未知";
+    herb_name:
+      normalizedResult.herb_name,
 
-          normalizedResult.quality_grade =
-            "无法评级";
+    abnormal:
+      normalizedResult.issues_detected
+        ?.join(" ") || ""
 
-          normalizedResult.risk_level =
-            "UNKNOWN";
+  });
 
-        }
+/* =========================
+   APPLY RISK RESULT
+========================= */
+
+normalizedResult.risk_level =
+  riskResult.riskLevel;
+
+normalizedResult.total_risk_score =
+  riskResult.totalRisk;
+
+/* =========================
+   UNKNOWN MODE
+========================= */
+
+if (riskResult.isUnknown) {
+
+  normalizedResult.herb_name =
+    "未知";
+
+  normalizedResult.quality_grade =
+    "无法评级";
+
+}
 
         // =========================
         // REPORT
