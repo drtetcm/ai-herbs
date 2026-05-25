@@ -55,123 +55,160 @@ analyzeBtn.addEventListener("click", async () => {
 
       <div id="loading">
 
+        <!-- Step 1 -->
+
+        <div class="loading-step">
+
+          <span class="loading-icon done">
+            ✅
+          </span>
+
+          <span>
+            📸 药材图片已上传
+          </span>
+
+        </div>
+
+        <!-- Step 2 -->
+
+        <div class="loading-step">
+
+          <span
+            class="loading-icon active"
+            id="step2"
+          >
+            ⏳
+          </span>
+
+          <span id="text2">
+            🧠 AI正在验药分析...
+          </span>
+
+        </div>
+
+        <!-- Step 3 -->
+
+        <div class="loading-step">
+
+          <span
+            class="loading-icon"
+            id="step3"
+          >
+          </span>
+
+          <span id="text3">
+          </span>
+
+        </div>
+
+        <!-- Step 4 -->
+
+        <div class="loading-step">
+
+          <span
+            class="loading-icon"
+            id="step4"
+          >
+          </span>
+
+          <span id="text4">
+          </span>
+
+        </div>
+
       </div>
 
     </div>
 
   `;
 
-  // 获取 loading DOM
-
-  const loading =
-    document.getElementById("loading");
-
-  // AI步骤
-
-  const loadingSteps = [
-
-    "📸 药材图片已上传",
-
-    "🧠 AI验药分析完成",
-
-    "🔍 AI视觉特征识别完成",
-
-    "📑 AI正在形成报告..."
-
-  ];
-
-  // 当前步骤
-
-  let currentStep = 0;
-
-  // 添加步骤
-
-  const appendStep = (
-    text,
-    isActive = false
-  ) => {
-
-    const step =
-      document.createElement("div");
-
-    step.className = "loading-step";
-
-    step.innerHTML = `
-
-      <span class="loading-icon ${isActive ? "active" : "done"}">
-
-        ${isActive ? "⏳" : "✅"}
-
-      </span>
-
-      <span>
-
-        ${text}
-
-      </span>
-
-    `;
-
-    loading.appendChild(step);
-  };
-
-  // 第一条
-
-  appendStep(
-    loadingSteps[0]
-  );
-
-  // Timeline推进
-
-  const loadingInterval =
-    setInterval(() => {
-
-      currentStep++;
-
-      // 上一个 active → done
-
-      const previousActive =
-        document.querySelector(
-          ".loading-icon.active"
-        );
-
-      if (previousActive) {
-
-        previousActive.classList.remove(
-          "active"
-        );
-
-        previousActive.classList.add(
-          "done"
-        );
-
-        previousActive.innerHTML = "✅";
-      }
-
-      // 添加下一条
-
-      if (
-        currentStep <
-        loadingSteps.length
-      ) {
-
-        const isLast =
-          currentStep ===
-          loadingSteps.length - 1;
-
-        appendStep(
-          loadingSteps[currentStep],
-          isLast
-        );
-      }
-
-    }, 1600);
-
   // 滚动
 
   result.scrollIntoView({
     behavior: "smooth"
   });
+
+  // Timeline 动画
+
+  setTimeout(() => {
+
+    const step2 =
+      document.getElementById("step2");
+
+    const text2 =
+      document.getElementById("text2");
+
+    const step3 =
+      document.getElementById("step3");
+
+    const text3 =
+      document.getElementById("text3");
+
+    if (
+      step2 &&
+      text2 &&
+      step3 &&
+      text3
+    ) {
+
+      step2.innerHTML = "✅";
+
+      step2.className =
+        "loading-icon done";
+
+      text2.innerHTML =
+        "🧠 AI验药分析完成";
+
+      step3.innerHTML = "⏳";
+
+      step3.className =
+        "loading-icon active";
+
+      text3.innerHTML =
+        "🔍 AI正在视觉特征识别...";
+    }
+
+  }, 1400);
+
+  setTimeout(() => {
+
+    const step3 =
+      document.getElementById("step3");
+
+    const text3 =
+      document.getElementById("text3");
+
+    const step4 =
+      document.getElementById("step4");
+
+    const text4 =
+      document.getElementById("text4");
+
+    if (
+      step3 &&
+      text3 &&
+      step4 &&
+      text4
+    ) {
+
+      step3.innerHTML = "✅";
+
+      step3.className =
+        "loading-icon done";
+
+      text3.innerHTML =
+        "🔍 AI视觉特征识别完成";
+
+      step4.innerHTML = "⏳";
+
+      step4.className =
+        "loading-icon active";
+
+      text4.innerHTML =
+        "📑 AI正在形成报告...";
+    }
+
+  }, 3000);
 
   try {
 
@@ -180,37 +217,33 @@ analyzeBtn.addEventListener("click", async () => {
     const reportHTML =
       await analyzeHerb(file);
 
-    // 停止 Timeline
+    // 最后一步完成
 
-    clearInterval(
-      loadingInterval
-    );
+    const step4 =
+      document.getElementById("step4");
 
-    // 最后 active → done
+    const text4 =
+      document.getElementById("text4");
 
-    const finalActive =
-      document.querySelector(
-        ".loading-icon.active"
-      );
+    if (
+      step4 &&
+      text4
+    ) {
 
-    if (finalActive) {
+      step4.innerHTML = "✅";
 
-      finalActive.classList.remove(
-        "active"
-      );
+      step4.className =
+        "loading-icon done";
 
-      finalActive.classList.add(
-        "done"
-      );
-
-      finalActive.innerHTML = "✅";
+      text4.innerHTML =
+        "📑 AI报告生成完成";
     }
 
     // 延迟增强完成感
 
     setTimeout(() => {
 
-      // 最终报告
+      // 显示最终报告
 
       result.innerHTML =
         reportHTML;
@@ -219,13 +252,9 @@ analyzeBtn.addEventListener("click", async () => {
         behavior: "smooth"
       });
 
-    }, 900);
+    }, 1000);
 
   } catch (error) {
-
-    clearInterval(
-      loadingInterval
-    );
 
     result.innerHTML = `
 
