@@ -113,6 +113,28 @@ You must analyze:
 8. Dryness or moisture appearance
 
 =========================
+CONSERVATIVE IDENTIFICATION
+=========================
+
+If multiple herbs share highly similar structures:
+
+- reduce confidence significantly
+- maintain multiple candidates
+- avoid aggressive final identification
+
+Allowed uncertain herb_name values:
+
+- 疑似黄芪
+- 疑似白术
+- 疑似甘草
+- 疑似白芍
+- 待确认药材
+- 相似饮片待确认
+
+Never force a high confidence answer
+when visual structures are ambiguous.
+
+=========================
 HERBAL IDENTIFICATION
 =========================
 
@@ -124,12 +146,8 @@ After visual analysis:
 
 3. Determine final herb_name
 
-4. If uncertain:
-- reduce confidence
-- increase unknown_probability
-- avoid aggressive guessing
+4. Carefully distinguish similar sliced herbs:
 
-5. Carefully distinguish similar sliced herbs:
 - 黄芪
 - 甘草
 - 白术
@@ -272,8 +290,12 @@ ONLY RETURN JSON.
 横切纹
 纤维结构
 边缘形态
+粉性质感
 
-然后再判断。
+对于相似饮片：
+
+宁可不确定，
+也不要高置信度乱猜。
 
 严格输出JSON。
 
@@ -387,6 +409,33 @@ ONLY RETURN JSON.
         parsed.possible_candidates ??= [];
 
         parsed.identification_reason ??= "";
+
+        // =========================
+        // CONSERVATIVE MODE
+        // =========================
+
+        const candidateCount =
+          parsed.possible_candidates.length;
+
+        if (
+          candidateCount >= 3 &&
+          parsed.confidence >= 80
+        ) {
+
+          parsed.confidence = 65;
+
+        }
+
+        if (
+          candidateCount >= 4
+        ) {
+
+          parsed.herb_name =
+            "相似饮片待确认";
+
+          parsed.confidence = 55;
+
+        }
 
         // =========================
         // HARD UNKNOWN DETECTION
@@ -514,6 +563,39 @@ ONLY RETURN JSON.
         };
 
         // =========================
+        // VISUAL FEATURE FORMATTER
+        // =========================
+
+        const vf =
+          normalizedResult.visual_features;
+
+        const visualFeatureReport = `
+颜色特征：
+${vf.color_tone || "暂无"}
+
+纹理特征：
+${vf.texture || "暂无"}
+
+切片结构：
+${vf.slice_pattern || "暂无"}
+
+纤维结构：
+${vf.fiber_structure || "暂无"}
+
+边缘特征：
+${vf.edge_characteristics || "暂无"}
+
+表面特征：
+${vf.surface_details || "暂无"}
+
+密度质感：
+${vf.density_feeling || "暂无"}
+
+干湿状态：
+${vf.dryness_moisture || "暂无"}
+`;
+
+        // =========================
         // RISK ENGINE
         // =========================
 
@@ -593,6 +675,9 @@ ${normalizedResult.possible_candidates.join("、") || "无"}
 
 识别依据：
 ${normalizedResult.identification_reason || "暂无"}
+
+视觉特征分析：
+${visualFeatureReport}
 
 对象类型：
 ${normalizedResult.object_type}
