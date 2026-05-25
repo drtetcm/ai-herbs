@@ -66,6 +66,9 @@ imageInput.addEventListener("change", () => {
     imageUrl;
 
   previewImage.classList.add("show");
+  document
+  .getElementById("uploadOverlay")
+  .style.opacity = ".15";
 
   const uploadText =
     document.querySelector(".upload-text");
