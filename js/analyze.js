@@ -23,9 +23,9 @@ export async function analyzeHerb(file) {
       return `
         <div class="report-container">
 
-          <div class="report-card">
+          <div class="section">
 
-            <div style="color:#dc2626;">
+            <div style="color:#dc2626;font-weight:700;">
               ❌ 验药失败：${data.message}
             </div>
 
@@ -38,7 +38,7 @@ export async function analyzeHerb(file) {
 
     const herb = data.result;
 
-    // 风险颜色class
+    // 风险等级
     let riskClass = "risk-low";
 
     if (herb["真假风险"] === "中风险") {
@@ -63,25 +63,23 @@ export async function analyzeHerb(file) {
 
       <div class="report-container">
 
-        <!-- 顶部 -->
+        <!-- Header -->
 
-        <div class="report-card">
+        <div class="report-header">
 
-          <div class="report-header">
+          <div class="header-left">
 
-            <div class="report-logo">
+            <div class="header-logo">
               🌿
             </div>
 
-            <div>
+            <div class="header-title">
 
-              <div class="report-title">
-                AI验药报告
-              </div>
+              <h1>AI验药报告</h1>
 
-              <div class="report-subtitle">
+              <p>
                 AI Traditional Medicine Verification System
-              </div>
+              </p>
 
             </div>
 
@@ -89,109 +87,107 @@ export async function analyzeHerb(file) {
 
         </div>
 
-        <!-- 第一行 -->
+        <!-- 顶部Dashboard -->
 
-        <div class="report-grid-top">
+        <div class="top-grid">
 
           <!-- 药材信息 -->
 
-          <div class="report-card">
+          <div class="card">
 
-            <div class="info-label">
+            <div class="card-label">
               药材名称
             </div>
 
-            <div class="herb-name">
+            <div class="card-value">
               ${herb["药材名称"]}
             </div>
 
-            <div class="info-label">
-              学名
-            </div>
-
-            <div class="herb-scientific">
+            <div class="card-sub">
               ${herb["学名"]}
             </div>
 
           </div>
 
-          <!-- 指标 -->
+          <!-- 可信度 -->
 
-          <div class="metrics-grid">
+          <div class="card">
 
-            <!-- 可信度 -->
+            <div class="card-label">
+              可信度
+            </div>
 
-            <div class="metric-card">
+            <div class="card-value">
+              ${herb["可信度"]}
+            </div>
 
-              <div class="info-label">
-                可信度
-              </div>
+          </div>
 
-              <div class="metric-value">
-                ${herb["可信度"]}
-              </div>
+          <!-- 风险 -->
+
+          <div class="card">
+
+            <div class="card-label">
+              真伪风险
+            </div>
+
+            <div style="margin-top:22px;">
+
+              <span class="${riskClass}">
+                ${herb["真假风险"]}
+              </span>
 
             </div>
 
-            <!-- 风险 -->
+          </div>
 
-            <div class="metric-card">
+          <!-- 质量 -->
 
-              <div class="info-label">
-                真伪风险
-              </div>
+          <div class="card">
 
-              <div>
-                <span class="risk-badge ${riskClass}">
-                  ${herb["真假风险"]}
-                </span>
-              </div>
-
+            <div class="card-label">
+              质量等级
             </div>
 
-            <!-- 质量 -->
-
-            <div class="metric-card">
-
-              <div class="info-label">
-                质量等级
-              </div>
-
-              <div class="metric-value">
-                ${herb["质量等级"]}
-              </div>
-
+            <div class="card-value">
+              ${herb["质量等级"]}
             </div>
 
           </div>
 
         </div>
 
-        <!-- 规格 -->
+        <!-- 第二行 -->
 
-        <div class="report-card section-spacing">
+        <div class="top-grid">
 
-          <div class="section-title">
-            规格信息
+          <!-- 规格 -->
+
+          <div class="section">
+
+            <h2 class="section-title">
+              规格信息
+            </h2>
+
+            <div class="spec-box">
+              ${herb["规格"]}
+            </div>
+
           </div>
 
-          <div class="section-content">
-            ${herb["规格"]}
-          </div>
+          <!-- 外观特征 -->
 
-        </div>
+          <div class="section" style="grid-column: span 3;">
 
-        <!-- 外观特征 -->
+            <h2 class="section-title">
+              外观特征
+            </h2>
 
-        <div class="report-card section-spacing">
+            <div class="feature-list">
 
-          <div class="section-title">
-            外观特征
-          </div>
+              ${featuresHTML}
 
-          <div class="features-grid">
-
-            ${featuresHTML}
+            </div>
 
           </div>
 
@@ -199,14 +195,16 @@ export async function analyzeHerb(file) {
 
         <!-- AI分析 -->
 
-        <div class="report-card section-spacing">
+        <div class="section">
 
-          <div class="section-title">
+          <h2 class="section-title">
             AI分析说明
-          </div>
+          </h2>
 
-          <div class="section-content analysis-text">
+          <div class="analysis-box">
+
             ${herb["分析说明"]}
+
           </div>
 
         </div>
@@ -222,9 +220,9 @@ export async function analyzeHerb(file) {
     return `
       <div class="report-container">
 
-        <div class="report-card">
+        <div class="section">
 
-          <div style="color:#dc2626;">
+          <div style="color:#dc2626;font-weight:700;">
             ❌ 系统错误：${error.message}
           </div>
 
