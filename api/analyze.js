@@ -218,6 +218,18 @@ export default async function handler(req, res) {
           confidence:
             parsedResult.confidence || 0,
 
+          image_quality_score:
+            parsedResult.image_quality_score || 0,
+
+          image_blur_level:
+            parsedResult.image_blur_level || "UNKNOWN",
+
+          lighting_quality:
+            parsedResult.lighting_quality || "UNKNOWN",
+
+          visibility_score:
+            parsedResult.visibility_score || 0,
+
           quality_grade:
             parsedResult.quality_grade || "UNKNOWN",
 
