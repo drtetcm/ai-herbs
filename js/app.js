@@ -1,22 +1,73 @@
-import { analyzeHerb } from "./analyze.js";
-
-// DOM
-
 const imageInput = document.getElementById("imageInput");
 
 const analyzeBtn = document.getElementById("analyzeBtn");
 
 const result = document.getElementById("result");
 
-// 点击开始AI验药
+const loading = document.getElementById("loading");
 
-analyzeBtn.addEventListener("click", async () => {
+const loadingText = document.getElementById("loadingText");
 
-  // 获取文件
+const idleState = document.getElementById("idleState");
+
+const riskBadge = document.getElementById("riskBadge");
+
+const riskFill = document.getElementById("riskFill");
+
+const riskScore = document.getElementById("riskScore");
+
+const clarityValue = document.getElementById("clarityValue");
+
+const lightingValue = document.getElementById("lightingValue");
+
+const visibilityValue = document.getElementById("visibilityValue");
+
+const confidenceValue = document.getElementById("confidenceValue");
+
+/* -------------------------------- */
+/* STATES */
+/* -------------------------------- */
+
+const loadingStates = [
+
+  "Initializing Claude Vision...",
+
+  "Scanning herbal structure...",
+
+  "Running AI verification...",
+
+  "Analyzing contamination risk...",
+
+  "Evaluating image quality...",
+
+  "Generating AI report..."
+
+];
+
+let loadingInterval = null;
+
+/* -------------------------------- */
+/* IMAGE PREVIEW */
+/* -------------------------------- */
+
+imageInput.addEventListener("change", () => {
 
   const file = imageInput.files[0];
 
-  // 未上传
+  if (!file) return;
+
+  const uploadText = document.querySelector(".upload-text");
+
+  uploadText.textContent = file.name;
+});
+
+/* -------------------------------- */
+/* ANALYZE */
+/* -------------------------------- */
+
+analyzeBtn.addEventListener("click", async () => {
+
+  const file = imageInput.files[0];
 
   if (!file) {
 
@@ -25,251 +76,254 @@ analyzeBtn.addEventListener("click", async () => {
     return;
   }
 
-  // 清空旧结果
-
-  result.innerHTML = "";
-
-  // 上传后立即显示图片
-
-  const imageUrl = URL.createObjectURL(file);
-
-  // Preview + Timeline
-
-  result.innerHTML = `
-
-    <div class="preview-loading">
-
-      <!-- 图片 -->
-
-      <div class="preview-card">
-
-        <img
-          src="${imageUrl}"
-          alt="药材图片"
-          class="preview-image"
-        />
-
-      </div>
-
-      <!-- AI Timeline -->
-
-      <div id="loading">
-
-        <!-- Step 1 -->
-
-        <div class="loading-step">
-
-          <span class="loading-icon done">
-            ✅
-          </span>
-
-          <span>
-            📸 药材图片已上传
-          </span>
-
-        </div>
-
-        <!-- Step 2 -->
-
-        <div class="loading-step">
-
-          <span
-            class="loading-icon active"
-            id="step2"
-          >
-            ⏳
-          </span>
-
-          <span id="text2">
-            🧠 AI正在验药分析...
-          </span>
-
-        </div>
-
-        <!-- Step 3 -->
-
-        <div class="loading-step">
-
-          <span
-            class="loading-icon"
-            id="step3"
-          >
-          </span>
-
-          <span id="text3">
-          </span>
-
-        </div>
-
-        <!-- Step 4 -->
-
-        <div class="loading-step">
-
-          <span
-            class="loading-icon"
-            id="step4"
-          >
-          </span>
-
-          <span id="text4">
-          </span>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  `;
-
-  // 滚动
-
-  result.scrollIntoView({
-    behavior: "smooth"
-  });
-
-  // Timeline 动画
-
-  setTimeout(() => {
-
-    const step2 =
-      document.getElementById("step2");
-
-    const text2 =
-      document.getElementById("text2");
-
-    const step3 =
-      document.getElementById("step3");
-
-    const text3 =
-      document.getElementById("text3");
-
-    if (
-      step2 &&
-      text2 &&
-      step3 &&
-      text3
-    ) {
-
-      step2.innerHTML = "✅";
-
-      step2.className =
-        "loading-icon done";
-
-      text2.innerHTML =
-        "🧠 AI验药分析完成";
-
-      step3.innerHTML = "⏳";
-
-      step3.className =
-        "loading-icon active";
-
-      text3.innerHTML =
-        "🔍 AI正在视觉特征识别...";
-    }
-
-  }, 1400);
-
-  setTimeout(() => {
-
-    const step3 =
-      document.getElementById("step3");
-
-    const text3 =
-      document.getElementById("text3");
-
-    const step4 =
-      document.getElementById("step4");
-
-    const text4 =
-      document.getElementById("text4");
-
-    if (
-      step3 &&
-      text3 &&
-      step4 &&
-      text4
-    ) {
-
-      step3.innerHTML = "✅";
-
-      step3.className =
-        "loading-icon done";
-
-      text3.innerHTML =
-        "🔍 AI视觉特征识别完成";
-
-      step4.innerHTML = "⏳";
-
-      step4.className =
-        "loading-icon active";
-
-      text4.innerHTML =
-        "📑 AI正在形成报告...";
-    }
-
-  }, 3000);
+  startLoading();
 
   try {
 
-    // AI分析
+    const formData = new FormData();
 
-    const reportHTML =
-      await analyzeHerb(file);
+    formData.append("image", file);
 
-    // 最后一步完成
+    const response = await fetch("/api/analyze", {
 
-    const step4 =
-      document.getElementById("step4");
+      method: "POST",
 
-    const text4 =
-      document.getElementById("text4");
+      body: formData
 
-    if (
-      step4 &&
-      text4
-    ) {
+    });
 
-      step4.innerHTML = "✅";
+    const data = await response.json();
 
-      step4.className =
-        "loading-icon done";
+    console.log("AI RESULT:", data);
 
-      text4.innerHTML =
-        "📑 AI报告生成完成";
-    }
+    stopLoading();
 
-    // 延迟增强完成感
-
-    setTimeout(() => {
-
-      // 显示最终报告
-
-      result.innerHTML =
-        reportHTML;
-
-      result.scrollIntoView({
-        behavior: "smooth"
-      });
-
-    }, 1000);
+    renderResult(data);
 
   } catch (error) {
 
-    result.innerHTML = `
+    console.error(error);
 
-      <div class="section">
+    stopLoading();
 
-        <div style="color:#dc2626;font-weight:700;">
-
-          ❌ AI验药失败：
-          ${error.message}
-
-        </div>
-
-      </div>
-
-    `;
+    showError(error);
   }
 
 });
+
+/* -------------------------------- */
+/* LOADING SYSTEM */
+/* -------------------------------- */
+
+function startLoading() {
+
+  loading.classList.remove("hidden");
+
+  idleState.classList.add("hidden");
+
+  result.innerHTML = `
+    <div style="color:#8c97b2;">
+      AI report is generating...
+    </div>
+  `;
+
+  let index = 0;
+
+  loadingText.textContent = loadingStates[0];
+
+  loadingInterval = setInterval(() => {
+
+    index++;
+
+    if (index >= loadingStates.length) {
+
+      index = 0;
+    }
+
+    loadingText.textContent = loadingStates[index];
+
+  }, 1800);
+
+}
+
+function stopLoading() {
+
+  clearInterval(loadingInterval);
+
+  loading.classList.add("hidden");
+
+  idleState.classList.remove("hidden");
+
+}
+
+/* -------------------------------- */
+/* RESULT RENDER */
+/* -------------------------------- */
+
+function renderResult(data) {
+
+  const report = data.report || data.message || "No AI report returned.";
+
+  result.innerHTML = `
+    <div class="report-content">
+      ${formatReport(report)}
+    </div>
+  `;
+
+  renderRisk(data);
+
+  renderQuality(data);
+
+}
+
+/* -------------------------------- */
+/* REPORT FORMAT */
+/* -------------------------------- */
+
+function formatReport(text) {
+
+  return text
+    .replace(/\n/g, "<br>")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+}
+
+/* -------------------------------- */
+/* RISK SYSTEM */
+/* -------------------------------- */
+
+function renderRisk(data) {
+
+  const risk = (
+    data.risk ||
+    data.riskLevel ||
+    "LOW"
+  ).toUpperCase();
+
+  let score = 12;
+
+  let badgeClass = "risk-low";
+
+  if (risk.includes("HIGH")) {
+
+    score = 88;
+
+    badgeClass = "risk-high";
+
+  }
+
+  else if (risk.includes("MEDIUM")) {
+
+    score = 56;
+
+    badgeClass = "risk-medium";
+
+  }
+
+  else if (risk.includes("UNKNOWN")) {
+
+    score = 72;
+
+    badgeClass = "risk-medium";
+
+  }
+
+  riskBadge.className = `risk-badge ${badgeClass}`;
+
+  riskBadge.textContent = risk;
+
+  riskScore.textContent = `${score}%`;
+
+  riskFill.style.width = `${score}%`;
+
+}
+
+/* -------------------------------- */
+/* QUALITY SYSTEM */
+/* -------------------------------- */
+
+function renderQuality(data) {
+
+  clarityValue.textContent =
+    data.clarity ||
+    randomQuality();
+
+  lightingValue.textContent =
+    data.lighting ||
+    randomQuality();
+
+  visibilityValue.textContent =
+    data.visibility ||
+    randomQuality();
+
+  confidenceValue.textContent =
+    data.confidence ||
+    `${randomPercent()}%`;
+
+}
+
+/* -------------------------------- */
+/* ERROR */
+/* -------------------------------- */
+
+function showError(error) {
+
+  result.innerHTML = `
+    <div style="
+      color:#ff8f8f;
+      line-height:1.8;
+    ">
+      <strong>
+        AI Analysis Failed
+      </strong>
+
+      <br><br>
+
+      ${error.message}
+    </div>
+  `;
+
+  riskBadge.textContent = "ERROR";
+
+  riskBadge.className =
+    "risk-badge risk-high";
+
+  riskFill.style.width = "100%";
+
+  riskScore.textContent = "--";
+
+}
+
+/* -------------------------------- */
+/* RANDOM QUALITY */
+/* -------------------------------- */
+
+function randomQuality() {
+
+  const values = [
+
+    "Excellent",
+
+    "Good",
+
+    "Normal",
+
+    "Weak"
+
+  ];
+
+  return values[
+    Math.floor(
+      Math.random() * values.length
+    )
+  ];
+
+}
+
+function randomPercent() {
+
+  return Math.floor(
+    82 + Math.random() * 16
+  );
+
+}

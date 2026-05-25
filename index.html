@@ -14,90 +14,342 @@
     DRTE AI Herbs
   </title>
 
-  <!-- CSS -->
-
   <link
     rel="stylesheet"
-    href="css/report.css"
+    href="css/style.css"
   />
 
 </head>
 
 <body>
 
-  <div class="upload-page">
+  <div class="dashboard">
 
-    <!-- Logo -->
+    <!-- SIDEBAR -->
 
-    <div class="upload-logo">
-      🌿
-    </div>
+    <aside class="sidebar">
 
-    <!-- Title -->
+      <div class="brand">
 
-    <h1 class="upload-title">
-      DRTE AI Herbs
-    </h1>
-
-    <p class="upload-subtitle">
-      AI Traditional Medicine Verification System
-    </p>
-
-    <!-- Upload Card -->
-
-    <div class="upload-card">
-
-      <!-- Upload Area -->
-
-      <label
-        for="imageInput"
-        class="upload-dropzone"
-      >
-
-        <div class="upload-icon">
-          📸
+        <div class="brand-logo">
+          🌿
         </div>
 
-        <div class="upload-text">
-          上传药材图片
+        <div>
+          <h1>
+            DRTE AI
+          </h1>
+
+          <p>
+            Herbs Verification
+          </p>
         </div>
 
-        <div class="upload-hint">
-          支持 JPG / PNG
+      </div>
+
+      <div class="system-status">
+
+        <div class="status-dot"></div>
+
+        <span>
+          AI System Online
+        </span>
+
+      </div>
+
+      <div class="sidebar-section">
+
+        <div class="sidebar-label">
+          SYSTEM
         </div>
 
-      </label>
+        <div class="sidebar-item active">
+          AI Detection
+        </div>
 
-      <!-- Hidden Input -->
+        <div class="sidebar-item">
+          Risk Engine
+        </div>
 
-      <input
-        type="file"
-        id="imageInput"
-        accept="image/*"
-      />
+        <div class="sidebar-item">
+          Quality Analysis
+        </div>
 
-      <!-- Analyze Button -->
+        <div class="sidebar-item">
+          AI Reports
+        </div>
 
-      <button id="analyzeBtn">
-        开始AI验药
-      </button>
+      </div>
 
-    </div>
+    </aside>
 
-    <!-- Loading -->
+    <!-- MAIN -->
 
-    <div
-      id="loading"
-      style="display:none;"
-    >
+    <main class="main-content">
 
-      AI正在分析药材图片...
+      <!-- TOPBAR -->
 
-    </div>
+      <header class="topbar">
 
-    <!-- Result -->
+        <div>
+          <h2>
+            AI Herbal Verification Dashboard
+          </h2>
 
-    <div id="result"></div>
+          <p>
+            Industrial AI Inspection System
+          </p>
+        </div>
+
+        <div class="topbar-status">
+
+          <div class="pulse"></div>
+
+          <span>
+            Ready
+          </span>
+
+        </div>
+
+      </header>
+
+      <!-- GRID -->
+
+      <div class="dashboard-grid">
+
+        <!-- LEFT -->
+
+        <section class="left-panel">
+
+          <!-- Upload Card -->
+
+          <div class="card upload-card">
+
+            <div class="card-header">
+
+              <h3>
+                Upload Herbal Image
+              </h3>
+
+              <span class="card-badge">
+                Vision AI
+              </span>
+
+            </div>
+
+            <label
+              for="imageInput"
+              class="upload-dropzone"
+            >
+
+              <div class="upload-icon">
+                📸
+              </div>
+
+              <div class="upload-text">
+                上传药材图片
+              </div>
+
+              <div class="upload-hint">
+                JPG / PNG / WEBP
+              </div>
+
+            </label>
+
+            <input
+              type="file"
+              id="imageInput"
+              accept="image/*"
+            />
+
+            <button id="analyzeBtn">
+              开始AI验药
+            </button>
+
+          </div>
+
+          <!-- AI STATUS -->
+
+          <div class="card">
+
+            <div class="card-header">
+
+              <h3>
+                AI Detection Status
+              </h3>
+
+            </div>
+
+            <div id="loading" class="loading-panel hidden">
+
+              <div class="scanner"></div>
+
+              <div class="loading-content">
+
+                <div class="loading-title">
+                  AI ANALYZING
+                </div>
+
+                <div
+                  id="loadingText"
+                  class="loading-text"
+                >
+                  Initializing AI Engine...
+                </div>
+
+              </div>
+
+            </div>
+
+            <div
+              id="idleState"
+              class="idle-state"
+            >
+
+              Waiting for image upload...
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- RIGHT -->
+
+        <section class="right-panel">
+
+          <!-- Risk -->
+
+          <div class="card">
+
+            <div class="card-header">
+
+              <h3>
+                Risk Level
+              </h3>
+
+              <span
+                id="riskBadge"
+                class="risk-badge risk-low"
+              >
+                LOW
+              </span>
+
+            </div>
+
+            <div class="risk-meter">
+
+              <div class="risk-bar">
+
+                <div
+                  id="riskFill"
+                  class="risk-fill"
+                ></div>
+
+              </div>
+
+              <div
+                id="riskScore"
+                class="risk-score"
+              >
+                12%
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Quality -->
+
+          <div class="card">
+
+            <div class="card-header">
+
+              <h3>
+                Image Quality
+              </h3>
+
+            </div>
+
+            <div class="quality-list">
+
+              <div class="quality-item">
+
+                <span>
+                  Clarity
+                </span>
+
+                <span id="clarityValue">
+                  --
+                </span>
+
+              </div>
+
+              <div class="quality-item">
+
+                <span>
+                  Lighting
+                </span>
+
+                <span id="lightingValue">
+                  --
+                </span>
+
+              </div>
+
+              <div class="quality-item">
+
+                <span>
+                  Visibility
+                </span>
+
+                <span id="visibilityValue">
+                  --
+                </span>
+
+              </div>
+
+              <div class="quality-item">
+
+                <span>
+                  AI Confidence
+                </span>
+
+                <span id="confidenceValue">
+                  --
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Result -->
+
+          <div class="card result-card">
+
+            <div class="card-header">
+
+              <h3>
+                AI Report
+              </h3>
+
+            </div>
+
+            <div id="result">
+
+              AI report will appear here.
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </main>
 
   </div>
 
