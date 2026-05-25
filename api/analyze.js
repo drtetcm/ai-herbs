@@ -2,6 +2,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import formidable from "formidable";
 import fs from "fs";
 
+import { calculateRisk }
+from "../utils/riskEngine.js";
+
 export const config = {
   api: {
     bodyParser: false,
@@ -249,6 +252,34 @@ export default async function handler(req, res) {
             parsedResult.recommendation || "暂无建议"
 
         };
+
+        // =========================
+// Risk Engine
+// =========================
+
+const riskResult =
+  calculateRisk(normalizedResult);
+
+// 覆盖风险等级
+
+normalizedResult.risk_level =
+  riskResult.riskLevel;
+
+// 综合风险评分
+
+normalizedResult.total_risk_score =
+  riskResult.totalRisk;
+
+// Unknown Mode
+
+if (riskResult.isUnknown) {
+
+  normalizedResult.herb_name = "未知";
+
+  normalizedResult.quality_grade =
+    "无法评级";
+
+}
 
         console.log("标准化结果:", normalizedResult);
 
