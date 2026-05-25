@@ -59,9 +59,20 @@ imageInput.addEventListener("change", () => {
 
   if (!file) return;
 
-  const uploadText = document.querySelector(".upload-text");
+  const imageUrl =
+    URL.createObjectURL(file);
 
-  uploadText.textContent = file.name;
+  previewImage.src =
+    imageUrl;
+
+  previewImage.classList.add("show");
+
+  const uploadText =
+    document.querySelector(".upload-text");
+
+  uploadText.textContent =
+    file.name;
+
 });
 
 /* -------------------------------- */

@@ -453,6 +453,15 @@ body{
   object-fit: cover;
 
   z-index: 1;
+
+  opacity: 0;
+
+  transition: .3s;
+}
+
+.preview-image.show {
+
+  opacity: 1;
 }
 
 .upload-overlay {
@@ -508,20 +517,6 @@ body{
 #imageInput{
 
   display:none;
-}
-
-.preview-image{
-
-  position:absolute;
-
-  inset:0;
-
-  width:100%;
-  height:100%;
-
-  object-fit:cover;
-
-  border-radius:18px;
 }
 
 #analyzeBtn{
