@@ -1,14 +1,43 @@
+import { systemPrompt } from "../prompts/systemPrompt.js";
+import { herbRules } from "../prompts/herbRules.js";
+import { outputFormat } from "../prompts/outputFormat.js";
+
 export async function analyzeHerb(file) {
 
   console.log("上传文件:", file);
 
   try {
 
-    // 上传图片
+    // =========================
+    // Prompt Engine
+    // =========================
+
+    const finalPrompt = `
+${systemPrompt}
+
+${herbRules}
+
+${outputFormat}
+
+现在请分析用户上传的药材图片。
+`;
+
+    console.log("最终Prompt:", finalPrompt);
+
+    // =========================
+    // FormData
+    // =========================
 
     const formData = new FormData();
 
     formData.append("image", file);
+
+    // 新增Prompt
+    formData.append("prompt", finalPrompt);
+
+    // =========================
+    // API Request
+    // =========================
 
     const response = await fetch("/api/analyze", {
       method: "POST",
@@ -19,7 +48,9 @@ export async function analyzeHerb(file) {
 
     console.log("API返回:", data);
 
-    // 错误处理
+    // =========================
+    // API错误
+    // =========================
 
     if (data.status === "error") {
 
@@ -38,37 +69,76 @@ export async function analyzeHerb(file) {
       `;
     }
 
+    // =========================
     // AI结果
+    // =========================
 
-    const herb = data.result;
+    let herb = data.result;
 
+    // 如果后端返回字符串JSON
+    if (typeof herb === "string") {
+
+      try {
+        herb = JSON.parse(herb);
+      } catch (err) {
+
+        console.error("JSON解析失败:", err);
+
+        return `
+          <div class="report-container">
+
+            <div class="section">
+
+              <div style="color:#dc2626;font-weight:700;">
+                ❌ AI返回JSON格式错误
+              </div>
+
+            </div>
+
+          </div>
+        `;
+      }
+    }
+
+    console.log("解析后JSON:", herb);
+
+    // =========================
     // 图片URL
+    // =========================
 
     const imageUrl = URL.createObjectURL(file);
 
+    // =========================
     // 风险等级
+    // =========================
 
     let riskClass = "risk-low";
 
-    if (herb["真假风险"] === "中风险") {
+    const riskLevel = herb.risk_level || "LOW";
+
+    if (riskLevel === "MEDIUM") {
       riskClass = "risk-medium";
     }
 
-    if (herb["真假风险"] === "高风险") {
+    if (riskLevel === "HIGH") {
       riskClass = "risk-high";
     }
 
+    // =========================
     // 外观特征
+    // =========================
 
-    const featuresHTML = herb["外观特征"]
-      .map(item => `
+    const issuesHTML = herb.issues_detected
+      ?.map(item => `
         <div class="feature-item">
           ${item}
         </div>
       `)
-      .join("");
+      .join("") || "";
 
+    // =========================
     // 返回HTML
+    // =========================
 
     return `
 
@@ -125,11 +195,11 @@ export async function analyzeHerb(file) {
             </div>
 
             <h1 class="hero-name">
-              ${herb["药材名称"]}
+              ${herb.herb_name || "未知药材"}
             </h1>
 
             <div class="hero-latin">
-              ${herb["学名"]}
+              AI Confidence: ${herb.confidence || 0}%
             </div>
 
             <!-- Stats -->
@@ -145,7 +215,7 @@ export async function analyzeHerb(file) {
                 </div>
 
                 <div class="hero-stat-value">
-                  ${herb["可信度"]}
+                  ${herb.confidence || 0}%
                 </div>
 
               </div>
@@ -161,7 +231,7 @@ export async function analyzeHerb(file) {
                 <div style="margin-top:12px;">
 
                   <span class="${riskClass}">
-                    ${herb["真假风险"]}
+                    ${riskLevel}
                   </span>
 
                 </div>
@@ -196,23 +266,49 @@ export async function analyzeHerb(file) {
 
               <div class="analysis-box">
 
-                ${herb["分析说明"]}
+                ${herb.expert_summary || "暂无分析"}
 
               </div>
 
             </div>
 
-            <!-- 外观特征 -->
+            <!-- 风险 -->
 
             <div class="section">
 
               <h2 class="section-title">
-                AI视觉特征识别
+                风险分析
               </h2>
 
               <div class="feature-list">
 
-                ${featuresHTML}
+                <div class="feature-item">
+                  假药概率：${herb.fake_probability || 0}%
+                </div>
+
+                <div class="feature-item">
+                  发霉风险：${herb.mold_risk || 0}%
+                </div>
+
+                <div class="feature-item">
+                  硫磺熏蒸风险：${herb.sulfur_fumigation_risk || 0}%
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- 异常 -->
+
+            <div class="section">
+
+              <h2 class="section-title">
+                AI异常检测
+              </h2>
+
+              <div class="feature-list">
+
+                ${issuesHTML}
 
               </div>
 
@@ -235,7 +331,7 @@ export async function analyzeHerb(file) {
               <div style="margin-top:18px;">
 
                 <span class="${riskClass}">
-                  ${herb["真假风险"]}
+                  ${riskLevel}
                 </span>
 
               </div>
@@ -251,21 +347,35 @@ export async function analyzeHerb(file) {
               </div>
 
               <div class="side-value">
-                ${herb["质量等级"]}
+                ${herb.quality_grade || "N/A"}
               </div>
 
             </div>
 
-            <!-- 规格 -->
+            <!-- 颜色 -->
 
             <div class="side-card">
 
               <div class="side-label">
-                药材规格
+                色泽分析
               </div>
 
               <div class="spec-box">
-                ${herb["规格"]}
+                ${herb.color_analysis || "暂无"}
+              </div>
+
+            </div>
+
+            <!-- 纹理 -->
+
+            <div class="side-card">
+
+              <div class="side-label">
+                纹理分析
+              </div>
+
+              <div class="spec-box">
+                ${herb.texture_analysis || "暂无"}
               </div>
 
             </div>
