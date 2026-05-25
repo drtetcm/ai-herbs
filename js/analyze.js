@@ -38,6 +38,9 @@ export async function analyzeHerb(file) {
 
     const herb = data.result;
 
+    // 图片URL
+    const imageUrl = URL.createObjectURL(file);
+
     // 风险等级
     let riskClass = "risk-low";
 
@@ -75,10 +78,10 @@ export async function analyzeHerb(file) {
 
             <div class="header-title">
 
-              <h1>AI验药报告</h1>
+              <h1>AI验药系统</h1>
 
               <p>
-                AI Traditional Medicine Verification System
+                AI Traditional Medicine Verification Platform
               </p>
 
             </div>
@@ -87,13 +90,85 @@ export async function analyzeHerb(file) {
 
         </div>
 
-        <!-- 顶部Dashboard -->
+        <!-- Hero Layout -->
+
+        <div class="hero-layout">
+
+          <!-- Left Image -->
+
+          <div class="hero-image-card">
+
+            <img
+              src="${imageUrl}"
+              alt="药材图片"
+              class="herb-image"
+            />
+
+          </div>
+
+          <!-- Right Summary -->
+
+          <div class="hero-summary">
+
+            <div class="hero-badge">
+              AI VISION ANALYSIS
+            </div>
+
+            <h1 class="hero-name">
+              ${herb["药材名称"]}
+            </h1>
+
+            <div class="hero-latin">
+              ${herb["学名"]}
+            </div>
+
+            <div class="hero-stats">
+
+              <!-- 可信度 -->
+
+              <div class="hero-stat">
+
+                <div class="hero-stat-label">
+                  可信度
+                </div>
+
+                <div class="hero-stat-value">
+                  ${herb["可信度"]}
+                </div>
+
+              </div>
+
+              <!-- 风险等级 -->
+
+              <div class="hero-stat">
+
+                <div class="hero-stat-label">
+                  风险等级
+                </div>
+
+                <div style="margin-top:12px;">
+
+                  <span class="${riskClass}">
+                    ${herb["真假风险"]}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Dashboard -->
 
         <div class="top-grid">
 
           <!-- 药材信息 -->
 
-          <div class="card risk-card">
+          <div class="card">
 
             <div class="card-label">
               药材名称
@@ -111,10 +186,10 @@ export async function analyzeHerb(file) {
 
           <!-- 可信度 -->
 
-          <div class="card risk-card">
+          <div class="card">
 
             <div class="card-label">
-              可信度
+              AI可信度
             </div>
 
             <div class="card-value">
@@ -143,7 +218,7 @@ export async function analyzeHerb(file) {
 
           <!-- 质量 -->
 
-          <div class="card risk-card">
+          <div class="card">
 
             <div class="card-label">
               质量等级
@@ -204,7 +279,7 @@ export async function analyzeHerb(file) {
           <div class="ai-tag">
             AI VISION ANALYSIS
           </div>
-          
+
           <div class="analysis-box">
 
             ${herb["分析说明"]}
