@@ -24,6 +24,12 @@ const visibilityValue = document.getElementById("visibilityValue");
 
 const confidenceValue = document.getElementById("confidenceValue");
 
+const previewImage =
+  document.getElementById("previewImage");
+
+const uploadPlaceholder =
+  document.getElementById("uploadPlaceholder");
+
 /* -------------------------------- */
 /* STATES */
 /* -------------------------------- */
