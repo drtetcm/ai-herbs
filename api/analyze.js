@@ -671,7 +671,32 @@ ${vf.dryness_moisture || "暂无"}
 ${normalizedResult.herb_name}
 
 候选药材：
-${normalizedResult.possible_candidates.join("、") || "无"}
+${
+  normalizedResult.possible_candidates
+    .map((candidate) => {
+
+      if (typeof candidate === "string") {
+        return candidate;
+      }
+
+      if (
+        typeof candidate === "object" &&
+        candidate !== null
+      ) {
+
+        return (
+          candidate.name ||
+          candidate.herb ||
+          JSON.stringify(candidate)
+        );
+
+      }
+
+      return String(candidate);
+
+    })
+    .join("、") || "无"
+}
 
 识别依据：
 ${normalizedResult.identification_reason || "暂无"}
