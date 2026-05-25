@@ -1,31 +1,47 @@
-const imageInput = document.getElementById("imageInput");
+const imageInput =
+  document.getElementById("imageInput");
 
-const analyzeBtn = document.getElementById("analyzeBtn");
+const analyzeBtn =
+  document.getElementById("analyzeBtn");
 
-const result = document.getElementById("result");
+const result =
+  document.getElementById("result");
 
-const loading = document.getElementById("loading");
+const loading =
+  document.getElementById("loading");
 
-const loadingText = document.getElementById("loadingText");
+const loadingText =
+  document.getElementById("loadingText");
 
-const idleState = document.getElementById("idleState");
+const idleState =
+  document.getElementById("idleState");
 
-const riskBadge = document.getElementById("riskBadge");
+const riskBadge =
+  document.getElementById("riskBadge");
 
-const riskFill = document.getElementById("riskFill");
+const riskFill =
+  document.getElementById("riskFill");
 
-const riskScore = document.getElementById("riskScore");
+const riskScore =
+  document.getElementById("riskScore");
 
-const clarityValue = document.getElementById("clarityValue");
+const clarityValue =
+  document.getElementById("clarityValue");
 
-const lightingValue = document.getElementById("lightingValue");
+const lightingValue =
+  document.getElementById("lightingValue");
 
-const visibilityValue = document.getElementById("visibilityValue");
+const visibilityValue =
+  document.getElementById("visibilityValue");
 
-const confidenceValue = document.getElementById("confidenceValue");
+const confidenceValue =
+  document.getElementById("confidenceValue");
 
 const previewImage =
   document.getElementById("previewImage");
+
+const uploadOverlay =
+  document.getElementById("uploadOverlay");
 
 /* -------------------------------- */
 /* STATES */
@@ -66,15 +82,39 @@ imageInput.addEventListener("change", () => {
     imageUrl;
 
   previewImage.classList.add("show");
-  document
-  .getElementById("uploadOverlay")
-  .style.opacity = ".15";
+
+  uploadOverlay.style.opacity = ".18";
 
   const uploadText =
     document.querySelector(".upload-text");
 
   uploadText.textContent =
     file.name;
+
+  /* reset state */
+
+  result.innerHTML = "";
+
+  riskBadge.textContent = "--";
+
+  riskBadge.className =
+    "risk-badge";
+
+  riskFill.style.width = "0%";
+
+  riskScore.textContent = "--";
+
+  clarityValue.textContent = "--";
+
+  lightingValue.textContent = "--";
+
+  visibilityValue.textContent = "--";
+
+  confidenceValue.textContent = "--";
+
+  idleState.classList.remove("hidden");
+
+  loading.classList.add("hidden");
 
 });
 
@@ -109,9 +149,13 @@ analyzeBtn.addEventListener("click", async () => {
 
     });
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
-    console.log("AI RESULT:", data);
+    console.log(
+      "AI RESULT:",
+      data
+    );
 
     stopLoading();
 
@@ -124,6 +168,7 @@ analyzeBtn.addEventListener("click", async () => {
     stopLoading();
 
     showError(error);
+
   }
 
 });
@@ -139,37 +184,53 @@ function startLoading() {
   idleState.classList.add("hidden");
 
   result.innerHTML = `
-    <div style="color:#8c97b2;">
+    <div style="
+      color:#8c97b2;
+      line-height:1.8;
+    ">
       AI report is generating...
     </div>
   `;
 
   let index = 0;
 
-  loadingText.textContent = loadingStates[0];
+  loadingText.textContent =
+    loadingStates[0];
 
-  loadingInterval = setInterval(() => {
+  loadingInterval =
+    setInterval(() => {
 
-    index++;
+      index++;
 
-    if (index >= loadingStates.length) {
+      if (
+        index >=
+        loadingStates.length
+      ) {
 
-      index = 0;
-    }
+        index = 0;
 
-    loadingText.textContent = loadingStates[index];
+      }
 
-  }, 1800);
+      loadingText.textContent =
+        loadingStates[index];
+
+    }, 1800);
 
 }
 
 function stopLoading() {
 
-  clearInterval(loadingInterval);
+  clearInterval(
+    loadingInterval
+  );
 
-  loading.classList.add("hidden");
+  loading.classList.add(
+    "hidden"
+  );
 
-  idleState.classList.remove("hidden");
+  idleState.classList.add(
+    "hidden"
+  );
 
 }
 
@@ -179,7 +240,10 @@ function stopLoading() {
 
 function renderResult(data) {
 
-  const report = data.report || data.message || "No AI report returned.";
+  const report =
+    data.report ||
+    data.message ||
+    "No AI report returned.";
 
   result.innerHTML = `
     <div class="report-content">
@@ -200,8 +264,16 @@ function renderResult(data) {
 function formatReport(text) {
 
   return text
-    .replace(/\n/g, "<br>")
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+    .replace(
+      /\n/g,
+      "<br>"
+    )
+
+    .replace(
+      /\*\*(.*?)\*\*/g,
+      "<strong>$1</strong>"
+    );
 
 }
 
@@ -212,46 +284,64 @@ function formatReport(text) {
 function renderRisk(data) {
 
   const risk = (
+
     data.risk ||
+
     data.riskLevel ||
+
     "LOW"
+
   ).toUpperCase();
 
   let score = 12;
 
-  let badgeClass = "risk-low";
+  let badgeClass =
+    "risk-low";
 
-  if (risk.includes("HIGH")) {
+  if (
+    risk.includes("HIGH")
+  ) {
 
     score = 88;
 
-    badgeClass = "risk-high";
+    badgeClass =
+      "risk-high";
 
   }
 
-  else if (risk.includes("MEDIUM")) {
+  else if (
+    risk.includes("MEDIUM")
+  ) {
 
     score = 56;
 
-    badgeClass = "risk-medium";
+    badgeClass =
+      "risk-medium";
 
   }
 
-  else if (risk.includes("UNKNOWN")) {
+  else if (
+    risk.includes("UNKNOWN")
+  ) {
 
     score = 72;
 
-    badgeClass = "risk-medium";
+    badgeClass =
+      "risk-medium";
 
   }
 
-  riskBadge.className = `risk-badge ${badgeClass}`;
+  riskBadge.className =
+    `risk-badge ${badgeClass}`;
 
-  riskBadge.textContent = risk;
+  riskBadge.textContent =
+    risk;
 
-  riskScore.textContent = `${score}%`;
+  riskScore.textContent =
+    `${score}%`;
 
-  riskFill.style.width = `${score}%`;
+  riskFill.style.width =
+    `${score}%`;
 
 }
 
@@ -262,20 +352,28 @@ function renderRisk(data) {
 function renderQuality(data) {
 
   clarityValue.textContent =
+
     data.clarity ||
-    randomQuality();
+
+    "--";
 
   lightingValue.textContent =
+
     data.lighting ||
-    randomQuality();
+
+    "--";
 
   visibilityValue.textContent =
+
     data.visibility ||
-    randomQuality();
+
+    "--";
 
   confidenceValue.textContent =
+
     data.confidence ||
-    `${randomPercent()}%`;
+
+    "--";
 
 }
 
@@ -290,6 +388,7 @@ function showError(error) {
       color:#ff8f8f;
       line-height:1.8;
     ">
+
       <strong>
         AI Analysis Failed
       </strong>
@@ -297,50 +396,20 @@ function showError(error) {
       <br><br>
 
       ${error.message}
+
     </div>
   `;
 
-  riskBadge.textContent = "ERROR";
+  riskBadge.textContent =
+    "ERROR";
 
   riskBadge.className =
     "risk-badge risk-high";
 
-  riskFill.style.width = "100%";
+  riskFill.style.width =
+    "100%";
 
-  riskScore.textContent = "--";
-
-}
-
-/* -------------------------------- */
-/* RANDOM QUALITY */
-/* -------------------------------- */
-
-function randomQuality() {
-
-  const values = [
-
-    "Excellent",
-
-    "Good",
-
-    "Normal",
-
-    "Weak"
-
-  ];
-
-  return values[
-    Math.floor(
-      Math.random() * values.length
-    )
-  ];
-
-}
-
-function randomPercent() {
-
-  return Math.floor(
-    82 + Math.random() * 16
-  );
+  riskScore.textContent =
+    "--";
 
 }
