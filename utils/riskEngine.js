@@ -1,192 +1,253 @@
 export function calculateRisk(result) {
 
-  // =========================
-  // 基础风险值
-  // =========================
+  let totalRisk = 0;
 
-  const moldRisk =
-    Number(result.mold_risk || 0);
-
-  const fakeRisk =
-    Number(result.fake_probability || 0);
-
-  const sulfurRisk =
-    Number(result.sulfur_fumigation_risk || 0);
+  /* =========================
+     BASIC VALUES
+  ========================= */
 
   const confidence =
     Number(result.confidence || 0);
 
-  // =========================
-  // 新增：
-  // 图片质量评分
-  // =========================
+  const visibility =
+    parseInt(result.visibility || 0);
 
-  const imageQualityScore =
-    Number(result.image_quality_score || 60);
+  const clarity =
+    result.clarity || "";
 
-  // =========================
-  // 新增：
-  // 模糊等级
-  // LOW / MEDIUM / HIGH
-  // =========================
+  const lighting =
+    result.lighting || "";
 
-  const blurLevel =
-    result.image_blur_level || "LOW";
+  const herbName =
+    result.herb_name ||
+    result.herbName ||
+    "";
 
-  // =========================
-  // Risk Weight Table
-  // 不同风险不同权重
-  // =========================
+  const abnormal =
+    result.abnormal_issues ||
+    result.abnormal ||
+    "";
 
-  const moldWeight = 0.25;
+  /* =========================
+     AI CONFIDENCE
+  ========================= */
 
-  const fakeWeight = 0.5;
-
-  const sulfurWeight = 0.25;
-
-  // =========================
-  // 基础风险
-  // =========================
-
-  let totalRisk =
-
-    moldRisk * moldWeight +
-    fakeRisk * fakeWeight +
-    sulfurRisk * sulfurWeight;
-
-  // =========================
-  // 连续置信度扣分
-  // Confidence Curve
-  // =========================
-
-  if (confidence < 90) {
+  if (confidence >= 90) {
 
     totalRisk += 5;
 
   }
 
-  if (confidence < 80) {
-
-    totalRisk += 10;
-
-  }
-
-  if (confidence < 70) {
+  else if (confidence >= 75) {
 
     totalRisk += 15;
 
   }
 
-  if (confidence < 60) {
+  else if (confidence >= 60) {
+
+    totalRisk += 30;
+
+  }
+
+  else if (confidence >= 40) {
+
+    totalRisk += 50;
+
+  }
+
+  else {
+
+    totalRisk += 70;
+
+  }
+
+  /* =========================
+     VISIBILITY
+  ========================= */
+
+  if (visibility >= 85) {
+
+    totalRisk += 5;
+
+  }
+
+  else if (visibility >= 70) {
+
+    totalRisk += 15;
+
+  }
+
+  else if (visibility >= 50) {
+
+    totalRisk += 30;
+
+  }
+
+  else {
+
+    totalRisk += 55;
+
+  }
+
+  /* =========================
+     CLARITY ANALYSIS
+  ========================= */
+
+  if (
+
+    clarity.includes("严重模糊") ||
+
+    clarity.includes("极度模糊")
+
+  ) {
+
+    totalRisk += 45;
+
+  }
+
+  else if (
+
+    clarity.includes("低度模糊") ||
+
+    clarity.includes("轻微模糊")
+
+  ) {
 
     totalRisk += 20;
 
   }
 
-  if (confidence < 50) {
+  else if (
+
+    clarity.includes("清晰")
+
+  ) {
+
+    totalRisk += 5;
+
+  }
+
+  /* =========================
+     LIGHTING ANALYSIS
+  ========================= */
+
+  if (
+
+    lighting.includes("暗") ||
+
+    lighting.includes("阴影")
+
+  ) {
 
     totalRisk += 25;
 
   }
 
-  if (confidence < 40) {
+  else if (
 
-    totalRisk += 35;
+    lighting.includes("一般")
+
+  ) {
+
+    totalRisk += 12;
 
   }
 
-  // =========================
-  // 图片质量惩罚
-  // =========================
+  else if (
 
-  if (imageQualityScore < 80) {
+    lighting.includes("良好")
+
+  ) {
 
     totalRisk += 5;
 
   }
 
-  if (imageQualityScore < 60) {
-
-    totalRisk += 10;
-
-  }
-
-  if (imageQualityScore < 40) {
-
-    totalRisk += 20;
-
-  }
-
-  // =========================
-  // 模糊等级惩罚
-  // =========================
-
-  if (blurLevel === "MEDIUM") {
-
-    totalRisk += 15;
-
-  }
-
-  if (blurLevel === "HIGH") {
-
-    totalRisk += 30;
-
-  }
-
-  // =========================
-  // Unknown Mode
-  // =========================
+  /* =========================
+     UNKNOWN MODE
+  ========================= */
 
   let isUnknown = false;
 
   if (
 
-    confidence < 40 ||
+    herbName.includes("未知") ||
 
-    imageQualityScore < 35 ||
+    confidence < 45 ||
 
-    blurLevel === "HIGH"
+    visibility < 40 ||
+
+    clarity.includes("严重模糊")
 
   ) {
 
     isUnknown = true;
 
-    totalRisk += 30;
+    totalRisk += 35;
 
   }
 
-  // =========================
-  // 限制最大值
-  // =========================
+  /* =========================
+     ABNORMAL ISSUE ANALYSIS
+  ========================= */
+
+  if (abnormal.length > 180) {
+
+    totalRisk += 25;
+
+  }
+
+  else if (abnormal.length > 100) {
+
+    totalRisk += 15;
+
+  }
+
+  /* =========================
+     HARD LIMIT
+  ========================= */
+
+  if (totalRisk > 100) {
+
+    totalRisk = 100;
+
+  }
 
   totalRisk =
-    Math.min(totalRisk, 100);
+    Math.round(totalRisk);
 
-  // =========================
-  // 风险等级
-  // =========================
+  /* =========================
+     RISK LEVEL
+  ========================= */
 
   let riskLevel = "LOW";
 
-  if (totalRisk >= 70) {
+  if (totalRisk >= 75) {
 
     riskLevel = "HIGH";
 
   }
-  else if (totalRisk >= 40) {
+
+  else if (totalRisk >= 50) {
 
     riskLevel = "MEDIUM";
 
   }
 
-  // =========================
-  // 返回
-  // =========================
+  else if (totalRisk >= 25) {
+
+    riskLevel = "ELEVATED";
+
+  }
+
+  /* =========================
+     RETURN
+  ========================= */
 
   return {
 
-    totalRisk:
-      Math.round(totalRisk),
+    totalRisk,
 
     riskLevel,
 
@@ -194,9 +255,11 @@ export function calculateRisk(result) {
 
     confidence,
 
-    imageQualityScore,
+    visibility,
 
-    blurLevel
+    clarity,
+
+    lighting
 
   };
 
