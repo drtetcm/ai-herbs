@@ -32,7 +32,7 @@ export function calculateRisk(result) {
 
   if (confidence < 40) {
 
-    totalRisk += 30;
+    totalRisk += 70;
 
   }
 

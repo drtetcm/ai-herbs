@@ -44,7 +44,30 @@ ${outputFormat}
       body: formData
     });
 
-    const data = await response.json();
+    let data;
+
+    try {
+
+      data = await response.json();
+
+    } catch (err) {
+
+      console.error("JSON解析失败:", err);
+
+      return `
+        <div class="report-container">
+
+          <div class="section">
+
+            <div style="color:#dc2626;font-weight:700;">
+              ❌ AI服务暂时不可用，请稍后重试
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
 
     console.log("API返回:", data);
 
@@ -281,6 +304,10 @@ ${outputFormat}
               </h2>
 
               <div class="feature-list">
+                <div class="feature-item">
+                  综合风险评分：
+                  ${herb.total_risk_score || 0}/100
+                </div>
 
                 <div class="feature-item">
                   假药概率：${herb.fake_probability || 0}%
