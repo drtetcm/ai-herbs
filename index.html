@@ -2,21 +2,74 @@
 <html lang="zh">
 
 <head>
-  <meta charset="UTF-8">
-  <title>DRTE AI Herbs</title>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>
+    DRTE AI Herbs
+  </title>
+
+  <!-- CSS -->
+
+  <link
+    rel="stylesheet"
+    href="css/report.css"
+  />
+
 </head>
 
 <body>
 
-  <input type="file" id="imageInput">
+  <div class="upload-page">
 
-  <button id="analyzeBtn">
-    开始验药
-  </button>
+    <!-- Logo -->
 
-  <pre id="result"></pre>
+    <div class="upload-logo">
+      🌿
+    </div>
 
-  <script type="module" src="js/app.js"></script>
+    <!-- Title -->
+
+    <h1 class="upload-title">
+      DRTE AI Herbs
+    </h1>
+
+    <p class="upload-subtitle">
+      AI Traditional Medicine Verification System
+    </p>
+
+    <!-- Upload Card -->
+
+    <div class="upload-card">
+
+      <input
+        type="file"
+        id="imageInput"
+        accept="image/*"
+      />
+
+      <button id="analyzeBtn">
+        开始AI验药
+      </button>
+
+    </div>
+
+    <!-- Result -->
+
+    <div id="result"></div>
+
+  </div>
+
+  <script
+    type="module"
+    src="js/app.js"
+  ></script>
 
 </body>
+
 </html>

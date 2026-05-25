@@ -4,6 +4,8 @@ export async function analyzeHerb(file) {
 
   try {
 
+    // 上传图片
+
     const formData = new FormData();
 
     formData.append("image", file);
@@ -18,6 +20,7 @@ export async function analyzeHerb(file) {
     console.log("API返回:", data);
 
     // 错误处理
+
     if (data.status === "error") {
 
       return `
@@ -35,12 +38,16 @@ export async function analyzeHerb(file) {
       `;
     }
 
+    // AI结果
+
     const herb = data.result;
 
     // 图片URL
+
     const imageUrl = URL.createObjectURL(file);
 
     // 风险等级
+
     let riskClass = "risk-low";
 
     if (herb["真假风险"] === "中风险") {
@@ -52,6 +59,7 @@ export async function analyzeHerb(file) {
     }
 
     // 外观特征
+
     const featuresHTML = herb["外观特征"]
       .map(item => `
         <div class="feature-item">
@@ -61,15 +69,42 @@ export async function analyzeHerb(file) {
       .join("");
 
     // 返回HTML
+
     return `
 
       <div class="report-container">
 
-        <!-- HERO -->
+        <!-- Header -->
+
+        <div class="report-header">
+
+          <div class="header-left">
+
+            <div class="header-logo">
+              🌿
+            </div>
+
+            <div class="header-title">
+
+              <h1>
+                AI验药系统
+              </h1>
+
+              <p>
+                AI Traditional Medicine Verification Platform
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Hero -->
 
         <div class="hero-layout">
 
-          <!-- Left Image -->
+          <!-- 图片 -->
 
           <div class="hero-image-card">
 
@@ -81,7 +116,7 @@ export async function analyzeHerb(file) {
 
           </div>
 
-          <!-- Right Summary -->
+          <!-- AI结果 -->
 
           <div class="hero-summary">
 
@@ -97,25 +132,29 @@ export async function analyzeHerb(file) {
               ${herb["学名"]}
             </div>
 
-            <div class="hero-divider"></div>
+            <!-- Stats -->
 
-            <div class="hero-mini-grid">
+            <div class="hero-stats">
 
-              <div class="mini-card">
+              <!-- 可信度 -->
 
-                <div class="mini-label">
+              <div class="hero-stat">
+
+                <div class="hero-stat-label">
                   AI可信度
                 </div>
 
-                <div class="mini-value">
+                <div class="hero-stat-value">
                   ${herb["可信度"]}
                 </div>
 
               </div>
 
-              <div class="mini-card">
+              <!-- 风险 -->
 
-                <div class="mini-label">
+              <div class="hero-stat">
+
+                <div class="hero-stat-label">
                   风险等级
                 </div>
 
@@ -129,25 +168,13 @@ export async function analyzeHerb(file) {
 
               </div>
 
-              <div class="mini-card">
-
-                <div class="mini-label">
-                  质量等级
-                </div>
-
-                <div class="mini-value">
-                  ${herb["质量等级"]}
-                </div>
-
-              </div>
-
             </div>
 
           </div>
 
         </div>
 
-        <!-- MAIN DASHBOARD -->
+        <!-- Dashboard -->
 
         <div class="dashboard-layout">
 
@@ -215,6 +242,20 @@ export async function analyzeHerb(file) {
 
             </div>
 
+            <!-- 质量 -->
+
+            <div class="side-card">
+
+              <div class="side-label">
+                质量等级
+              </div>
+
+              <div class="side-value">
+                ${herb["质量等级"]}
+              </div>
+
+            </div>
+
             <!-- 规格 -->
 
             <div class="side-card">
@@ -223,46 +264,8 @@ export async function analyzeHerb(file) {
                 药材规格
               </div>
 
-              <div class="side-content">
+              <div class="spec-box">
                 ${herb["规格"]}
-              </div>
-
-            </div>
-
-            <!-- AI Metrics -->
-
-            <div class="side-card">
-
-              <div class="side-label">
-                AI视觉指标
-              </div>
-
-              <div class="metric-list">
-
-                <div class="metric-item">
-
-                  <span>Color Match</span>
-
-                  <strong>92%</strong>
-
-                </div>
-
-                <div class="metric-item">
-
-                  <span>Texture Match</span>
-
-                  <strong>88%</strong>
-
-                </div>
-
-                <div class="metric-item">
-
-                  <span>Shape Match</span>
-
-                  <strong>90%</strong>
-
-                </div>
-
               </div>
 
             </div>
