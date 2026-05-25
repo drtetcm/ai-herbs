@@ -81,15 +81,15 @@ export default async function handler(req, res) {
           imageBuffer.toString("base64");
 
         // =========================
-        // INDUSTRIAL PROMPT
+        // PROFESSIONAL HERBAL PROMPT
         // =========================
 
         const prompt = `
-You are an industrial herbal material inspection AI.
+You are a professional traditional Chinese medicine herbal inspection AI.
 
-Your task is NOT only to identify herbs.
+Your task is NOT to immediately guess the herb.
 
-You must FIRST determine whether the uploaded image is actually a herbal material.
+You must FIRST analyze the visual herbal features carefully.
 
 Return STRICT JSON ONLY.
 
@@ -97,13 +97,57 @@ NO markdown.
 NO explanation.
 NO code block.
 
-Rules:
+=========================
+VISUAL FEATURE ANALYSIS
+=========================
 
-1. Determine if the object is herbal-like.
+You must analyze:
 
-2. Detect object type.
+1. Color tone
+2. Texture
+3. Slice pattern
+4. Fiber structure
+5. Edge characteristics
+6. Surface details
+7. Density feeling
+8. Dryness or moisture appearance
+
+=========================
+HERBAL IDENTIFICATION
+=========================
+
+After visual analysis:
+
+1. Determine whether the object is herbal-like
+
+2. Identify possible herbal candidates
+
+3. Determine final herb_name
+
+4. If uncertain:
+- reduce confidence
+- increase unknown_probability
+- avoid aggressive guessing
+
+5. Carefully distinguish similar sliced herbs:
+- 黄芪
+- 甘草
+- 白术
+- 白芍
+- 山药
+- 当归
+- 川芎
+- 茯苓
+- 猪苓
+
+Analyze structural details carefully before deciding.
+
+=========================
+OBJECT TYPE
+=========================
 
 Allowed object_type values:
+
 - herb
 - powder
 - plastic
@@ -114,37 +158,51 @@ Allowed object_type values:
 - animal
 - unknown
 
-3. If image is not clearly herbal:
-- set is_herb_like = false
+=========================
+UNKNOWN RULES
+=========================
+
+If image quality is poor:
+- lower confidence
 - increase unknown_probability
 
-4. If image quality is poor:
-- reduce confidence
+If visual features are ambiguous:
 - increase unknown_probability
 
-5. unknown_probability:
+unknown_probability:
 0-20 = likely herb
 20-50 = suspicious
 50-100 = likely NOT herb
 
-6. confidence:
-0-100
-
-7. risk_level:
-ONLY:
-LOW
-MEDIUM
-HIGH
-UNKNOWN
-
-8. herb_name:
-If uncertain:
-return:
-"未知"
-
-Return JSON:
+=========================
+RETURN JSON
+=========================
 
 {
+  "visual_features": {
+
+    "color_tone": "",
+
+    "texture": "",
+
+    "slice_pattern": "",
+
+    "fiber_structure": "",
+
+    "edge_characteristics": "",
+
+    "surface_details": "",
+
+    "density_feeling": "",
+
+    "dryness_moisture": ""
+
+  },
+
+  "possible_candidates": [],
+
+  "identification_reason": "",
+
   "herb_name": "",
 
   "confidence": 0,
@@ -178,7 +236,10 @@ Return JSON:
   "expert_summary": "",
 
   "recommendation": ""
+
 }
+
+ONLY RETURN JSON.
 `;
 
         // =========================
@@ -190,7 +251,7 @@ Return JSON:
 
             model: "claude-sonnet-4-6",
 
-            max_tokens: 2000,
+            max_tokens: 2500,
 
             temperature: 0,
 
@@ -198,10 +259,21 @@ Return JSON:
 你是工业级AI中药材风控系统。
 
 你的第一任务：
-判断图片是不是药材。
+判断是不是药材。
 
-不是药材时：
-必须提高 unknown_probability。
+第二任务：
+分析药材视觉结构。
+
+禁止直接猜测药材。
+
+必须先分析：
+颜色
+纹理
+横切纹
+纤维结构
+边缘形态
+
+然后再判断。
 
 严格输出JSON。
 
@@ -310,6 +382,12 @@ Return JSON:
 
         parsed.unknown_probability ??= 0;
 
+        parsed.visual_features ??= {};
+
+        parsed.possible_candidates ??= [];
+
+        parsed.identification_reason ??= "";
+
         // =========================
         // HARD UNKNOWN DETECTION
         // =========================
@@ -364,6 +442,20 @@ Return JSON:
 
           confidence:
             Number(parsed.confidence || 0),
+
+          visual_features:
+            parsed.visual_features || {},
+
+          possible_candidates:
+            Array.isArray(
+              parsed.possible_candidates
+            )
+              ? parsed.possible_candidates
+              : [],
+
+          identification_reason:
+            parsed.identification_reason ||
+            "",
 
           is_herb_like:
             Boolean(parsed.is_herb_like),
@@ -495,6 +587,12 @@ Return JSON:
         const report = `
 药材名称：
 ${normalizedResult.herb_name}
+
+候选药材：
+${normalizedResult.possible_candidates.join("、") || "无"}
+
+识别依据：
+${normalizedResult.identification_reason || "暂无"}
 
 对象类型：
 ${normalizedResult.object_type}
