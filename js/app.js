@@ -13,9 +13,6 @@ const loading =
 const loadingText =
   document.getElementById("loadingText");
 
-const idleState =
-  document.getElementById("idleState");
-
 const riskBadge =
   document.getElementById("riskBadge");
 
@@ -112,8 +109,6 @@ imageInput.addEventListener("change", () => {
 
   confidenceValue.textContent = "--";
 
-  idleState.classList.remove("hidden");
-
   loading.classList.add("hidden");
 
 });
@@ -181,8 +176,6 @@ function startLoading() {
 
   loading.classList.remove("hidden");
 
-  idleState.classList.add("hidden");
-
   result.innerHTML = `
     <div style="
       color:#8c97b2;
@@ -225,10 +218,6 @@ function stopLoading() {
   );
 
   loading.classList.add(
-    "hidden"
-  );
-
-  idleState.classList.add(
     "hidden"
   );
 
