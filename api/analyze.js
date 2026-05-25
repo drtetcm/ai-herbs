@@ -14,14 +14,24 @@ const anthropic = new Anthropic({
 
 export default async function handler(req, res) {
 
+  // =========================
+  // Method Check
+  // =========================
+
   if (req.method !== "POST") {
+
     return res.status(405).json({
       status: "error",
       message: "Method not allowed"
     });
+
   }
 
   try {
+
+    // =========================
+    // Parse FormData
+    // =========================
 
     const form = formidable({});
 
@@ -29,7 +39,7 @@ export default async function handler(req, res) {
 
       if (err) {
 
-        console.error(err);
+        console.error("Form Parse Error:", err);
 
         return res.status(500).json({
           status: "error",
@@ -40,52 +50,86 @@ export default async function handler(req, res) {
 
       try {
 
-        // 获取上传图片
+        // =========================
+        // Get Image
+        // =========================
+
         const imageFile = files.image[0];
 
-        // 读取图片
+        if (!imageFile) {
+
+          return res.status(400).json({
+            status: "error",
+            message: "No image uploaded"
+          });
+
+        }
+
+        // =========================
+        // Get Prompt
+        // =========================
+
+        const prompt = fields.prompt?.[0] || `
+请分析用户上传的中药材图片。
+`;
+
+        console.log("收到Prompt:", prompt);
+
+        // =========================
+        // Read Image
+        // =========================
+
         const imageBuffer = fs.readFileSync(imageFile.filepath);
 
-        // 转Base64
         const base64Image = imageBuffer.toString("base64");
 
-        // Claude Vision
+        // =========================
+        // Claude Vision Request
+        // =========================
+
         const response = await anthropic.messages.create({
 
           model: "claude-sonnet-4-6",
 
-          max_tokens: 1000,
+          max_tokens: 1500,
 
           temperature: 0,
 
           system: `
-你是专业中药材鉴定AI引擎。
+你是企业级 AI中药材鉴定引擎。
 
 你的唯一任务：
 
-分析中药材图片，
-并返回标准JSON。
+分析药材图片，
+并严格输出JSON。
 
-禁止输出：
+禁止：
 
 - Markdown
 - 标题
-- 解释
-- 分析报告
 - 代码块
+- 解释文字
 - \`\`\`
 
 只能输出合法JSON。
 
-如果无法判断：
+如果无法确定：
 
-填写 "未知"
+必须明确写：
+
+"未知"
+
+禁止编造。
 `,
 
           messages: [
             {
               role: "user",
               content: [
+
+                // =========================
+                // Image
+                // =========================
 
                 {
                   type: "image",
@@ -96,24 +140,13 @@ export default async function handler(req, res) {
                   }
                 },
 
+                // =========================
+                // Prompt Engine
+                // =========================
+
                 {
                   type: "text",
-                  text: `
-请分析这张中药材图片。
-
-返回格式：
-
-{
-  "药材名称": "",
-  "学名": "",
-  "可信度": "",
-  "规格": "",
-  "真假风险": "",
-  "质量等级": "",
-  "外观特征": [],
-  "分析说明": ""
-}
-`
+                  text: prompt
                 }
 
               ]
@@ -122,15 +155,23 @@ export default async function handler(req, res) {
 
         });
 
-        // Claude原始返回
+        // =========================
+        // Claude Raw Response
+        // =========================
+
         const rawText = response.content[0].text;
 
-        console.log("Claude原始返回：", rawText);
+        console.log("Claude原始返回:", rawText);
 
-        // 提取JSON
+        // =========================
+        // Extract JSON
+        // =========================
+
         const jsonMatch = rawText.match(/\{[\s\S]*\}/);
 
         if (!jsonMatch) {
+
+          console.error("AI未返回JSON");
 
           return res.status(500).json({
             status: "error",
@@ -140,21 +181,92 @@ export default async function handler(req, res) {
 
         }
 
-        // JSON解析
-        const parsedResult = JSON.parse(jsonMatch[0]);
+        // =========================
+        // Parse JSON
+        // =========================
 
-        // 返回成功结果
+        let parsedResult;
+
+        try {
+
+          parsedResult = JSON.parse(jsonMatch[0]);
+
+        } catch (jsonError) {
+
+          console.error("JSON解析失败:", jsonError);
+
+          return res.status(500).json({
+            status: "error",
+            message: "AI JSON格式错误",
+            raw: rawText
+          });
+
+        }
+
+        // =========================
+        // Normalize Fields
+        // =========================
+
+        const normalizedResult = {
+
+          herb_name:
+            parsedResult.herb_name || "未知",
+
+          confidence:
+            parsedResult.confidence || 0,
+
+          quality_grade:
+            parsedResult.quality_grade || "UNKNOWN",
+
+          risk_level:
+            parsedResult.risk_level || "LOW",
+
+          fake_probability:
+            parsedResult.fake_probability || 0,
+
+          mold_risk:
+            parsedResult.mold_risk || 0,
+
+          sulfur_fumigation_risk:
+            parsedResult.sulfur_fumigation_risk || 0,
+
+          color_analysis:
+            parsedResult.color_analysis || "暂无",
+
+          texture_analysis:
+            parsedResult.texture_analysis || "暂无",
+
+          slice_pattern_analysis:
+            parsedResult.slice_pattern_analysis || "暂无",
+
+          issues_detected:
+            parsedResult.issues_detected || [],
+
+          expert_summary:
+            parsedResult.expert_summary || "暂无分析",
+
+          recommendation:
+            parsedResult.recommendation || "暂无建议"
+
+        };
+
+        console.log("标准化结果:", normalizedResult);
+
+        // =========================
+        // Success Response
+        // =========================
+
         return res.status(200).json({
 
           status: "success",
 
-          result: parsedResult
+          result: normalizedResult
 
         });
 
       } catch (visionError) {
 
-        console.error(visionError);
+        console.error("Claude Vision Error:", visionError);
 
         return res.status(500).json({
           status: "error",
@@ -167,7 +279,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Server Error:", error);
 
     return res.status(500).json({
       status: "error",
