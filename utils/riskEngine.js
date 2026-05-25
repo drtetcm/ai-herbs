@@ -28,6 +28,19 @@ export function calculateRisk(result) {
     result.abnormal ||
     "";
 
+  const unknownProbability =
+    Number(
+      result.unknown_probability || 0
+    );
+
+  const objectType =
+    result.object_type || "unknown";
+
+  const forceUnknown =
+    Boolean(result.force_unknown);
+
+  let isUnknown = false;
+
   /* =========================
      AI CONFIDENCE
   ========================= */
@@ -58,7 +71,7 @@ export function calculateRisk(result) {
 
   else {
 
-    totalRisk += 70;
+    totalRisk += 75;
 
   }
 
@@ -86,15 +99,20 @@ export function calculateRisk(result) {
 
   else {
 
-    totalRisk += 55;
+    totalRisk += 60;
 
   }
 
   /* =========================
-     CLARITY ANALYSIS
+     BLUR ANALYSIS
   ========================= */
 
+  const blurText =
+    clarity.toUpperCase();
+
   if (
+
+    blurText.includes("HIGH") ||
 
     clarity.includes("严重模糊") ||
 
@@ -102,11 +120,13 @@ export function calculateRisk(result) {
 
   ) {
 
-    totalRisk += 45;
+    totalRisk += 50;
 
   }
 
   else if (
+
+    blurText.includes("MEDIUM") ||
 
     clarity.includes("低度模糊") ||
 
@@ -114,11 +134,13 @@ export function calculateRisk(result) {
 
   ) {
 
-    totalRisk += 20;
+    totalRisk += 25;
 
   }
 
   else if (
+
+    blurText.includes("LOW") ||
 
     clarity.includes("清晰")
 
@@ -132,7 +154,12 @@ export function calculateRisk(result) {
      LIGHTING ANALYSIS
   ========================= */
 
+  const lightingText =
+    lighting.toUpperCase();
+
   if (
+
+    lightingText.includes("DARK") ||
 
     lighting.includes("暗") ||
 
@@ -140,21 +167,25 @@ export function calculateRisk(result) {
 
   ) {
 
-    totalRisk += 25;
+    totalRisk += 30;
 
   }
 
   else if (
+
+    lightingText.includes("MEDIUM") ||
 
     lighting.includes("一般")
 
   ) {
 
-    totalRisk += 12;
+    totalRisk += 15;
 
   }
 
   else if (
+
+    lightingText.includes("GOOD") ||
 
     lighting.includes("良好")
 
@@ -165,10 +196,83 @@ export function calculateRisk(result) {
   }
 
   /* =========================
-     UNKNOWN MODE
+     UNKNOWN PROBABILITY
   ========================= */
 
-  let isUnknown = false;
+  if (unknownProbability >= 80) {
+
+    totalRisk += 60;
+
+  }
+
+  else if (unknownProbability >= 60) {
+
+    totalRisk += 45;
+
+  }
+
+  else if (unknownProbability >= 40) {
+
+    totalRisk += 30;
+
+  }
+
+  else if (unknownProbability >= 20) {
+
+    totalRisk += 15;
+
+  }
+
+  else {
+
+    totalRisk += 5;
+
+  }
+
+  /* =========================
+     OBJECT TYPE ANALYSIS
+  ========================= */
+
+  const dangerousObjects = [
+
+    "plastic",
+    "food",
+    "packaging",
+    "table",
+    "human_hand",
+    "animal"
+
+  ];
+
+  if (
+    dangerousObjects.includes(objectType)
+  ) {
+
+    totalRisk += 60;
+
+    isUnknown = true;
+
+  }
+
+  if (objectType === "powder") {
+
+    totalRisk += 45;
+
+    isUnknown = true;
+
+  }
+
+  if (objectType === "unknown") {
+
+    totalRisk += 40;
+
+    isUnknown = true;
+
+  }
+
+  /* =========================
+     UNKNOWN MODE
+  ========================= */
 
   if (
 
@@ -178,18 +282,22 @@ export function calculateRisk(result) {
 
     visibility < 40 ||
 
-    clarity.includes("严重模糊")
+    blurText.includes("HIGH") ||
+
+    unknownProbability >= 60 ||
+
+    forceUnknown
 
   ) {
 
     isUnknown = true;
 
-    totalRisk += 35;
+    totalRisk += 40;
 
   }
 
   /* =========================
-     ABNORMAL ISSUE ANALYSIS
+     ABNORMAL ANALYSIS
   ========================= */
 
   if (abnormal.length > 180) {
@@ -205,25 +313,18 @@ export function calculateRisk(result) {
   }
 
   /* =========================
-     HARD LIMIT
-  ========================= */
-
-  if (totalRisk > 100) {
-
-    totalRisk = 100;
-
-  }
-
-  totalRisk =
-    Math.round(totalRisk);
-
-  /* =========================
-     RISK LEVEL
+     UNKNOWN OVERRIDE
   ========================= */
 
   let riskLevel = "LOW";
 
-  if (totalRisk >= 75) {
+  if (
+
+    isUnknown ||
+
+    totalRisk >= 75
+
+  ) {
 
     riskLevel = "HIGH";
 
@@ -240,6 +341,19 @@ export function calculateRisk(result) {
     riskLevel = "ELEVATED";
 
   }
+
+  /* =========================
+     HARD LIMIT
+  ========================= */
+
+  if (totalRisk > 100) {
+
+    totalRisk = 100;
+
+  }
+
+  totalRisk =
+    Math.round(totalRisk);
 
   /* =========================
      RETURN
@@ -259,7 +373,11 @@ export function calculateRisk(result) {
 
     clarity,
 
-    lighting
+    lighting,
+
+    objectType,
+
+    unknownProbability
 
   };
 
