@@ -17,22 +17,141 @@ export function calculateRisk(result) {
     Number(result.confidence || 0);
 
   // =========================
-  // 综合风险评分
+  // 新增：
+  // 图片质量评分
+  // =========================
+
+  const imageQualityScore =
+    Number(result.image_quality_score || 60);
+
+  // =========================
+  // 新增：
+  // 模糊等级
+  // LOW / MEDIUM / HIGH
+  // =========================
+
+  const blurLevel =
+    result.image_blur_level || "LOW";
+
+  // =========================
+  // Risk Weight Table
+  // 不同风险不同权重
+  // =========================
+
+  const moldWeight = 0.25;
+
+  const fakeWeight = 0.5;
+
+  const sulfurWeight = 0.25;
+
+  // =========================
+  // 基础风险
   // =========================
 
   let totalRisk =
 
-    moldRisk * 0.35 +
-    fakeRisk * 0.4 +
-    sulfurRisk * 0.25;
+    moldRisk * moldWeight +
+    fakeRisk * fakeWeight +
+    sulfurRisk * sulfurWeight;
 
   // =========================
-  // 低置信度惩罚
+  // 连续置信度扣分
+  // Confidence Curve
   // =========================
+
+  if (confidence < 90) {
+
+    totalRisk += 5;
+
+  }
+
+  if (confidence < 80) {
+
+    totalRisk += 10;
+
+  }
+
+  if (confidence < 70) {
+
+    totalRisk += 15;
+
+  }
+
+  if (confidence < 60) {
+
+    totalRisk += 20;
+
+  }
+
+  if (confidence < 50) {
+
+    totalRisk += 25;
+
+  }
 
   if (confidence < 40) {
 
-    totalRisk += 70;
+    totalRisk += 35;
+
+  }
+
+  // =========================
+  // 图片质量惩罚
+  // =========================
+
+  if (imageQualityScore < 80) {
+
+    totalRisk += 5;
+
+  }
+
+  if (imageQualityScore < 60) {
+
+    totalRisk += 10;
+
+  }
+
+  if (imageQualityScore < 40) {
+
+    totalRisk += 20;
+
+  }
+
+  // =========================
+  // 模糊等级惩罚
+  // =========================
+
+  if (blurLevel === "MEDIUM") {
+
+    totalRisk += 15;
+
+  }
+
+  if (blurLevel === "HIGH") {
+
+    totalRisk += 30;
+
+  }
+
+  // =========================
+  // Unknown Mode
+  // =========================
+
+  let isUnknown = false;
+
+  if (
+
+    confidence < 40 ||
+
+    imageQualityScore < 35 ||
+
+    blurLevel === "HIGH"
+
+  ) {
+
+    isUnknown = true;
+
+    totalRisk += 30;
 
   }
 
@@ -40,7 +159,8 @@ export function calculateRisk(result) {
   // 限制最大值
   // =========================
 
-  totalRisk = Math.min(totalRisk, 100);
+  totalRisk =
+    Math.min(totalRisk, 100);
 
   // =========================
   // 风险等级
@@ -60,16 +180,8 @@ export function calculateRisk(result) {
   }
 
   // =========================
-  // Unknown Mode
+  // 返回
   // =========================
-
-  let isUnknown = false;
-
-  if (confidence < 40) {
-
-    isUnknown = true;
-
-  }
 
   return {
 
@@ -78,7 +190,13 @@ export function calculateRisk(result) {
 
     riskLevel,
 
-    isUnknown
+    isUnknown,
+
+    confidence,
+
+    imageQualityScore,
+
+    blurLevel
 
   };
 
