@@ -541,6 +541,8 @@ const jsonString =
 
 console.log("CLEAN JSON:", jsonString);
 
+        let parsed;
+        
         try {
 
           parsed =
@@ -883,7 +885,7 @@ ${normalizedResult.image_blur_level}
 ${normalizedResult.lighting_quality}
 
 可见度：
-normalizedResult.visibility_score
+${normalizedResult.visibility_score}%
 
 异常问题：
 ${normalizedResult.issues_detected.join("、") || "未发现"}
