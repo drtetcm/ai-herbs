@@ -242,75 +242,11 @@ function renderResult(data) {
     data
   );
 
-  const herbName =
-    data.herb_name ||
-    "未知";
+  const report =
 
-  const candidates =
-    data.candidate_herbs ||
-    data.possible_candidates ||
-    [];
+    data.report ||
 
-  const candidatesText =
-    formatCandidates(
-      candidates
-    );
-
-  const visualAnalysis =
-
-    typeof data.visual_analysis === "object"
-
-      ? JSON.stringify(
-          data.visual_analysis,
-          null,
-          2
-        )
-
-      : (
-          data.visual_analysis ||
-          "暂无"
-        );
-
-  const report = `
-药材名称：
-${herbName}
-
-候选药材：
-${candidatesText}
-
-识别依据：
-${data.identification_basis || "暂无"}
-
-视觉特征分析：
-${visualAnalysis}
-
-对象类型：
-${data.object_type || "unknown"}
-
-是否药材：
-${data.is_herbal ? "是" : "否"}
-
-未知对象概率：
-${data.unknown_probability || 0}%
-
-风险等级：
-${data.risk_level || data.risk || "LOW"}
-
-总风险：
-${data.overall_risk || data.totalRisk || 0}%
-
-AI置信度：
-${data.confidence || 0}%
-
-图片清晰度：
-${data.clarity || "--"}
-
-光线质量：
-${data.lighting || "--"}
-
-可见度：
-${data.visibility || "--"}%
-`;
+    "AI报告生成失败";
 
   result.innerHTML = `
     <div class="report-content">
