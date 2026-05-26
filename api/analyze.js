@@ -220,6 +220,8 @@ set:
 
 force_unknown = true
 
+Prefer UNKNOWN over false-positive identification.
+
 =========================
 SCENE INTERFERENCE TYPES
 =========================
@@ -270,17 +272,20 @@ CLARITY TYPES
 
 Possible clarity values:
 
-- LOW
+- GOOD
 - MEDIUM
-- HIGH
+- POOR
 
-IMPORTANT:
+Definitions:
 
-HIGH means:
-severely blurry
-
-LOW means:
+GOOD:
 clear image
+
+MEDIUM:
+moderate blur
+
+POOR:
+heavy blur
 
 =========================
 OBJECT TYPES
@@ -325,6 +330,14 @@ Confidence MUST reflect:
 - texture quality
 - object completeness
 - lighting reliability
+
+Confidence MUST decrease aggressively under:
+
+- occlusion
+- shadows
+- blur
+- scene interference
+- incomplete morphology
 
 Confidence is NOT:
 
@@ -381,6 +394,8 @@ JSON schema:
 }
 
 STRICT JSON ONLY.
+Do NOT output arrays as stringified JSON.
+possible_candidates MUST be valid JSON array objects.
 `;
 
         // =========================
@@ -395,37 +410,6 @@ STRICT JSON ONLY.
             max_tokens: 2500,
 
             temperature: 0,
-
-            system: `
-你是工业级AI中药材风控系统。
-
-你的第一任务：
-判断是不是药材。
-
-第二任务：
-分析药材视觉结构。
-
-禁止直接猜测药材。
-
-必须先分析：
-颜色
-纹理
-横切纹
-纤维结构
-边缘形态
-粉性质感
-
-对于相似饮片：
-
-宁可不确定，
-也不要高置信度乱猜。
-
-严格输出JSON。
-
-禁止Markdown。
-禁止代码块。
-禁止解释。
-`,
 
             messages: [
 
@@ -450,7 +434,7 @@ STRICT JSON ONLY.
                   {
                     type: "text",
 
-                    text: prompt
+                    text: SYSTEM_PROMPT
                   }
 
                 ]
