@@ -387,11 +387,19 @@ function renderQuality(data) {
 
   visibilityValue.textContent =
 
-    data.visibility || "--";
+    data.visibility !== undefined
+
+    ? `${data.visibility}%`
+
+    : "--";
 
   confidenceValue.textContent =
 
-    data.confidence || "--";
+    data.confidence !== undefined
+
+    ? `${data.confidence}%`
+
+    : "--";
 
 }
 
