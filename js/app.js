@@ -237,14 +237,43 @@ function stopLoading() {
 
 function renderResult(data) {
 
+  console.log(
+    "RENDER DATA:",
+    data
+  );
+
+  const herbName =
+    data.herb_name ||
+    "未知";
+
+  const candidates =
+    data.candidate_herbs ||
+    data.possible_candidates ||
+    [];
+
   const candidatesText =
     formatCandidates(
-      data.possible_candidates
+      candidates
     );
+
+  const visualAnalysis =
+
+    typeof data.visual_analysis === "object"
+
+      ? JSON.stringify(
+          data.visual_analysis,
+          null,
+          2
+        )
+
+      : (
+          data.visual_analysis ||
+          "暂无"
+        );
 
   const report = `
 药材名称：
-${data.herb_name || "未知"}
+${herbName}
 
 候选药材：
 ${candidatesText}
@@ -253,22 +282,22 @@ ${candidatesText}
 ${data.identification_basis || "暂无"}
 
 视觉特征分析：
-${data.visual_analysis || "暂无"}
+${visualAnalysis}
 
 对象类型：
 ${data.object_type || "unknown"}
 
 是否药材：
-${data.is_herb_like ? "是" : "否"}
+${data.is_herbal ? "是" : "否"}
 
 未知对象概率：
 ${data.unknown_probability || 0}%
 
 风险等级：
-${data.risk || "UNKNOWN"}
+${data.risk_level || data.risk || "LOW"}
 
 总风险：
-${data.totalRisk || 0}%
+${data.overall_risk || data.totalRisk || 0}%
 
 AI置信度：
 ${data.confidence || 0}%
@@ -303,34 +332,15 @@ function formatCandidates(candidates) {
 
   if (
     !candidates ||
-    !Array.isArray(candidates)
+    !Array.isArray(candidates) ||
+    candidates.length === 0
   ) {
 
     return "无";
 
   }
 
-  return candidates
-
-    .map(item => {
-
-      if (
-        typeof item === "string"
-      ) {
-
-        return item;
-      }
-
-      return `
-${item.herb_name || "未知"}
-（匹配度 ${
-  item.match_score || 0
-}%）
-`;
-
-    })
-
-    .join("、");
+  return candidates.join("、");
 
 }
 
@@ -362,16 +372,20 @@ function renderRisk(data) {
 
   const risk = (
 
-    data.risk ||
+    data.risk_level ||
 
-    data.riskLevel ||
+    data.risk ||
 
     "LOW"
 
   ).toUpperCase();
 
   let score =
-    Number(data.totalRisk || 12);
+    Number(
+      data.overall_risk ||
+      data.totalRisk ||
+      12
+    );
 
   let badgeClass =
     "risk-low";
@@ -395,11 +409,11 @@ function renderRisk(data) {
   }
 
   else if (
-    risk.includes("UNKNOWN")
+    risk.includes("ELEVATED")
   ) {
 
     badgeClass =
-      "risk-high";
+      "risk-medium";
 
   }
 
