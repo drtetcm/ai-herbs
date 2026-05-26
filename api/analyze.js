@@ -289,6 +289,23 @@ visual_analysis should contain:
 - density_features
 - dryness_features
 
+You MUST provide a most likely herb_name
+for visible herbal slices.
+
+Do NOT return UNKNOWN
+simply because multiple herbs look similar.
+
+When several herbs are visually close,
+select the most probable herb
+and lower confidence appropriately.
+
+UNKNOWN should be extremely rare
+for clear herbal slice images.
+
+For standard commercial herbal slice photos,
+assume the image likely contains
+a legitimate Chinese medicinal herb.
+
 =========================
 RETURN JSON
 =========================
