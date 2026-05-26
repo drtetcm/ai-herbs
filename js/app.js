@@ -237,12 +237,6 @@ function stopLoading() {
 
 function renderResult(data) {
 
-  console.log(
-    "RENDER DATA:",
-    data
-  );
-
-  
   const rawReport = String(
     data.report || ""
   );
@@ -398,7 +392,7 @@ function renderQuality(data) {
 
   visibilityValue.textContent =
 
-    `${data.visibility || "--"}%`;
+    data.visibility || "--";
 
   confidenceValue.textContent =
 
