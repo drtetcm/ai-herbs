@@ -496,37 +496,55 @@ ONLY RETURN JSON.
 
         console.log("RAW:", rawText);
 
-        // =========================
-        // JSON EXTRACT
-        // =========================
+// =========================
+// CLEAN AI RESPONSE
+// =========================
 
-        const jsonMatch =
-          rawText.match(/\{[\s\S]*\}/);
+let cleanedText = rawText
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .replace(/^\s*Here.*?\n/gi, "")
+  .trim();
 
-        if (!jsonMatch) {
+// =========================
+// JSON EXTRACT
+// =========================
 
-          return res.status(500).json({
+const firstBrace =
+  cleanedText.indexOf("{");
 
-            status: "error",
+const lastBrace =
+  cleanedText.lastIndexOf("}");
 
-            message: "AI did not return JSON",
+if (
+  firstBrace === -1 ||
+  lastBrace === -1
+) {
 
-            raw: rawText
+  return res.status(500).json({
 
-          });
+    status: "error",
 
-        }
+    message: "AI did not return JSON",
 
-        // =========================
-        // PARSE JSON
-        // =========================
+    raw: rawText
 
-        let parsed;
+  });
+
+}
+
+const jsonString =
+  cleanedText.slice(
+    firstBrace,
+    lastBrace + 1
+  );
+
+console.log("CLEAN JSON:", jsonString);
 
         try {
 
           parsed =
-            JSON.parse(jsonMatch[0]);
+            JSON.parse(jsonString);
 
         } catch (jsonError) {
 
@@ -602,7 +620,7 @@ ONLY RETURN JSON.
         }
 
         if (
-          Number(parsed.unknown_probability) >= 60
+          Number(parsed.unknown_probability) >= 85
         ) {
 
           forceUnknown = true;
@@ -623,7 +641,8 @@ ONLY RETURN JSON.
         if (
           nonHerbalObjects.includes(
             parsed.object_type
-          )
+          ) &&
+  parsed.is_herb_like === false
         ) {
 
           forceUnknown = true;
@@ -637,7 +656,9 @@ ONLY RETURN JSON.
         const normalizedResult = {
 
           herb_name:
-            parsed.herb_name || "未知",
+            parsed.herb_name ||
+  parsed.possible_candidates?.[0] ||
+  "待确认药材",
 
           confidence:
             Number(parsed.confidence || 0),
@@ -793,26 +814,6 @@ ${vf.dryness_moisture || "暂无"}
           riskResult.totalRisk;
 
         // =========================
-        // UNKNOWN MODE
-        // =========================
-
-        if (
-          riskResult.isUnknown ||
-          normalizedResult.force_unknown
-        ) {
-
-          normalizedResult.herb_name =
-            "未知对象";
-
-          normalizedResult.risk_level =
-            "HIGH";
-
-          normalizedResult.quality_grade =
-            "无法评级";
-
-        }
-
-        // =========================
         // REPORT
         // =========================
 
@@ -882,7 +883,7 @@ ${normalizedResult.image_blur_level}
 ${normalizedResult.lighting_quality}
 
 可见度：
-${normalizedResult.visibility_score}%
+normalizedResult.visibility_score
 
 异常问题：
 ${normalizedResult.issues_detected.join("、") || "未发现"}
@@ -917,7 +918,7 @@ ${normalizedResult.recommendation}
             normalizedResult.lighting_quality,
 
           visibility:
-            `${normalizedResult.visibility_score}%`,
+            normalizedResult.visibility_score,
 
           unknown_probability:
             normalizedResult.unknown_probability,
