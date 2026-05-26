@@ -2,21 +2,21 @@ export function calculateRisk(result) {
 
   let totalRisk = 0;
 
+  let adjustedConfidence =
+    Number(result.confidence || 0);
+
   /* =========================
      BASIC VALUES
   ========================= */
-
-  const confidence =
-    Number(result.confidence || 0);
 
   const visibility =
     parseInt(result.visibility || 0);
 
   const clarity =
-    result.clarity || "";
+    String(result.clarity || "");
 
   const lighting =
-    result.lighting || "";
+    String(result.lighting || "");
 
   const herbName =
     result.herb_name ||
@@ -42,77 +42,29 @@ export function calculateRisk(result) {
   let isUnknown = false;
 
   /* =========================
-     AI CONFIDENCE
-  ========================= */
-
-  if (confidence >= 90) {
-
-    totalRisk += 5;
-
-  }
-
-  else if (confidence >= 75) {
-
-    totalRisk += 15;
-
-  }
-
-  else if (confidence >= 60) {
-
-    totalRisk += 30;
-
-  }
-
-  else if (confidence >= 40) {
-
-    totalRisk += 50;
-
-  }
-
-  else {
-
-    totalRisk += 75;
-
-  }
-
-  /* =========================
-     VISIBILITY
-  ========================= */
-
-  if (visibility >= 85) {
-
-    totalRisk += 5;
-
-  }
-
-  else if (visibility >= 70) {
-
-    totalRisk += 15;
-
-  }
-
-  else if (visibility >= 50) {
-
-    totalRisk += 30;
-
-  }
-
-  else {
-
-    totalRisk += 60;
-
-  }
-
-  /* =========================
-     BLUR ANALYSIS
+     NORMALIZED TEXT
   ========================= */
 
   const blurText =
     clarity.toUpperCase();
 
+  const lightingText =
+    lighting.toUpperCase();
+
+  /* =========================
+     IMAGE QUALITY PENALTIES
+     (工业级视觉风控核心)
+  ========================= */
+
+  // -------------------------
+  // BLUR PENALTY
+  // -------------------------
+
   if (
 
-    blurText.includes("HIGH") ||
+    blurText.includes("EXTREME") ||
+
+    blurText.includes("VERY_LOW") ||
 
     clarity.includes("严重模糊") ||
 
@@ -120,7 +72,9 @@ export function calculateRisk(result) {
 
   ) {
 
-    totalRisk += 50;
+    adjustedConfidence -= 35;
+
+    totalRisk += 45;
 
   }
 
@@ -128,11 +82,11 @@ export function calculateRisk(result) {
 
     blurText.includes("MEDIUM") ||
 
-    clarity.includes("低度模糊") ||
-
-    clarity.includes("轻微模糊")
+    clarity.includes("中度模糊")
 
   ) {
+
+    adjustedConfidence -= 20;
 
     totalRisk += 25;
 
@@ -142,24 +96,81 @@ export function calculateRisk(result) {
 
     blurText.includes("LOW") ||
 
-    clarity.includes("清晰")
+    clarity.includes("轻微模糊")
 
   ) {
 
-    totalRisk += 5;
+    adjustedConfidence -= 10;
+
+    totalRisk += 10;
 
   }
 
-  /* =========================
-     LIGHTING ANALYSIS
-  ========================= */
+  // -------------------------
+  // VISIBILITY PENALTY
+  // -------------------------
 
-  const lightingText =
-    lighting.toUpperCase();
+  if (visibility < 20) {
+
+    adjustedConfidence -= 40;
+
+    totalRisk += 50;
+
+  }
+
+  else if (visibility < 40) {
+
+    adjustedConfidence -= 30;
+
+    totalRisk += 35;
+
+  }
+
+  else if (visibility < 60) {
+
+    adjustedConfidence -= 20;
+
+    totalRisk += 20;
+
+  }
+
+  else if (visibility < 75) {
+
+    adjustedConfidence -= 10;
+
+    totalRisk += 10;
+
+  }
+
+  // -------------------------
+  // LIGHTING PENALTY
+  // -------------------------
+
+  // 极暗
 
   if (
 
+    lightingText.includes("POOR") ||
+
     lightingText.includes("DARK") ||
+
+    lighting.includes("极暗") ||
+
+    lighting.includes("严重暗光")
+
+  ) {
+
+    adjustedConfidence -= 35;
+
+    totalRisk += 40;
+
+  }
+
+  // 中暗
+
+  else if (
+
+    lightingText.includes("MODERATE") ||
 
     lighting.includes("暗") ||
 
@@ -167,31 +178,109 @@ export function calculateRisk(result) {
 
   ) {
 
-    totalRisk += 30;
+    adjustedConfidence -= 20;
+
+    totalRisk += 20;
 
   }
 
-  else if (
+  // 曝光过度
 
-    lightingText.includes("MEDIUM") ||
+  if (
 
-    lighting.includes("一般")
+    lightingText.includes("OVEREXPOSED") ||
+
+    lighting.includes("曝光")
 
   ) {
+
+    adjustedConfidence -= 45;
+
+    totalRisk += 60;
+
+  }
+
+  // 黄光 / 色温污染
+
+  if (
+
+    lightingText.includes("WARM") ||
+
+    lightingText.includes("YELLOW") ||
+
+    lighting.includes("黄光")
+
+  ) {
+
+    adjustedConfidence -= 15;
 
     totalRisk += 15;
 
   }
 
-  else if (
+  // 强阴影
 
-    lightingText.includes("GOOD") ||
+  if (
 
-    lighting.includes("良好")
+    lightingText.includes("SHADOW") ||
+
+    lighting.includes("强阴影")
 
   ) {
 
+    adjustedConfidence -= 20;
+
+    totalRisk += 25;
+
+  }
+
+  // 反光
+
+  if (
+
+    lightingText.includes("REFLECTION") ||
+
+    lighting.includes("反光")
+
+  ) {
+
+    adjustedConfidence -= 30;
+
+    totalRisk += 35;
+
+  }
+
+  /* =========================
+     CONFIDENCE ANALYSIS
+  ========================= */
+
+  if (adjustedConfidence >= 90) {
+
     totalRisk += 5;
+
+  }
+
+  else if (adjustedConfidence >= 75) {
+
+    totalRisk += 15;
+
+  }
+
+  else if (adjustedConfidence >= 60) {
+
+    totalRisk += 30;
+
+  }
+
+  else if (adjustedConfidence >= 40) {
+
+    totalRisk += 50;
+
+  }
+
+  else {
+
+    totalRisk += 75;
 
   }
 
@@ -240,7 +329,8 @@ export function calculateRisk(result) {
     "packaging",
     "table",
     "human_hand",
-    "animal"
+    "animal",
+    "tool"
 
   ];
 
@@ -278,11 +368,15 @@ export function calculateRisk(result) {
 
     herbName.includes("未知") ||
 
-    confidence < 45 ||
+    herbName.includes("非药材") ||
+
+    adjustedConfidence < 45 ||
 
     visibility < 40 ||
 
-    blurText.includes("HIGH") ||
+    blurText.includes("EXTREME") ||
+
+    blurText.includes("VERY_LOW") ||
 
     unknownProbability >= 60 ||
 
@@ -313,7 +407,23 @@ export function calculateRisk(result) {
   }
 
   /* =========================
-     UNKNOWN OVERRIDE
+     HARD LIMIT
+  ========================= */
+
+  if (adjustedConfidence < 5) {
+
+    adjustedConfidence = 5;
+
+  }
+
+  if (adjustedConfidence > 99) {
+
+    adjustedConfidence = 99;
+
+  }
+
+  /* =========================
+     FINAL RISK LEVEL
   ========================= */
 
   let riskLevel = "LOW";
@@ -355,6 +465,9 @@ export function calculateRisk(result) {
   totalRisk =
     Math.round(totalRisk);
 
+  adjustedConfidence =
+    Math.round(adjustedConfidence);
+
   /* =========================
      RETURN
   ========================= */
@@ -367,7 +480,8 @@ export function calculateRisk(result) {
 
     isUnknown,
 
-    confidence,
+    confidence:
+      adjustedConfidence,
 
     visibility,
 
