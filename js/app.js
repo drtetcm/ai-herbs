@@ -155,11 +155,6 @@ analyzeBtn.addEventListener("click", async () => {
     const data =
       await response.json();
 
-    console.log(
-      "AI RESULT:",
-      data
-    );
-
     stopLoading();
 
     renderResult(data);
