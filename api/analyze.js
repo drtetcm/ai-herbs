@@ -407,16 +407,20 @@ possible_candidates MUST be valid JSON array objects.
 
             model: "claude-sonnet-4-6",
 
-            max_tokens: 2500,
+            max_tokens: 3000,
 
             temperature: 0,
 
             messages: [
-
               {
                 role: "user",
 
                 content: [
+                  {
+                    type: "text",
+
+                    text: SYSTEM_PROMPT
+                  },
 
                   {
                     type: "image",
@@ -429,13 +433,8 @@ possible_candidates MUST be valid JSON array objects.
 
                       data: base64Image
                     }
-                  },
-
-                  {
-                    type: "text",
-
-                    text: SYSTEM_PROMPT
                   }
+
 
                 ]
               }
