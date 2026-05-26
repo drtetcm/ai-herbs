@@ -426,7 +426,7 @@ export function calculateRisk(result) {
      FINAL RISK LEVEL
   ========================= */
 
-  let riskLevel = "LOW";
+  let riskLevel = "GOOD";
 
   if (
 
@@ -436,7 +436,7 @@ export function calculateRisk(result) {
 
   ) {
 
-    riskLevel = "HIGH";
+    riskLevel = "POOR";
 
   }
 
