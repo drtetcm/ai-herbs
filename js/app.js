@@ -247,8 +247,10 @@ function renderResult(data) {
     data.report || ""
   );
 
-  const report =
-    rawReport.split('", risk:')[0];
+  const report = rawReport
+  .replace(/",\s*risk:.*$/s, "")
+  .replace(/\\n/g, "\n")
+  .trim();
 
   result.innerHTML = `
     <div class="report-content">
