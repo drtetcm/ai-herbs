@@ -242,11 +242,13 @@ function renderResult(data) {
     data
   );
 
+  
+  const rawReport = String(
+    data.report || ""
+  );
+
   const report =
-
-    data.report ||
-
-    "AI报告生成失败";
+    rawReport.split('", risk:')[0];
 
   result.innerHTML = `
     <div class="report-content">
