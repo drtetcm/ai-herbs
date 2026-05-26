@@ -248,8 +248,9 @@ function renderResult(data) {
   );
 
   const report = rawReport
-  .replace(/",\s*risk:.*$/s, "")
   .replace(/\\n/g, "\n")
+  .replace(/"\s*,\s*risk\s*:.*$/s, "")
+  .replace(/risk\s*:.*$/s, "")
   .trim();
 
   result.innerHTML = `
