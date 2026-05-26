@@ -542,7 +542,7 @@ const jsonString =
 console.log("CLEAN JSON:", jsonString);
 
         let parsed;
-        
+
         try {
 
           parsed =
@@ -723,12 +723,26 @@ console.log("CLEAN JSON:", jsonString);
               : [],
 
           expert_summary:
-            parsed.expert_summary ||
-            "暂无分析",
+  String(
+    parsed.expert_summary || "暂无分析"
+  )
+    .replace(/risk\s*:.*$/is, "")
+    .replace(/confidence\s*:.*$/is, "")
+    .replace(/object_type\s*:.*$/is, "")
+    .replace(/unknown_probability\s*:.*$/is, "")
+    .replace(/\\n/g, "\n")
+    .trim(),
 
           recommendation:
-            parsed.recommendation ||
-            "暂无建议",
+  String(
+    parsed.recommendation || "暂无建议"
+  )
+    .replace(/risk\s*:.*$/is, "")
+    .replace(/confidence\s*:.*$/is, "")
+    .replace(/object_type\s*:.*$/is, "")
+    .replace(/unknown_probability\s*:.*$/is, "")
+    .replace(/\\n/g, "\n")
+    .trim(),
 
           force_unknown:
             forceUnknown
