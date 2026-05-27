@@ -182,7 +182,7 @@ confidence MUST decrease by at least 20 points.
 
 If object edges are unclear:
 
-confidence MUST decrease.
+confidence MUST decrease heavily.
 
 8.
 
@@ -212,7 +212,7 @@ confidence MUST decrease heavily.
 
 If strong warm lighting exists:
 
-color reliability MUST decrease.
+color reliability MUST decrease significantly.
 
 13.
 
@@ -223,6 +223,124 @@ set:
 force_unknown = true
 
 Prefer UNKNOWN over false-positive identification.
+
+14.
+
+If morphology integrity is below 60:
+
+force_unknown = true
+
+Do NOT identify specific herbs
+from incomplete morphology.
+
+15.
+
+If visibility_score is below 50:
+
+Prioritize UNKNOWN mode
+over herb classification.
+
+16.
+
+Never identify herbs
+from local texture fragments alone.
+
+Partial texture is NOT sufficient
+for herb identification.
+
+17.
+
+If multiple foreground objects exist:
+
+confidence MUST decrease heavily.
+
+18.
+
+If herb boundaries are unclear:
+
+force_unknown = true
+
+19.
+
+If morphology cannot be globally verified:
+
+specific herb identification
+is prohibited.
+
+20.
+
+If structure visibility is low:
+
+Do NOT rely on color similarity
+for herb identification.
+
+21.
+
+If texture visibility is poor:
+
+specific herb classification
+MUST remain conservative.
+
+22.
+
+If object stacking causes
+partial structure blocking:
+
+confidence MUST decrease heavily.
+
+23.
+
+If only local regions are visible:
+
+global morphology verification
+is impossible.
+
+24.
+
+If visual evidence is insufficient:
+
+output UNKNOWN
+instead of speculative classification.
+
+25.
+
+Conservative classification
+is preferred over false-positive identification.
+
+26.
+
+When confidence is uncertain:
+
+reduce confidence aggressively.
+
+27.
+
+If multiple herbs share
+similar color and texture:
+
+Do NOT identify based on
+surface similarity alone.
+
+28.
+
+If environmental lighting
+affects color perception:
+
+color MUST NOT be used
+as primary identification evidence.
+
+29.
+
+If structure consistency
+cannot be confirmed:
+
+force_unknown = true
+
+30.
+
+Industrial-grade reliability
+is more important
+than aggressive classification.
 
 =========================
 SCENE INTERFERENCE TYPES
