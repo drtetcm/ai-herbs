@@ -103,17 +103,14 @@ const compressedBuffer =
 
 const isolationResult =
   await isolateObject(
-    originalImageBuffer
+    compressedBuffer
   );
 
-// 使用裁切后的主体图
+// 使用主体裁切图
 const imageBuffer =
   isolationResult.success
     ? isolationResult.croppedBuffer
-    : originalImageBuffer;
-
-  const base64Image =
-  imageBuffer.toString("base64");
+    : compressedBuffer;
 
 // DEBUG
 console.log(
