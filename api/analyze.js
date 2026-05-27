@@ -612,32 +612,38 @@ const normalizedResult =
         // =========================
 
         const vf =
-          normalizedResult.visual_features;
+  normalizedResult.visual_analysis;
 
-        const visualFeatureReport = `
+const visualFeatureReport = `
 颜色特征：
-${vf.color_tone || "暂无"}
+${vf.color || "暂无"}
 
 纹理特征：
 ${vf.texture || "暂无"}
 
-切片结构：
-${vf.slice_pattern || "暂无"}
-
-纤维结构：
-${vf.fiber_structure || "暂无"}
-
-边缘特征：
-${vf.edge_characteristics || "暂无"}
+形态结构：
+${vf.shape || "暂无"}
 
 表面特征：
-${vf.surface_details || "暂无"}
+${vf.surface || "暂无"}
 
-密度质感：
-${vf.density_feeling || "暂无"}
+边缘特征：
+${vf.edges || "暂无"}
 
-干湿状态：
-${vf.dryness_moisture || "暂无"}
+结构特征：
+${vf.structure || "暂无"}
+
+粉末特征：
+${vf.powder_characteristics || "暂无"}
+
+光线影响：
+${vf.lighting_impact || "暂无"}
+
+遮挡影响：
+${vf.occlusion_impact || "暂无"}
+
+场景干扰：
+${vf.scene_impact || "暂无"}
 `;
 
         // =========================
@@ -651,13 +657,13 @@ ${vf.dryness_moisture || "暂无"}
               normalizedResult.confidence,
 
             visibility:
-              normalizedResult.visibility_score,
+  normalizedResult.visibility,
 
-            clarity:
-              normalizedResult.image_blur_level,
+clarity:
+  normalizedResult.clarity,
 
-            lighting:
-              normalizedResult.lighting_quality,
+lighting:
+  normalizedResult.lighting,
 
             herb_name:
               normalizedResult.herb_name,
@@ -732,22 +738,24 @@ ${normalizedResult.confidence}%
 ${normalizedResult.quality_grade}
 
 模糊等级：
-${normalizedResult.image_blur_level}
+${normalizedResult.clarity}
 
 光线质量：
-${normalizedResult.lighting_quality}
+${normalizedResult.lighting}
 
 可见度：
-${normalizedResult.visibility_score}%
+${normalizedResult.visibility}%
 
 异常问题：
-${normalizedResult.issues_detected.join("、") || "未发现"}
+${normalizedResult.abnormal_issues || "未发现"}
 
 专家分析：
-${normalizedResult.expert_summary}
+${normalizedResult.reasoning || "暂无分析"}
 
 AI建议：
-${normalizedResult.recommendation}
+${normalizedResult.force_unknown
+  ? "当前图像存在较高不确定性，建议重新拍摄。"
+  : "当前识别结果可作为参考。"}
 `;
 
         // =========================
@@ -767,13 +775,13 @@ ${normalizedResult.recommendation}
             normalizedResult.confidence,
 
           clarity:
-            normalizedResult.image_blur_level,
+            normalizedResult.clarity,
 
           lighting:
-            normalizedResult.lighting_quality,
+            normalizedResult.lighting,
 
           visibility:
-            normalizedResult.visibility_score,
+            normalizedResult.visibility,
 
           unknown_probability:
             normalizedResult.unknown_probability,
