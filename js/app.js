@@ -238,15 +238,23 @@ function renderResult(data) {
 
   const report = rawReport
   .replace(/\\n/g, "\n")
+  .replace(/^\s+/g, "")
+  .replace(/\n{3,}/g, "\n\n")
   .replace(/"\s*,\s*risk\s*:.*$/s, "")
   .replace(/risk\s*:.*$/s, "")
   .trim();
 
   result.innerHTML = `
+  <div class="ai-report-card">
+    <div class="ai-report-title">
+      AI Report
+    </div>
+
     <div class="report-content">
       ${formatReport(report)}
     </div>
-  `;
+  </div>
+`;
 
   renderRisk(data);
 
