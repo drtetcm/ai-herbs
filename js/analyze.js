@@ -70,16 +70,28 @@ async function compressImage(file) {
 
           }
 
-          resolve(blob);
+          const compressedFile =
+  new File(
+    [blob],
+    file.name,
+    {
+      type: "image/jpeg",
+      lastModified: Date.now()
+    }
+  );
+
+console.log(
+  "Compressed Size:",
+  Math.round(blob.size / 1024 / 1024 * 100) / 100,
+  "MB"
+);
+
+resolve(compressedFile);
 
         },
-
         "image/jpeg",
-
-        0.8
-
+        0.65
       );
-
     };
 
     img.onerror = reject;
