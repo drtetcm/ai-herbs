@@ -1320,7 +1320,7 @@ lighting:
         // REPORT
         // =========================
 
-        const report = `
+        let report = `
 药材名称：
 ${normalizedResult.herb_name}
 
@@ -1381,6 +1381,11 @@ ${normalizedResult.force_unknown
   ? "当前图像存在较高不确定性，建议重新拍摄。"
   : "当前识别结果可作为参考。"}
 `;
+
+report =
+  report
+    .replace(/^\s+/, "")
+    .trim();
 
         // =========================
         // RESPONSE

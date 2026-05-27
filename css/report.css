@@ -632,13 +632,22 @@ body {
 
 .section-title {
 
-  margin: 0 0 22px;
+  margin: 0 0 12px;
 
-  font-size: 28px;
+  font-size: 32px;
 
   font-weight: 800;
 
   letter-spacing: -1px;
+
+  color: #ffffff;
+
+  border-left: 4px solid #3b82f6;
+
+  padding-left: 12px;
+
+  text-shadow:
+    0 0 12px rgba(59,130,246,0.35);
 }
 
 /* =========================
@@ -686,13 +695,18 @@ body {
 
   border-radius: 20px;
 
-  padding: 28px;
+  padding:
+    16px 24px 24px;
 
   font-size: 17px;
 
-  line-height: 2;
+  line-height: 1.8;
 
   color: #1e293b;
+
+  text-align: left;
+
+  white-space: pre-wrap;
 }
 
 /* =========================
