@@ -1320,13 +1320,14 @@ lighting:
         // REPORT
         // =========================
 
-        let report = `药材名称：
+let report = `
+药材名称：
 ${normalizedResult.herb_name}
 
 候选药材：
 ${
   normalizedResult.possible_candidates
-    ?.map(
+    .map(
       (candidate) =>
         candidate.herb_name
     )
@@ -1383,10 +1384,7 @@ ${
 }
 `;
 
-report = report
-  .replace(/^\s+/g, "")
-  .replace(/\n{3,}/g, "\n\n")
-  .trim();
+report = report.trim();
 
         // =========================
         // RESPONSE
