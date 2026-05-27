@@ -1,68 +1,103 @@
 import sharp from "sharp";
 
 /**
- * Object Isolation V1
- * 自动主体裁切
+ * Industrial Object Isolation V2
+ * 自动主体检测 + 背景裁切
  */
 
 export async function isolateObject(imageBuffer) {
-  try {
-    // 读取图片信息
-    const image = sharp(imageBuffer);
-    const metadata = await image.metadata();
 
-    const width = metadata.width;
-    const height = metadata.height;
+  try {
+
+    const image =
+      sharp(imageBuffer);
+
+    const metadata =
+      await image.metadata();
+
+    const width =
+      metadata.width;
+
+    const height =
+      metadata.height;
 
     if (!width || !height) {
-      throw new Error("Invalid image dimensions");
+
+      throw new Error(
+        "Invalid image dimensions"
+      );
+
     }
 
-    // ===== 核心策略 =====
-    // 裁掉外围背景
-    // 保留中心主体区域
+    // =========================
+    // TRIM BACKGROUND
+    // 自动移除外围背景
+    // =========================
 
-    // 中心区域比例
-    const cropRatio = 0.72;
+    const trimmed =
+      image.trim(15);
 
-    const cropWidth = Math.floor(width * cropRatio);
-    const cropHeight = Math.floor(height * cropRatio);
+    const trimInfo =
+      await trimmed.metadata();
 
-    // 居中裁切
-    const left = Math.floor((width - cropWidth) / 2);
-    const top = Math.floor((height - cropHeight) / 2);
+    // =========================
+    // RESIZE FOR CLAUDE
+    // =========================
 
-    // 执行裁切
-    const croppedBuffer = await image
-      .extract({
-        left,
-        top,
-        width: cropWidth,
-        height: cropHeight,
-      })
-      .jpeg({
-        quality: 95,
-      })
-      .toBuffer();
+    const processedBuffer =
+      await trimmed
+        .resize({
+          width: 1024,
+          withoutEnlargement: true,
+          fit: "inside"
+        })
+        .jpeg({
+          quality: 95
+        })
+        .toBuffer();
 
     return {
+
       success: true,
-      croppedBuffer,
+
+      croppedBuffer:
+        processedBuffer,
+
       cropInfo: {
+
         originalWidth: width,
+
         originalHeight: height,
-        cropWidth,
-        cropHeight,
-        cropRatio,
-      },
+
+        trimmedWidth:
+          trimInfo.width,
+
+        trimmedHeight:
+          trimInfo.height
+
+      }
+
     };
+
   } catch (error) {
-    console.error("Object isolation error:", error);
+
+    console.error(
+      "Object isolation error:",
+      error
+    );
 
     return {
+
       success: false,
-      error: error.message,
-      croppedBuffer: imageBuffer, // fallback
+
+      error:
+        error.message,
+
+      croppedBuffer:
+        imageBuffer
+
     };
+
   }
+
 }
