@@ -5,6 +5,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import formidable from "formidable";
 
 import fs from "fs";
+import sharp from "sharp";
 
 import { calculateRisk }
 from "../utils/riskEngine.js";
@@ -43,7 +44,16 @@ export default async function handler(req, res) {
     // PARSE FORM
     // =========================
 
-    const form = formidable({});
+    const form = formidable({
+
+  multiples: false,
+
+  maxFileSize:
+    20 * 1024 * 1024,
+
+  keepExtensions: true
+
+});
 
     form.parse(req, async (err, fields, files) => {
 
@@ -923,7 +933,7 @@ possible_candidates MUST be valid JSON array objects.
                       type: "base64",
 
                       media_type:
-                        imageFile.mimetype,
+                        "image/jpeg",
 
                       data: base64Image
                     }
