@@ -1,3 +1,5 @@
+import { normalizeAI }
+from "../utils/normalizeAI.js";
 import Anthropic from "@anthropic-ai/sdk";
 
 import formidable from "formidable";
@@ -521,22 +523,6 @@ console.log("CLEAN JSON:", jsonString);
         }
 
         // =========================
-        // SAFE DEFAULTS
-        // =========================
-
-        parsed.is_herb_like ??= true;
-
-        parsed.object_type ??= "unknown";
-
-        parsed.unknown_probability ??= 0;
-
-        parsed.visual_features ??= {};
-
-        parsed.possible_candidates ??= [];
-
-        parsed.identification_reason ??= "";
-
-        // =========================
         // CONSERVATIVE MODE
         // =========================
 
@@ -611,99 +597,15 @@ console.log("CLEAN JSON:", jsonString);
         // NORMALIZE
         // =========================
 
-        const normalizedResult = {
+const normalizedResult =
+  normalizeAI({
 
-          herb_name:
-            parsed.herb_name ||
-  parsed.possible_candidates?.[0] ||
-  "待确认药材",
+    ...parsed,
 
-          confidence:
-            Number(parsed.confidence || 0),
+    force_unknown:
+      forceUnknown
 
-          visual_features:
-            parsed.visual_features || {},
-
-          possible_candidates:
-            Array.isArray(
-              parsed.possible_candidates
-            )
-              ? parsed.possible_candidates
-              : [],
-
-          identification_reason:
-            parsed.identification_reason ||
-            "",
-
-          is_herb_like:
-            Boolean(parsed.is_herb_like),
-
-          object_type:
-            parsed.object_type || "unknown",
-
-          unknown_probability:
-            Number(
-              parsed.unknown_probability || 0
-            ),
-
-          image_quality_score:
-            Number(parsed.image_quality_score || 0),
-
-          image_blur_level:
-            parsed.image_blur_level || "UNKNOWN",
-
-          lighting_quality:
-            parsed.lighting_quality || "UNKNOWN",
-
-          visibility_score:
-            Number(parsed.visibility_score || 0),
-
-          quality_grade:
-            parsed.quality_grade || "UNKNOWN",
-
-          risk_level:
-            parsed.risk_level || "LOW",
-
-          fake_probability:
-            Number(parsed.fake_probability || 0),
-
-          mold_risk:
-            Number(parsed.mold_risk || 0),
-
-          sulfur_fumigation_risk:
-            Number(parsed.sulfur_fumigation_risk || 0),
-
-          issues_detected:
-            Array.isArray(parsed.issues_detected)
-              ? parsed.issues_detected
-              : [],
-
-          expert_summary:
-  String(
-    parsed.expert_summary || "暂无分析"
-  )
-    .replace(/risk\s*:.*$/is, "")
-    .replace(/confidence\s*:.*$/is, "")
-    .replace(/object_type\s*:.*$/is, "")
-    .replace(/unknown_probability\s*:.*$/is, "")
-    .replace(/\\n/g, "\n")
-    .trim(),
-
-          recommendation:
-  String(
-    parsed.recommendation || "暂无建议"
-  )
-    .replace(/risk\s*:.*$/is, "")
-    .replace(/confidence\s*:.*$/is, "")
-    .replace(/object_type\s*:.*$/is, "")
-    .replace(/unknown_probability\s*:.*$/is, "")
-    .replace(/\\n/g, "\n")
-    .trim(),
-
-          force_unknown:
-            forceUnknown
-
-        };
+  });
 
         // =========================
         // VISUAL FEATURE FORMATTER
@@ -760,9 +662,8 @@ ${vf.dryness_moisture || "暂无"}
             herb_name:
               normalizedResult.herb_name,
 
-            abnormal:
-              normalizedResult.issues_detected
-                ?.join(" ") || "",
+            abnormal_issues:
+  normalizedResult.abnormal_issues,
 
             unknown_probability:
               normalizedResult.unknown_probability,
@@ -796,28 +697,10 @@ ${normalizedResult.herb_name}
 候选药材：
 ${
   normalizedResult.possible_candidates
-    .map((candidate) => {
-
-      if (typeof candidate === "string") {
-        return candidate;
-      }
-
-      if (
-        typeof candidate === "object" &&
-        candidate !== null
-      ) {
-
-        return (
-          candidate.name ||
-          candidate.herb ||
-          JSON.stringify(candidate)
-        );
-
-      }
-
-      return String(candidate);
-
-    })
+  .map(
+    (candidate) =>
+      candidate.herb_name
+  )
     .join("、") || "无"
 }
 

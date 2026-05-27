@@ -301,14 +301,10 @@ function formatReport(text) {
 function renderRisk(data) {
 
   const risk = (
-
-    data.risk_level ||
-
-    data.risk ||
-
-    "LOW"
-
-  ).toUpperCase();
+  data.result?.risk_level ||
+  data.risk ||
+  "UNKNOWN"
+).toUpperCase();
 
   let score =
     Number(
@@ -373,31 +369,34 @@ function renderRisk(data) {
 
 function renderQuality(data) {
 
+  const result =
+    data.result || {};
+
   clarityValue.textContent =
 
-    data.clarity ||
+    result.clarity ||
 
     "--";
 
   lightingValue.textContent =
 
-    data.lighting ||
+    result.lighting ||
 
     "--";
 
   visibilityValue.textContent =
 
-    data.visibility !== undefined
+    result.visibility !== undefined
 
-    ? `${data.visibility}%`
+    ? `${result.visibility}%`
 
     : "--";
 
   confidenceValue.textContent =
 
-    data.confidence !== undefined
+    result.confidence !== undefined
 
-    ? `${data.confidence}%`
+    ? `${result.confidence}%`
 
     : "--";
 
