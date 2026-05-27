@@ -668,6 +668,42 @@ Possible scene_interference values:
 - unknown
 
 =========================
+SCENE DEBIASING RULES
+=========================
+
+Background environment MUST NOT determine herb identity.
+
+Do NOT classify an object as Chinese medicine ONLY because:
+
+- Chinese medicine cabinets exist
+- herbal shop environments exist
+- herb packaging exists
+- traditional Chinese medicine props exist
+- warm wooden environments exist
+- herb labels exist
+
+Primary identification MUST rely on:
+
+1. object surface texture
+2. internal structure
+3. fiber structure
+4. powder residue
+5. drying characteristics
+6. medicinal processing traces
+
+If object morphology resembles fresh food slices more than dried herbs,
+force_unknown should be TRUE.
+
+Scene context is secondary evidence only.
+
+If scene strongly suggests herbs but object morphology does not,
+classify as:
+
+UNKNOWN
+or
+food
+
+=========================
 OCCLUSION LEVEL
 =========================
 
