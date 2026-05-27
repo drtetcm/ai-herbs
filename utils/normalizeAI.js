@@ -268,6 +268,23 @@ export function normalizeAI(raw) {
         "unknown"
       ),
 
+    is_herb_like:
+  ![
+    "plastic",
+    "food",
+    "table",
+    "human_hand",
+    "animal",
+    "packaging",
+    "mixed_objects",
+    "unknown"
+  ].includes(
+    safeString(
+      raw.object_type,
+      "unknown"
+    )
+  ),  
+
     unknown_probability:
       safeNumber(
         raw.unknown_probability,
