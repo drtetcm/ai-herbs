@@ -16,7 +16,11 @@ export async function analyzeHerb(file) {
 
     });
 
-    const data = await response.json();
+    if (!response.ok) {
+  throw new Error(`HTTP ${response.status}`);
+}
+
+const data = await response.json();
 
     console.log("API返回:", data);
 
