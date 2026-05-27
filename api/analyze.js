@@ -346,6 +346,21 @@ Confidence is NOT:
 "how similar color looks"
 
 =========================
+LANGUAGE RULES
+=========================
+
+All reasoning,
+visual analysis,
+candidate reasons,
+and descriptions
+MUST be written in Chinese.
+
+Do NOT output English analysis.
+
+All explanatory text
+must use professional Chinese.
+
+=========================
 OUTPUT FORMAT
 =========================
 
