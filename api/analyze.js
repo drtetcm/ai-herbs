@@ -83,6 +83,21 @@ export default async function handler(req, res) {
   fs.readFileSync(imageFile.filepath);
 
 // =========================
+// IMAGE COMPRESSION
+// =========================
+
+const compressedBuffer =
+  await sharp(originalImageBuffer)
+    .resize(1600, 1600, {
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .jpeg({
+      quality: 80,
+    })
+    .toBuffer();
+
+// =========================
 // OBJECT ISOLATION
 // =========================
 
@@ -96,6 +111,9 @@ const imageBuffer =
   isolationResult.success
     ? isolationResult.croppedBuffer
     : originalImageBuffer;
+
+  const base64Image =
+  imageBuffer.toString("base64");
 
 // DEBUG
 console.log(
