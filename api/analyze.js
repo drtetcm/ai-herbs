@@ -1320,17 +1320,16 @@ lighting:
         // REPORT
         // =========================
 
-        let report = `
-药材名称：
+        let report = `药材名称：
 ${normalizedResult.herb_name}
 
 候选药材：
 ${
   normalizedResult.possible_candidates
-  .map(
-    (candidate) =>
-      candidate.herb_name
-  )
+    ?.map(
+      (candidate) =>
+        candidate.herb_name
+    )
     .join("、") || "无"
 }
 
@@ -1377,15 +1376,17 @@ ${normalizedResult.abnormal_issues || "未发现"}
 ${normalizedResult.reasoning || "暂无分析"}
 
 AI建议：
-${normalizedResult.force_unknown
-  ? "当前图像存在较高不确定性，建议重新拍摄。"
-  : "当前识别结果可作为参考。"}
+${
+  normalizedResult.force_unknown
+    ? "当前图像存在较高不确定性，建议重新拍摄。"
+    : "当前识别结果可作为参考。"
+}
 `;
 
-report =
-  report
-    .replace(/^\s+/, "")
-    .trim();
+report = report
+  .replace(/^\s+/g, "")
+  .replace(/\n{3,}/g, "\n\n")
+  .trim();
 
         // =========================
         // RESPONSE

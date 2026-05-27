@@ -245,11 +245,6 @@ function renderResult(data) {
   .trim();
 
   result.innerHTML = `
-  <div class="ai-report-card">
-    <div class="ai-report-title">
-      AI Report
-    </div>
-
     <div class="report-content">
       ${formatReport(report)}
     </div>
