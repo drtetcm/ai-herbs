@@ -9,6 +9,9 @@ import fs from "fs";
 import { calculateRisk }
 from "../utils/riskEngine.js";
 
+import { isolateObject }
+from "../utils/objectIsolation.js";
+
 export const config = {
   api: {
     bodyParser: false,
@@ -76,11 +79,33 @@ export default async function handler(req, res) {
         // IMAGE BASE64
         // =========================
 
-        const imageBuffer =
-          fs.readFileSync(imageFile.filepath);
+        const originalImageBuffer =
+  fs.readFileSync(imageFile.filepath);
 
-        const base64Image =
-          imageBuffer.toString("base64");
+// =========================
+// OBJECT ISOLATION
+// =========================
+
+const isolationResult =
+  await isolateObject(
+    originalImageBuffer
+  );
+
+// 使用裁切后的主体图
+const imageBuffer =
+  isolationResult.success
+    ? isolationResult.croppedBuffer
+    : originalImageBuffer;
+
+// DEBUG
+console.log(
+  "OBJECT ISOLATION:",
+  isolationResult.cropInfo
+);
+
+// BASE64
+const base64Image =
+  imageBuffer.toString("base64");
 
         // =========================
         // PROFESSIONAL HERBAL PROMPT
@@ -636,6 +661,10 @@ Possible scene_interference values:
 - reflection
 - texture_noise
 - mixed_scene
+- herbal_environment
+- medicine_cabinet
+- tcm_shop
+- herb_packaging
 - unknown
 
 =========================
