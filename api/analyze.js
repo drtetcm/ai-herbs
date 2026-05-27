@@ -493,6 +493,135 @@ has highest priority
 over recognition completeness.
 
 =========================
+SIMILAR HERB DIFFERENTIATION RULES
+=========================
+
+Herb identification MUST rely on:
+
+- global morphology
+- internal structure
+- cut-surface organization
+- fiber distribution
+- pore structure
+- fracture characteristics
+- powderiness
+- starch texture
+- structural consistency
+- edge morphology
+
+Color similarity alone
+is NOT sufficient
+for herb identification.
+
+Do NOT identify herbs
+using only:
+
+- local texture
+- local color
+- partial fragments
+- isolated surface patterns
+
+=========================
+SHAN YAO vs BAI ZHU
+=========================
+
+For ShanYao (山药):
+
+Typical characteristics:
+
+- elongated slices or segments
+- dense white starch texture
+- smooth cut surface
+- compact internal structure
+- low pore visibility
+- mild powderiness
+- relatively uniform thickness
+- less fibrous appearance
+
+For BaiZhu (白术):
+
+Typical characteristics:
+
+- irregular slices
+- porous sponge-like structure
+- visible holes or pores
+- rough fractured texture
+- obvious fibrous structures
+- irregular radial morphology
+- stronger structural roughness
+- more complex surface variation
+
+If porous fibrous morphology exists,
+do NOT classify as ShanYao.
+
+If dense starch morphology is absent,
+confidence for ShanYao MUST decrease.
+
+=========================
+FU LING vs SHAN YAO
+=========================
+
+FuLing (茯苓):
+
+- cube-like cut blocks
+- waxy or powdery texture
+- cloudy white appearance
+- brittle cut structure
+- low fiber visibility
+- smooth internal fracture
+- compact block morphology
+
+ShanYao:
+
+- elongated morphology
+- starch-rich texture
+- sliced root structure
+- mild radial organization
+- denser internal texture
+
+If cube morphology is absent,
+confidence for FuLing MUST decrease.
+
+=========================
+BAI ZHU vs CANG ZHU
+=========================
+
+BaiZhu:
+
+- lighter color
+- porous structure
+- softer fractured texture
+- sponge-like morphology
+
+CangZhu:
+
+- darker yellow-brown color
+- oil spots may exist
+- denser fibrous texture
+- rougher internal structure
+- stronger radial fiber appearance
+
+=========================
+ANTI-FALSE-POSITIVE POLICY
+=========================
+
+When two herbs share
+similar color and texture:
+
+prioritize:
+
+- morphology
+- structure
+- cut-surface anatomy
+
+over color similarity.
+
+If differentiation is uncertain:
+
+output UNKNOWN
+instead of speculative identification.
+
+=========================
 SCENE INTERFERENCE TYPES
 =========================
 
