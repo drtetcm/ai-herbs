@@ -686,7 +686,7 @@ body {
 .analysis-box {
 
   margin-top: 0;
-  
+
   background:
     linear-gradient(
       180deg,
@@ -1256,4 +1256,30 @@ body {
 
     margin-top: 2px;
   }
+}
+
+.ai-report-card pre {
+
+  margin: 0 !important;
+
+  padding: 0 !important;
+
+  white-space: pre-wrap;
+
+  word-break: break-word;
+
+  overflow-wrap: break-word;
+
+  font-size: 15px;
+
+  line-height: 1.8;
+
+  color: #e8ecff;
+
+  font-family:
+    "Inter",
+    "PingFang SC",
+    sans-serif;
+
+  text-align: left;
 }
