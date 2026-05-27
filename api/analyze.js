@@ -806,75 +806,303 @@ console.log("CLEAN JSON:", jsonString);
         }
 
         // =========================
-        // CONSERVATIVE MODE
-        // =========================
+// INDUSTRIAL HARD GATE
+// =========================
 
-        const candidateCount =
-          parsed.possible_candidates.length;
+const candidateCount =
+  parsed.possible_candidates?.length || 0;
 
-        if (
-          candidateCount >= 3 &&
-          parsed.confidence >= 80
-        ) {
+let forceUnknown = false;
 
-          parsed.confidence = 65;
+// =========================
+// BASIC UNKNOWN
+// =========================
 
-        }
-
-        if (
-          candidateCount >= 4
-        ) {
-
-          parsed.herb_name =
-            "相似饮片待确认";
-
-          parsed.confidence = 55;
-
-        }
-
-        // =========================
-        // HARD UNKNOWN DETECTION
-        // =========================
-
-        let forceUnknown = false;
-
-        if (
-          parsed.is_herb_like === false
-        ) {
-
-          forceUnknown = true;
-
-        }
-
-        if (
-          Number(parsed.unknown_probability) >= 85
-        ) {
-
-          forceUnknown = true;
-
-        }
-
-        const nonHerbalObjects = [
-
-          "plastic",
-          "food",
-          "table",
-          "human_hand",
-          "animal",
-          "packaging"
-
-        ];
-
-        if (
-          nonHerbalObjects.includes(
-            parsed.object_type
-          ) &&
+if (
   parsed.is_herb_like === false
-        ) {
+) {
 
-          forceUnknown = true;
+  forceUnknown = true;
 
-        }
+}
+
+if (
+  Number(parsed.unknown_probability) >= 85
+) {
+
+  forceUnknown = true;
+
+}
+
+// =========================
+// NON HERBAL OBJECTS
+// =========================
+
+const nonHerbalObjects = [
+
+  "plastic",
+  "food",
+  "table",
+  "human_hand",
+  "animal",
+  "packaging",
+  "mixed_objects"
+
+];
+
+if (
+  nonHerbalObjects.includes(
+    parsed.object_type
+  )
+) {
+
+  forceUnknown = true;
+
+}
+
+// =========================
+// LOW VISIBILITY
+// =========================
+
+if (
+  Number(parsed.visibility) < 50
+) {
+
+  forceUnknown = true;
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      35
+    );
+
+}
+
+// =========================
+// POOR CLARITY
+// =========================
+
+if (
+  parsed.clarity === "POOR"
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      35
+    );
+
+}
+
+// =========================
+// STRONG SHADOW
+// =========================
+
+if (
+  parsed.lighting === "STRONG_SHADOW"
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      30
+    );
+
+}
+
+// =========================
+// VERY DARK
+// =========================
+
+if (
+  parsed.lighting === "VERY_DARK"
+) {
+
+  forceUnknown = true;
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      20
+    );
+
+}
+
+// =========================
+// OVEREXPOSED
+// =========================
+
+if (
+  parsed.lighting === "OVEREXPOSED"
+) {
+
+  forceUnknown = true;
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      25
+    );
+
+}
+
+// =========================
+// WARM LIGHTING
+// =========================
+
+if (
+  parsed.lighting === "WARM_TINTED"
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      42
+    );
+
+}
+
+// =========================
+// OCCLUSION
+// =========================
+
+if (
+  parsed.occlusion_level === "medium" ||
+  parsed.occlusion_level === "high" ||
+  parsed.occlusion_level === "severe"
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      38
+    );
+
+}
+
+// =========================
+// SCENE INTERFERENCE
+// =========================
+
+const interferenceScenes = [
+
+  "hand",
+  "packaging",
+  "background_objects",
+  "shadow",
+  "reflection",
+  "texture_noise",
+  "mixed_scene",
+  "unknown"
+
+];
+
+if (
+  interferenceScenes.includes(
+    parsed.scene_interference
+  )
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      35
+    );
+
+}
+
+// =========================
+// MORPHOLOGY FAILURE
+// =========================
+
+if (
+  Number(parsed.morphology_integrity) < 60
+) {
+
+  forceUnknown = true;
+
+}
+
+// =========================
+// SUBJECT INCOMPLETE
+// =========================
+
+if (
+  Number(parsed.subject_completeness) < 60
+) {
+
+  forceUnknown = true;
+
+}
+
+// =========================
+// TEXTURE FAILURE
+// =========================
+
+if (
+  Number(parsed.texture_visibility) < 50
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      35
+    );
+
+}
+
+// =========================
+// MULTI CANDIDATES
+// =========================
+
+if (
+  candidateCount >= 3
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      55
+    );
+
+}
+
+if (
+  candidateCount >= 4
+) {
+
+  forceUnknown = true;
+
+}
+
+// =========================
+// FORCE UNKNOWN
+// =========================
+
+if (
+  parsed.force_unknown === true
+) {
+
+  forceUnknown = true;
+
+}
+
+// =========================
+// FINAL HARD UNKNOWN
+// =========================
+
+if (forceUnknown) {
+
+  parsed.herb_name =
+    "UNKNOWN";
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      35
+    );
+
+}
 
         // =========================
         // NORMALIZE
