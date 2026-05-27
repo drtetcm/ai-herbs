@@ -2,6 +2,95 @@ import { systemPrompt } from "../prompts/systemPrompt.js";
 import { herbRules } from "../prompts/herbRules.js";
 import { outputFormat } from "../prompts/outputFormat.js";
 
+async function compressImage(file) {
+
+  return new Promise((resolve, reject) => {
+
+    const img = new Image();
+
+    img.onload = () => {
+
+      const canvas =
+        document.createElement("canvas");
+
+      let width = img.width;
+      let height = img.height;
+
+      // 最大边限制
+      const MAX_SIZE = 1600;
+
+      if (width > height) {
+
+        if (width > MAX_SIZE) {
+
+          height *= MAX_SIZE / width;
+          width = MAX_SIZE;
+
+        }
+
+      } else {
+
+        if (height > MAX_SIZE) {
+
+          width *= MAX_SIZE / height;
+          height = MAX_SIZE;
+
+        }
+
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx =
+        canvas.getContext("2d");
+
+      ctx.drawImage(
+        img,
+        0,
+        0,
+        width,
+        height
+      );
+
+      canvas.toBlob(
+
+        (blob) => {
+
+          // 安卓兼容
+          if (!blob) {
+
+            console.warn(
+              "Compression failed, fallback original file"
+            );
+
+            resolve(file);
+
+            return;
+
+          }
+
+          resolve(blob);
+
+        },
+
+        "image/jpeg",
+
+        0.8
+
+      );
+
+    };
+
+    img.onerror = reject;
+
+    img.src =
+      URL.createObjectURL(file);
+
+  });
+
+}
+
 export async function analyzeHerb(file) {
 
   console.log("上传文件:", file);
@@ -30,7 +119,30 @@ ${outputFormat}
 
     const formData = new FormData();
 
-    formData.append("image", file);
+// 上传前压缩
+let compressedBlob;
+
+try {
+
+  compressedBlob =
+    await compressImage(file);
+
+} catch (error) {
+
+  console.error(
+    "Image compression failed:",
+    error
+  );
+
+  compressedBlob = file;
+
+}
+
+formData.append(
+  "image",
+  compressedBlob,
+  file.name
+);
 
     // 新增Prompt
     formData.append("prompt", finalPrompt);
@@ -43,6 +155,32 @@ ${outputFormat}
       method: "POST",
       body: formData
     });
+
+    if (!response.ok) {
+
+  const text =
+    await response.text();
+
+  console.error(
+    "API错误:",
+    response.status,
+    text
+  );
+
+  return `
+    <div class="report-container">
+
+      <div class="section">
+
+        <div style="color:#dc2626;font-weight:700;">
+          ❌ AI服务异常（${response.status}）
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
 
     let data;
 
