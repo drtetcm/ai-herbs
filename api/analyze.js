@@ -948,14 +948,6 @@ let forceUnknown = false;
 // =========================
 
 if (
-  parsed.is_herb_like === false
-) {
-
-  forceUnknown = true;
-
-}
-
-if (
   Number(parsed.unknown_probability) >= 85
 ) {
 
@@ -1193,14 +1185,6 @@ if (
       parsed.confidence,
       55
     );
-
-}
-
-if (
-  candidateCount >= 4
-) {
-
-  forceUnknown = true;
 
 }
 
