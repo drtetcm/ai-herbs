@@ -342,6 +342,156 @@ Industrial-grade reliability
 is more important
 than aggressive classification.
 
+31.
+
+If texture analysis fails
+AND morphology is incomplete:
+
+force_unknown = true
+
+32.
+
+If clarity is POOR
+AND visibility_score is below 60:
+
+confidence MUST NOT exceed 35.
+
+33.
+
+If texture cannot be identified:
+
+candidate ranking confidence
+MUST collapse significantly.
+
+34.
+
+If strong shadow overlaps
+main herb body:
+
+subject_completeness
+MUST decrease significantly.
+
+35.
+
+If more than 30%
+of the object is covered
+by non-herb objects:
+
+force_unknown = true
+
+36.
+
+If texture details are lost
+due to blur:
+
+specific herb identification
+is prohibited.
+
+37.
+
+If morphology depends only
+on estimated contours:
+
+confidence MUST remain low.
+
+38.
+
+If image blur prevents
+fiber/texture verification:
+
+force_unknown = true
+
+39.
+
+If local visible regions
+cannot represent
+global herb structure:
+
+UNKNOWN classification
+is preferred.
+
+40.
+
+If visual ambiguity exists
+between multiple herb candidates:
+
+Do NOT output
+high-confidence classification.
+
+41.
+
+If both morphology
+and texture reliability decrease:
+
+confidence MUST collapse aggressively.
+
+42.
+
+If lighting destroys
+surface structure visibility:
+
+texture evidence
+MUST be considered unreliable.
+
+43.
+
+If severe blur exists:
+
+morphology evidence
+MUST NOT be trusted.
+
+44.
+
+If image quality defects overlap
+(shadow + blur + occlusion):
+
+force_unknown = true
+
+45.
+
+If identification relies mainly
+on approximate color blocks:
+
+classification is prohibited.
+
+46.
+
+If image contains
+large uncertain regions:
+
+global structure verification
+fails.
+
+47.
+
+If morphology continuity
+cannot be observed:
+
+specific herb identification
+MUST stop.
+
+48.
+
+If herb body integrity
+cannot be visually confirmed:
+
+UNKNOWN mode
+is preferred.
+
+49.
+
+If visual confidence
+depends on speculation
+rather than observable evidence:
+
+force_unknown = true
+
+50.
+
+Safety-first conservative logic
+has highest priority
+over recognition completeness.
+
 =========================
 SCENE INTERFERENCE TYPES
 =========================
