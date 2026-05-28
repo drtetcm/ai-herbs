@@ -156,17 +156,17 @@ if (
   scene_interference === "herb_packaging"
 ) {
 
+    final_label = "UNKNOWN";
+
   unknown_probability += 35;
 
-  ai_confidence -= 30;
+  final_confidence -= 30;
 
   risk_score += 25;
 
   reasons.push(
     "Packaging/text contamination detected"
   );
-
-  object_type = "unknown";
 
 }
 
