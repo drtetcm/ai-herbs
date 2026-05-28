@@ -939,7 +939,7 @@ try {
       model:
         "claude-sonnet-4-6",
 
-      max_tokens: 700,
+      max_tokens: 2500,
 
       temperature: 0,
 
@@ -1074,12 +1074,23 @@ const jsonString =
     lastBrace + 1
   );
 
-console.log(
-  "CLEAN JSON:",
-  jsonString
-);
-
 console.log("CLEAN JSON:", jsonString);
+
+if (
+  !jsonString.trim().endsWith("}")
+) {
+
+  return res.status(500).json({
+
+    status: "error",
+
+    message: "AI JSON truncated",
+
+    raw: rawText
+
+  });
+
+}
 
         let parsed;
 

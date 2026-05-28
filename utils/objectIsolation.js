@@ -35,7 +35,7 @@ export async function isolateObject(imageBuffer) {
     // =========================
 
     const trimmed =
-      image.trim(15);
+      image.trim();
 
     const trimInfo =
       await trimmed.metadata();
