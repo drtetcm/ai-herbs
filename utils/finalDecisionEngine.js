@@ -263,5 +263,17 @@ if (
   );
 
 }
+// =========================
+// FINAL RETURN
+// =========================
 
+return {
+
+  final_label,
+
+  final_confidence,
+
+  reasons
+
+};
 }
