@@ -1098,27 +1098,36 @@ if (
 
         try {
 
-          // =========================
-// JSON SAFE REPAIR
+// =========================
+// SAFE JSON FIX
 // =========================
 
 let safeJson = jsonString;
 
-// 修复中文引号污染
+// 修复 AI 文本中的裸引号
 safeJson = safeJson.replace(
-  /"([^"]*?)"([^"]*?)"([^"]*?)"/g,
-  (match) => {
-    return match.replace(
-      /"/g,
-      '\\"'
-    );
-  }
-);
+  /(:\s*")(.*?)(")(.*?")/g,
+  (match, p1, p2, p3, p4) => {
 
-// 修复 key 的引号
-safeJson = safeJson.replace(
-  /\\"([a-zA-Z0-9_]+)\\"(?=\s*:)/g,
-  '"$1"'
+    // 如果后面不是逗号/}/]
+    // 说明是内容中的裸引号
+
+    if (
+      !p4.trim().match(/^(\s*[,}\]])/)
+    ) {
+
+      return (
+        p1 +
+        p2 +
+        '\\"' +
+        p4
+      );
+
+    }
+
+    return match;
+
+  }
 );
 
 console.log(
