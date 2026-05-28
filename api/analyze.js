@@ -1212,7 +1212,9 @@ if (
 
 parsed =
   JSON.parse(jsonString);
-            
+          
+  try {
+
             finalDecision =
   finalDecisionEngine({
 
@@ -1235,10 +1237,36 @@ parsed =
       parsed.scene_interference || "unknown",
 
     possible_candidates:
-      parsed.possible_candidates || []
+      parsed.possible_candidates || [],
+
+    ocr_text_density:
+      parsed.visual_analysis?.ocr_text_density || 0,
+
+    contains_chinese_text:
+      parsed.visual_analysis?.contains_chinese_text || false,
+
+    contains_packaging:
+      parsed.visual_analysis?.contains_packaging || false,
+
+    contains_logo:
+      parsed.visual_analysis?.contains_logo || false,
+
+    contains_product_layout:
+      parsed.visual_analysis?.contains_product_layout || false,
+
+    contains_price_tag:
+      parsed.visual_analysis?.contains_price_tag || false
 
   });
+  } catch (engineError) {
 
+  console.error(
+    "FINAL ENGINE ERROR:",
+    engineError
+  );
+
+}
+  
   if (
   finalDecision.final_label === "UNKNOWN"
 ) {
