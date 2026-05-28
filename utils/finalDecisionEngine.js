@@ -16,7 +16,7 @@ export function finalDecisionEngine(data) {
     contains_price_tag
   } = data;
 
-  let final_label;
+  let final_label = "UNKNOWN";
 
   let final_confidence = ai_confidence || 0;
 
@@ -28,19 +28,75 @@ export function finalDecisionEngine(data) {
 
   if (object_type === "food") {
 
-    final_label = "FOOD";
+    return {
+      final_label: "FOOD",
+      final_confidence: 0,
+        reasons: [
+        "Object classified as food"
+      ],
+      possible_candidates: []
+    };
+  }
+
+// =========================
+  // INDUSTRIAL CONTAMINATION
+  // =========================
+
+  const commercialScene =
+
+    scene_interference === "herb_packaging" ||
+    scene_interference === "medicine_cabinet" ||
+    scene_interference === "product_page" ||
+    scene_interference === "advertisement" ||
+
+    contains_product_layout === true ||
+    contains_price_tag === true ||
+    contains_logo === true;
+
+  if (commercialScene) {
+
+    final_label = "UNKNOWN";
 
     final_confidence = 0;
 
+    possible_candidates = [];
+
     reasons.push(
-      "Object classified as food"
+      "Commercial scene contamination detected"
     );
 
     return {
       final_label,
       final_confidence,
-      reasons
+      reasons,
+      possible_candidates
     };
+
+  }
+
+  // =========================
+  // OCR CONTAMINATION
+  // =========================
+
+  if (ocr_text_density >= 40) {
+
+    final_label = "UNKNOWN";
+
+    final_confidence = 0;
+
+    possible_candidates = [];
+
+    reasons.push(
+      "Heavy OCR contamination detected"
+    );
+
+    return {
+      final_label,
+      final_confidence,
+      reasons,
+      possible_candidates
+    };
+
   }
 
   // =========================
@@ -51,22 +107,18 @@ export function finalDecisionEngine(data) {
     authenticity_score <= 30
   ) {
 
-    final_label = "UNKNOWN";
-
     reasons.push(
       "Low authenticity score"
     );
   }
 
   // =========================
-  // UNKNOWN PROBABILITY
+  // HIGH UNKNOWN PROBABILITY
   // =========================
 
   if (
     unknown_probability >= 70
   ) {
-
-    final_label = "UNKNOWN";
 
     reasons.push(
       "High unknown probability"
@@ -74,14 +126,12 @@ export function finalDecisionEngine(data) {
   }
 
   // =========================
-  // LOW AI CONFIDENCE
+  // LOW CONFIDENCE
   // =========================
 
   if (
     ai_confidence <= 20
   ) {
-
-    final_label = "UNKNOWN";
 
     reasons.push(
       "Low AI confidence"
@@ -143,6 +193,24 @@ export function finalDecisionEngine(data) {
   }
 
   // =========================
+  // FORCE UNKNOWN
+  // =========================
+
+  if (
+
+    authenticity_score <= 30 ||
+    unknown_probability >= 70 ||
+    ai_confidence <= 20
+
+  ) {
+
+    final_label = "UNKNOWN";
+
+    possible_candidates = [];
+
+  }
+
+  // =========================
   // NORMALIZE CONFIDENCE
   // =========================
 
@@ -154,44 +222,17 @@ export function finalDecisionEngine(data) {
     final_confidence = 100;
   }
 
-// ============================
-// PACKAGING / OCR CONTAMINATION
-// ============================
+return {
 
-if (
-  scene_interference === "herb_packaging" ||
-  scene_interference === "medicine_cabinet" ||
-  scene_interference === "product_page" ||
-  scene_interference === "advertisement"
-) {
+    final_label,
 
-  final_label = "UNKNOWN";
+    final_confidence,
 
-  final_confidence -= 40;
+    reasons,
 
-  reasons.push(
-    "Packaging/OCR contamination detected"
-  );
+    possible_candidates
 
-}
-// ============================
-// OCR / TEXT CONTAMINATION
-// ============================
-
-if (
-  ocr_text_density > 40
-) {
-
-  final_label = "UNKNOWN";
-
-  final_confidence -= 25;
-
-  reasons.push(
-    "Heavy OCR contamination detected"
-  );
-
-}
-
+  };
 
 // ============================
 // CHINESE LABEL CONTAMINATION
