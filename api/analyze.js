@@ -1117,7 +1117,7 @@ if (
         try {
 
 parsed =
-  JSON.parse(safeJson);
+  JSON.parse(jsonString);
             
             finalDecision =
   finalDecisionEngine({
