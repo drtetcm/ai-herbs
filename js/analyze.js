@@ -248,31 +248,6 @@ formData.append(
 
     let herb = data.result;
 
-    // 如果后端返回字符串JSON
-    if (typeof herb === "string") {
-
-      try {
-        herb = JSON.parse(herb);
-      } catch (err) {
-
-        console.error("JSON解析失败:", err);
-
-        return `
-          <div class="report-container">
-
-            <div class="section">
-
-              <div style="color:#dc2626;font-weight:700;">
-                ❌ AI返回JSON格式错误
-              </div>
-
-            </div>
-
-          </div>
-        `;
-      }
-    }
-
     console.log("解析后JSON:", herb);
 
     // =========================
