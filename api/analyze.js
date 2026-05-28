@@ -1429,7 +1429,7 @@ normalizedResult.authenticity_level =
 
 // 保存规则分析
 normalizedResult.authenticity_rules =
-  authenticityRulesResult.reasoning;
+  authenticityRulesResult.reasoning || [];
 
 // 强制 UNKNOWN
 if (
@@ -1453,7 +1453,7 @@ if (
         // =========================
 
         const vf =
-  normalizedResult.visual_analysis;
+  normalizedResult.visual_analysis || {};
 
 const visualFeatureReport = `
 颜色特征：
@@ -1528,10 +1528,10 @@ lighting:
         // =========================
 
         normalizedResult.risk_level =
-          riskResult.riskLevel;
+  riskResult?.riskLevel || "UNKNOWN";
 
-        normalizedResult.total_risk_score =
-          riskResult.totalRisk;
+normalizedResult.total_risk_score =
+  riskResult?.totalRisk || 100;
 
         // =========================
         // REPORT
@@ -1543,7 +1543,9 @@ ${normalizedResult.herb_name}
 
 候选药材：
 ${
-  normalizedResult.possible_candidates
+  (
+    normalizedResult.possible_candidates || []
+  )
     .map(
       (candidate) =>
         candidate.herb_name
