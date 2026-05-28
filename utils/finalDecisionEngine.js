@@ -158,8 +158,6 @@ if (
 
     final_label = "UNKNOWN";
 
-  unknown_probability += 35;
-
   final_confidence -= 30;
 
   risk_score += 25;
