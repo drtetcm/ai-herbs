@@ -26,6 +26,8 @@ export const config = {
   api: {
     bodyParser: false,
   },
+
+  maxDuration: 60,
 };
 
 const anthropic = new Anthropic({
@@ -923,59 +925,104 @@ Return pure JSON only.
 
 `;
 
-        // =========================
-        // CLAUDE REQUEST
-        // =========================
+// =========================
+// CLAUDE REQUEST
+// =========================
 
-        const response =
-          await anthropic.messages.create({
+let response;
 
-            model: "claude-sonnet-4-6",
+try {
 
-            max_tokens: 1200,
+  response =
+    await anthropic.messages.create({
 
-            temperature: 0,
+      model:
+        "claude-3-5-sonnet-20241022",
 
-            messages: [
-              {
-                role: "user",
+      max_tokens: 700,
 
-                content: [
-                  {
-                    type: "text",
+      temperature: 0,
 
-                    text: SYSTEM_PROMPT
-                  },
+      messages: [
+        {
+          role: "user",
 
-                  {
-                    type: "image",
+          content: [
+            {
+              type: "text",
 
-                    source: {
-                      type: "base64",
+              text: SYSTEM_PROMPT
+            },
 
-                      media_type:
-                        "image/jpeg",
+            {
+              type: "image",
 
-                      data: base64Image
-                    }
-                  }
+              source: {
+                type: "base64",
 
+                media_type:
+                  "image/jpeg",
 
-                ]
+                data: base64Image
               }
+            }
 
-            ]
+          ]
+        }
 
-          });
+      ]
 
-        // =========================
-        // RAW TEXT
-        // =========================
+    });
 
-        const rawText =
-          response.content?.[0]?.text || "";
+} catch (claudeError) {
 
-        console.log("RAW:", rawText);
+  console.error(
+    "CLAUDE ERROR:",
+    claudeError
+  );
+
+  return res.status(500).json({
+
+    status: "error",
+
+    message:
+      "Claude API failed",
+
+    error:
+      claudeError.message
+
+  });
+
+}
+
+// =========================
+// RAW TEXT
+// =========================
+
+const rawText =
+  response?.content?.[0]?.text || "";
+
+console.log(
+  "RAW RESPONSE:",
+  rawText
+);
+
+// =========================
+// EMPTY RESPONSE CHECK
+// =========================
+
+if (!rawText) {
+
+  return res.status(500).json({
+
+    status: "error",
+
+    message:
+      "Claude returned empty response"
+
+  });
+
+}
 
 // =========================
 // CLEAN AI RESPONSE
@@ -1002,17 +1049,35 @@ if (
   lastBrace === -1
 ) {
 
+  console.error(
+    "INVALID JSON RESPONSE:",
+    cleanedText
+  );
+
   return res.status(500).json({
 
     status: "error",
 
-    message: "AI did not return JSON",
+    message:
+      "AI did not return valid JSON",
 
-    raw: rawText
+    raw:
+      cleanedText
 
   });
 
 }
+
+const jsonString =
+  cleanedText.slice(
+    firstBrace,
+    lastBrace + 1
+  );
+
+console.log(
+  "CLEAN JSON:",
+  jsonString
+);
 
 const jsonString =
   cleanedText.slice(
