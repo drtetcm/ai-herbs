@@ -19,6 +19,9 @@ from "../utils/authenticityRules.js";
 import { isolateObject }
 from "../utils/objectIsolation.js";
 
+import { finalDecisionEngine }
+from "../utils/finalDecisionEngine.js";
+
 export const config = {
   api: {
     bodyParser: false,
@@ -1021,10 +1024,43 @@ console.log("CLEAN JSON:", jsonString);
 
         let parsed;
 
+        let finalDecision;
+
         try {
 
           parsed =
             JSON.parse(jsonString);
+            
+            finalDecision =
+  finalDecisionEngine({
+
+    object_type:
+      parsed.object_type,
+
+    is_herb:
+      parsed.is_herb,
+
+    ai_confidence:
+      parsed.ai_confidence,
+
+    unknown_probability:
+      parsed.unknown_probability,
+
+    authenticity_score:
+      parsed.authenticity_score,
+
+    scene_interference:
+      parsed.scene_interference,
+
+    possible_candidates:
+      parsed.possible_candidates
+
+  });
+
+console.log(
+  "FINAL DECISION:",
+  finalDecision
+);
 
         } catch (jsonError) {
 
@@ -1615,7 +1651,16 @@ report = report.trim();
             normalizedResult.is_herb_like,
 
           result:
-            normalizedResult
+            normalizedResult,
+
+            final_decision:
+  finalDecision.final_label,
+
+final_confidence:
+  finalDecision.final_confidence,
+
+decision_reasons:
+  finalDecision.reasons
 
         });
 
