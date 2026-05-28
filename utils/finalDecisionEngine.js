@@ -160,8 +160,6 @@ if (
 
   final_confidence -= 30;
 
-  risk_score += 25;
-
   reasons.push(
     "Packaging/text contamination detected"
   );
