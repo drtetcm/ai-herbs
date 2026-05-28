@@ -906,6 +906,18 @@ JSON schema:
 STRICT JSON ONLY.
 Do NOT output arrays as stringified JSON.
 possible_candidates MUST be valid JSON array objects.
+
+IMPORTANT:
+
+You must return ONLY valid JSON.
+
+Do not include markdown.
+Do not include explanation.
+Do not include code block.
+Do not include any text outside JSON.
+
+Return pure JSON only.
+
 `;
 
         // =========================
