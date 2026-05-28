@@ -917,7 +917,7 @@ possible_candidates MUST be valid JSON array objects.
 
             model: "claude-sonnet-4-6",
 
-            max_tokens: 3000,
+            max_tokens: 1200,
 
             temperature: 0,
 
