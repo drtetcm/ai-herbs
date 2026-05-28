@@ -7,7 +7,13 @@ export function finalDecisionEngine(data) {
     unknown_probability,
     authenticity_score,
     scene_interference,
-    possible_candidates
+    possible_candidates,
+    ocr_text_density,
+    contains_chinese_text,
+    contains_packaging,
+    contains_logo,
+    contains_product_layout,
+    contains_price_tag
   } = data;
 
   let final_label = "UNKNOWN";
@@ -168,4 +174,94 @@ if (
   );
 
 }
+// ============================
+// OCR / TEXT CONTAMINATION
+// ============================
+
+if (
+  ocr_text_density > 40
+) {
+
+  final_label = "UNKNOWN";
+
+  final_confidence -= 25;
+
+  reasons.push(
+    "Heavy OCR contamination detected"
+  );
+
+}
+
+
+// ============================
+// CHINESE LABEL CONTAMINATION
+// ============================
+
+if (
+  contains_chinese_text === true
+) {
+
+  final_confidence -= 15;
+
+  reasons.push(
+    "Chinese label contamination"
+  );
+
+}
+
+
+// ============================
+// PRODUCT PAGE CONTAMINATION
+// ============================
+
+if (
+  contains_product_layout === true
+) {
+
+  final_label = "UNKNOWN";
+
+  final_confidence -= 35;
+
+  reasons.push(
+    "E-commerce layout contamination"
+  );
+
+}
+
+
+// ============================
+// PACKAGING DETECTION
+// ============================
+
+if (
+  contains_packaging === true
+) {
+
+  final_confidence -= 20;
+
+  reasons.push(
+    "Packaging detected"
+  );
+
+}
+
+
+// ============================
+// PRICE TAG DETECTION
+// ============================
+
+if (
+  contains_price_tag === true
+) {
+
+  final_label = "UNKNOWN";
+
+  final_confidence -= 30;
+
+  reasons.push(
+    "Commercial advertisement contamination"
+  );
+
+}
+
 }

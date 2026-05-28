@@ -904,9 +904,46 @@ JSON schema:
     "powder_characteristics": "",
     "lighting_impact": "",
     "occlusion_impact": "",
-    "scene_impact": ""
+    "scene_impact": "",
+    "ocr_text_density": 0,
+    "contains_chinese_text": false,
+    "contains_packaging": false,
+    "contains_logo": false,
+    "contains_product_layout": false,
+    "contains_price_tag": false
   }
 }
+
+OCR CONTAMINATION ANALYSIS:
+
+You must estimate:
+
+- OCR text density
+- Chinese label contamination
+- packaging contamination
+- logo contamination
+- product page contamination
+- advertisement contamination
+
+Detect:
+- printed Chinese herb names
+- product packaging
+- e-commerce layouts
+- Taobao/JD style product pages
+- logos
+- price tags
+- commercial advertisements
+- medicine cabinet branding
+
+If these exist:
+
+increase contamination indicators.
+
+IMPORTANT:
+
+Packaging text MUST NEVER determine herb identity.
+
+Morphology is always more important than text.
 
 STRICT JSON ONLY.
 Do NOT output arrays as stringified JSON.
@@ -928,6 +965,21 @@ Do NOT trust:
 - store environment
 - herb shop background
 - Chinese medicine cabinets
+
+You must estimate OCR contamination risk.
+
+Detect:
+- printed Chinese text
+- labels
+- logos
+- price tags
+- product layout
+- e-commerce screenshot style
+- advertisement style
+- medicine packaging
+
+If detected:
+increase contamination indicators.
 
 The identity MUST be based ONLY on:
 
