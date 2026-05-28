@@ -10,6 +10,9 @@ import sharp from "sharp";
 import { calculateRisk }
 from "../utils/riskEngine.js";
 
+import { evaluateAuthenticity }
+from "../utils/authenticityEngine.js";
+
 import { isolateObject }
 from "../utils/objectIsolation.js";
 
@@ -1321,6 +1324,43 @@ const normalizedResult =
 
   });
 
+// =========================
+// AUTHENTICITY ENGINE
+// =========================
+
+const authenticityResult =
+  evaluateAuthenticity(
+    normalizedResult
+  );
+
+// 写入结果
+normalizedResult.authenticity_score =
+  authenticityResult.authenticity_score;
+
+normalizedResult.authenticity_level =
+  authenticityResult.authenticity_level;
+
+normalizedResult.authenticity_reasoning =
+  authenticityResult.authenticity_reasoning;
+
+// 工业级真实性硬拦截
+if (
+  authenticityResult.force_unknown
+) {
+
+  forceUnknown = true;
+
+  normalizedResult.herb_name =
+    "UNKNOWN";
+
+  normalizedResult.confidence =
+    Math.min(
+      normalizedResult.confidence,
+      35
+    );
+
+}
+  
         // =========================
         // VISUAL FEATURE FORMATTER
         // =========================
@@ -1447,6 +1487,12 @@ ${normalizedResult.total_risk_score}%
 
 AI置信度：
 ${normalizedResult.confidence}%
+
+真实性评分：
+${normalizedResult.authenticity_score}%
+
+真实性等级：
+${normalizedResult.authenticity_level}
 
 图片质量：
 ${normalizedResult.quality_grade}
