@@ -1079,12 +1079,6 @@ console.log(
   jsonString
 );
 
-const jsonString =
-  cleanedText.slice(
-    firstBrace,
-    lastBrace + 1
-  );
-
 console.log("CLEAN JSON:", jsonString);
 
         let parsed;
