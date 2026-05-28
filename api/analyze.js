@@ -13,6 +13,9 @@ from "../utils/riskEngine.js";
 import { evaluateAuthenticity }
 from "../utils/authenticityEngine.js";
 
+import { applyAuthenticityRules }
+from "../utils/authenticityRules.js";
+
 import { isolateObject }
 from "../utils/objectIsolation.js";
 
@@ -1358,9 +1361,45 @@ if (
       normalizedResult.confidence,
       35
     );
-
 }
   
+// =========================
+// AUTHENTICITY HARD RULES
+// =========================
+
+const authenticityRulesResult =
+  applyAuthenticityRules(
+    normalizedResult
+  );
+
+// 覆盖真实性结果
+normalizedResult.authenticity_score =
+  authenticityRulesResult.authenticity_score;
+
+normalizedResult.authenticity_level =
+  authenticityRulesResult.authenticity_level;
+
+// 保存规则分析
+normalizedResult.authenticity_rules =
+  authenticityRulesResult.reasoning;
+
+// 强制 UNKNOWN
+if (
+  authenticityRulesResult.force_unknown
+) {
+
+  forceUnknown = true;
+
+  normalizedResult.herb_name =
+    "UNKNOWN";
+
+  normalizedResult.confidence =
+    Math.min(
+      normalizedResult.confidence,
+      25
+    );
+}
+
         // =========================
         // VISUAL FEATURE FORMATTER
         // =========================
@@ -1493,6 +1532,13 @@ ${normalizedResult.authenticity_score}%
 
 真实性等级：
 ${normalizedResult.authenticity_level}
+
+真实性规则：
+${JSON.stringify(
+  normalizedResult.authenticity_rules,
+  null,
+  2
+)}
 
 图片质量：
 ${normalizedResult.quality_grade}
