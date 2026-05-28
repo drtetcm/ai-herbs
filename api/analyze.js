@@ -1753,17 +1753,24 @@ decision_reasons:
 
   } catch (error) {
 
-    console.error("SERVER ERROR:", error);
+  console.error("========== SERVER ERROR ==========");
 
-    return res.status(500).json({
+  console.error(error);
 
-      status: "error",
+  console.error(error.stack);
 
-      message:
-        error.message
+  console.error("==================================");
 
-    });
+  return res.status(500).json({
 
-  }
+    status: "error",
+
+    message: error.message,
+
+    stack: error.stack
+
+  });
+
+}
 
 }
