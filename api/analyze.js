@@ -1116,11 +1116,6 @@ if (
 
         try {
 
-console.log(
-  "SAFE JSON:",
-  safeJson
-);
-
 parsed =
   JSON.parse(safeJson);
             
