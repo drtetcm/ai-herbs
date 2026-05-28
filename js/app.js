@@ -152,8 +152,24 @@ analyzeBtn.addEventListener("click", async () => {
 
     });
 
-    const data =
-      await response.json();
+    const rawText =
+  await response.text();
+
+console.log("RAW API:", rawText);
+
+let data;
+
+try {
+
+  data = JSON.parse(rawText);
+
+} catch (e) {
+
+  console.error("API返回不是JSON:", rawText);
+
+  throw new Error(rawText);
+
+} 
 
     stopLoading();
 
