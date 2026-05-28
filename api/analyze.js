@@ -1035,25 +1035,25 @@ console.log("CLEAN JSON:", jsonString);
   finalDecisionEngine({
 
     object_type:
-      parsed.object_type,
+      parsed.object_type || "unknown",
 
     is_herb:
-      parsed.is_herb,
+      parsed.object_type === "herb",
 
     ai_confidence:
-      parsed.ai_confidence,
+      parsed.confidence || 0,
 
     unknown_probability:
-      parsed.unknown_probability,
+      parsed.unknown_probability || 0,
 
     authenticity_score:
-      parsed.authenticity_score,
+      parsed.authenticity_score || 50,
 
     scene_interference:
-      parsed.scene_interference,
+      parsed.scene_interference || "unknown",
 
     possible_candidates:
-      parsed.possible_candidates
+      parsed.possible_candidates || []
 
   });
 
@@ -1654,13 +1654,13 @@ report = report.trim();
             normalizedResult,
 
             final_decision:
-  finalDecision.final_label,
+  finalDecision?.final_label || "UNKNOWN",
 
 final_confidence:
-  finalDecision.final_confidence,
+  finalDecision?.final_confidence || 0,
 
 decision_reasons:
-  finalDecision.reasons
+  finalDecision?.reasons || []
 
         });
 
