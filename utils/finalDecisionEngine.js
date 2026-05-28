@@ -148,32 +148,24 @@ export function finalDecisionEngine(data) {
     final_confidence = 100;
   }
 
-// =========================
-// PACKAGING CONTAMINATION
-// =========================
+// ============================
+// PACKAGING / OCR CONTAMINATION
+// ============================
 
 if (
-  scene_interference === "herb_packaging"
+  scene_interference === "herb_packaging" ||
+  scene_interference === "medicine_cabinet" ||
+  scene_interference === "product_page" ||
+  scene_interference === "advertisement"
 ) {
 
-    final_label = "UNKNOWN";
+  final_label = "UNKNOWN";
 
-  final_confidence -= 30;
+  final_confidence -= 40;
 
   reasons.push(
-    "Packaging/text contamination detected"
+    "Packaging/OCR contamination detected"
   );
 
 }
-
-  return {
-
-    final_label,
-
-    final_confidence,
-
-    reasons
-
-  };
-
 }

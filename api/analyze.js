@@ -912,6 +912,48 @@ STRICT JSON ONLY.
 Do NOT output arrays as stringified JSON.
 possible_candidates MUST be valid JSON array objects.
 
+CRITICAL SAFETY RULES:
+
+Packaging text MUST NEVER determine herb identity.
+
+Do NOT trust:
+- product packaging
+- printed herb names
+- medicine box text
+- OCR text
+- labels
+- advertisements
+- e-commerce pages
+- Taobao/JD product images
+- store environment
+- herb shop background
+- Chinese medicine cabinets
+
+The identity MUST be based ONLY on:
+
+- morphology
+- texture
+- slice structure
+- fiber pattern
+- natural surface
+- drying characteristics
+
+If packaging/text strongly influences recognition:
+
+Set:
+"object_type": "unknown"
+
+Increase:
+"unknown_probability"
+
+Reduce:
+"confidence"
+
+If fresh food + packaging coexist:
+prioritize UNKNOWN.
+
+Never classify by text alone.
+
 IMPORTANT:
 
 You must return ONLY valid JSON.
@@ -1144,6 +1186,16 @@ parsed =
       parsed.possible_candidates || []
 
   });
+
+  if (
+  finalDecision.final_label === "UNKNOWN"
+) {
+
+  parsed.object_type = "unknown";
+
+  parsed.is_herb = false;
+
+}
 
 console.log(
   "FINAL DECISION:",
