@@ -16,7 +16,7 @@ export function finalDecisionEngine(data) {
     contains_price_tag
   } = data;
 
-  let final_label = "UNKNOWN";
+  let final_label;
 
   let final_confidence = ai_confidence || 0;
 
