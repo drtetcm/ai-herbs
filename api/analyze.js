@@ -1098,8 +1098,36 @@ if (
 
         try {
 
-          parsed =
-            JSON.parse(jsonString);
+          // =========================
+// JSON SAFE REPAIR
+// =========================
+
+let safeJson = jsonString;
+
+// 修复中文引号污染
+safeJson = safeJson.replace(
+  /"([^"]*?)"([^"]*?)"([^"]*?)"/g,
+  (match) => {
+    return match.replace(
+      /"/g,
+      '\\"'
+    );
+  }
+);
+
+// 修复 key 的引号
+safeJson = safeJson.replace(
+  /\\"([a-zA-Z0-9_]+)\\"(?=\s*:)/g,
+  '"$1"'
+);
+
+console.log(
+  "SAFE JSON:",
+  safeJson
+);
+
+parsed =
+  JSON.parse(safeJson);
             
             finalDecision =
   finalDecisionEngine({
