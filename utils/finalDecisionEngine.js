@@ -148,6 +148,28 @@ export function finalDecisionEngine(data) {
     final_confidence = 100;
   }
 
+// =========================
+// PACKAGING CONTAMINATION
+// =========================
+
+if (
+  scene_interference === "herb_packaging"
+) {
+
+  unknown_probability += 35;
+
+  ai_confidence -= 30;
+
+  risk_score += 25;
+
+  reasons.push(
+    "Packaging/text contamination detected"
+  );
+
+  object_type = "unknown";
+
+}
+
   return {
 
     final_label,
