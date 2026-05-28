@@ -923,6 +923,24 @@ Do not include any text outside JSON.
 
 Return pure JSON only.
 
+Never use markdown.
+
+Never use triple backticks.
+
+Never use unescaped double quotes inside JSON strings.
+
+If quotes are needed inside text,
+use single quotes instead.
+
+Example:
+
+Wrong:
+"reason": "包装写着"山药""
+
+Correct:
+"reason": "包装写着'山药'"
+
+Your response MUST be directly parsable by JSON.parse().
 `;
 
 // =========================
@@ -1097,38 +1115,6 @@ if (
         let finalDecision;
 
         try {
-
-// =========================
-// SAFE JSON FIX
-// =========================
-
-let safeJson = jsonString;
-
-// 修复 AI 文本中的裸引号
-safeJson = safeJson.replace(
-  /(:\s*")(.*?)(")(.*?")/g,
-  (match, p1, p2, p3, p4) => {
-
-    // 如果后面不是逗号/}/]
-    // 说明是内容中的裸引号
-
-    if (
-      !p4.trim().match(/^(\s*[,}\]])/)
-    ) {
-
-      return (
-        p1 +
-        p2 +
-        '\\"' +
-        p4
-      );
-
-    }
-
-    return match;
-
-  }
-);
 
 console.log(
   "SAFE JSON:",
