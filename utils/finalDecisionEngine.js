@@ -208,7 +208,8 @@ if (contains_product_layout) {
     possible_candidates &&
     possible_candidates.length || 0
   ) {
-
+const candidateCount =
+  possible_candidates?.length || 0;
     if (candidateCount >= 4) {
 
   unknown_probability += 15;
