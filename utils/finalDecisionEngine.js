@@ -92,7 +92,18 @@ export function finalDecisionEngine(data) {
   // =========================
 
   if (ocr_text_density >= 40) {
+  
+    if (ocr_text_density >= 20) {
+  contaminationScore += 20;
+}
 
+if (ocr_text_density >= 40) {
+  contaminationScore += 40;
+}
+
+if (ocr_text_density >= 60) {
+  contaminationScore += 60;
+}
     final_label = "UNKNOWN";
 
     final_confidence = 0;
@@ -155,15 +166,39 @@ export function finalDecisionEngine(data) {
   // PACKAGING
   // =========================
 
-  if (contains_packaging) {
+  let contaminationScore = 0;
 
-    final_confidence -= 20;
+if (contains_packaging) {
+  contaminationScore += 25;
 
-    reasons.push(
-      "Packaging detected"
-    );
+  reasons.push(
+    "Packaging detected"
+  );
+}
 
-  }
+if (contains_logo) {
+  contaminationScore += 25;
+
+  reasons.push(
+    "Logo detected"
+  );
+}
+
+if (contains_price_tag) {
+  contaminationScore += 30;
+
+  reasons.push(
+    "Price tag detected"
+  );
+}
+
+if (contains_product_layout) {
+  contaminationScore += 35;
+
+  reasons.push(
+    "Commercial layout detected"
+  );
+}
 
   // =========================
   // CANDIDATE CONFLICT
@@ -171,8 +206,26 @@ export function finalDecisionEngine(data) {
 
   if (
     possible_candidates &&
-    possible_candidates.length >= 4
+    possible_candidates.length || 0
   ) {
+
+    if (candidateCount >= 4) {
+
+  unknown_probability += 15;
+
+  reasons.push(
+    "Low candidate consistency"
+  );
+}
+
+if (candidateCount >= 6) {
+
+  unknown_probability += 25;
+
+  reasons.push(
+    "Very low candidate consistency"
+  );
+}
 
     final_confidence -= 10;
 

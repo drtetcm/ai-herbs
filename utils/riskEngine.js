@@ -354,6 +354,24 @@ export function calculateRisk(result) {
 
   if (objectType === "unknown") {
 
+    if (
+  unknownProbability >= 50
+) {
+  totalRisk += 20;
+}
+
+if (
+  unknownProbability >= 70
+) {
+  totalRisk += 35;
+}
+
+if (
+  unknownProbability >= 90
+) {
+  totalRisk += 50;
+}
+
     totalRisk += 40;
 
     isUnknown = true;
