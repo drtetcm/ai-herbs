@@ -201,40 +201,35 @@ if (contains_product_layout) {
 }
 
   // =========================
-  // CANDIDATE CONFLICT
-  // =========================
+// CANDIDATE CONFLICT
+// =========================
 
-  if (
-    possible_candidates &&
-    possible_candidates.length || 0
-  ) {
 const candidateCount =
   possible_candidates?.length || 0;
-    if (candidateCount >= 4) {
+
+if (candidateCount >= 4) {
 
   unknown_probability += 15;
+
+  final_confidence -= 10;
 
   reasons.push(
     "Low candidate consistency"
   );
+
 }
 
 if (candidateCount >= 6) {
 
   unknown_probability += 25;
 
+  final_confidence -= 15;
+
   reasons.push(
     "Very low candidate consistency"
   );
+
 }
-
-    final_confidence -= 10;
-
-    reasons.push(
-      "Candidate conflict detected"
-    );
-
-  }
 
   // =========================
   // AUTHENTICITY WARNING
