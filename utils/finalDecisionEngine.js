@@ -65,6 +65,15 @@ export function finalDecisionEngine(data) {
       "Commercial scene contamination detected"
     );
 
+    console.log(
+  "FINAL ENGINE RESULT:",
+  {
+    final_label,
+    final_confidence,
+    reasons
+  }
+);
+
     return {
       final_label,
       final_confidence,
@@ -89,6 +98,15 @@ export function finalDecisionEngine(data) {
     reasons.push(
       "Heavy OCR contamination detected"
     );
+
+    console.log(
+  "FINAL ENGINE RESULT:",
+  {
+    final_label,
+    final_confidence,
+    reasons
+  }
+);
 
     return {
       final_label,
@@ -197,9 +215,6 @@ export function finalDecisionEngine(data) {
 // =========================
 
 if (
-
-  object_type === "herb" &&
-
   authenticity_score >= 80 &&
 
   unknown_probability <= 40
@@ -249,6 +264,15 @@ if (
   if (final_confidence > 100) {
     final_confidence = 100;
   }
+
+  console.log(
+  "FINAL ENGINE RESULT:",
+  {
+    final_label,
+    final_confidence,
+    reasons
+  }
+);
 
 return {
 
