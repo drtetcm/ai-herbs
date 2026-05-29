@@ -255,14 +255,11 @@ export function finalDecisionEngine(data) {
   if (
 
     object_type === "herb" &&
-
-    ai_confidence >= 60 &&
-
-    unknown_probability <= 40
-
-  ) {
-
-    final_label = "HERB";
+  ai_confidence >= 50 &&
+  unknown_probability <= 30 &&
+  scene_interference !== "commercial"
+) {
+  final_label = "HERB";
 
     final_confidence = Math.max(
       final_confidence,
@@ -274,6 +271,55 @@ export function finalDecisionEngine(data) {
     );
 
   }
+
+// =========================
+// SHADOW RECOVERY
+// =========================
+
+if (
+  final_label === "UNKNOWN" &&
+  object_type === "herb" &&
+  ai_confidence >= 28 &&
+  unknown_probability <= 50 &&
+  scene_interference === "shadow"
+) {
+  final_label = "HERB";
+
+  final_confidence = Math.max(
+    final_confidence,
+    ai_confidence
+  );
+
+  reasons.push(
+    "Recovered from shadow scene"
+  );
+}
+
+// =========================
+// DARK RECOVERY
+// =========================
+
+if (
+  final_label === "UNKNOWN" &&
+  object_type === "herb" &&
+  ai_confidence >= 25 &&
+  unknown_probability <= 45 &&
+  (
+    scene_interference === "dark" ||
+    scene_interference === "low_light"
+  )
+) {
+  final_label = "HERB";
+
+  final_confidence = Math.max(
+    final_confidence,
+    ai_confidence
+  );
+
+  reasons.push(
+    "Recovered from dark scene"
+  );
+}
 
   // =========================
   // FORCE UNKNOWN
