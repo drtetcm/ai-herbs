@@ -1803,10 +1803,23 @@ ${normalizedResult.identification_reason || "暂无"}
 ${visualFeatureReport}
 
 对象类型：
-${normalizedResult.object_type}
+${finalDecision?.final_label || "UNKNOWN"}
 
 是否药材：
-${normalizedResult.is_herb_like ? "是" : "否"}
+${finalDecision?.final_label === "HERB" ? "是" : "否"}
+
+最终判定：
+${finalDecision?.final_label || "UNKNOWN"}
+
+最终置信度：
+${finalDecision?.final_confidence || 0}%
+
+决策原因：
+${
+  finalDecision?.reasons?.length
+    ? finalDecision.reasons.join("；")
+    : "无"
+}
 
 未知对象概率：
 ${normalizedResult.unknown_probability}%
@@ -1856,6 +1869,7 @@ ${
   normalizedResult.force_unknown
     ? "当前图像存在较高不确定性，建议重新拍摄。"
     : "当前识别结果可作为参考。"
+}
 }
 `;
 
