@@ -1226,6 +1226,15 @@ console.log(
     }, null, 2)
   );
 
+console.log(
+  "PARSED KEYS:",
+  Object.keys(parsed)
+);
+
+console.log(
+  "AUTH SCORE:",
+  parsed.authenticity_score
+);
 
             finalDecision =
   finalDecisionEngine({
