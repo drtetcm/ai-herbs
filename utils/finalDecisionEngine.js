@@ -5,21 +5,21 @@ export function finalDecisionEngine(data) {
   JSON.stringify(data, null, 2)
 );
 
-  const {
-    object_type,
-    is_herb,
-    ai_confidence,
-    unknown_probability,
-    authenticity_score,
-    scene_interference,
-    possible_candidates,
-    ocr_text_density,
-    contains_chinese_text,
-    contains_packaging,
-    contains_logo,
-    contains_product_layout,
-    contains_price_tag
-  } = data;
+  let {
+  object_type,
+  is_herb,
+  ai_confidence,
+  unknown_probability,
+  authenticity_score,
+  scene_interference,
+  possible_candidates,
+  ocr_text_density,
+  contains_chinese_text,
+  contains_packaging,
+  contains_logo,
+  contains_product_layout,
+  contains_price_tag
+} = data;
 
   let final_label = "UNKNOWN";
 
@@ -162,19 +162,22 @@ export function finalDecisionEngine(data) {
   }
 
   // =========================
-  // SCENE INTERFERENCE
-  // =========================
+// SCENE INTERFERENCE
+// =========================
 
-  if (
-    scene_interference === true
-  ) {
+if (
+  scene_interference &&
+  scene_interference !== "none" &&
+  scene_interference !== "clean"
+) {
 
-    final_confidence -= 15;
+  final_confidence -= 15;
 
-    reasons.push(
-      "Scene interference detected"
-    );
-  }
+  reasons.push(
+    `Scene interference: ${scene_interference}`
+  );
+
+}
 
   // =========================
   // MULTI-CANDIDATE CONFLICT
@@ -278,18 +281,6 @@ if (
     reasons
   }
 );
-
-return {
-
-    final_label,
-
-    final_confidence,
-
-    reasons,
-
-    possible_candidates
-
-  };
 
 // ============================
 // CHINESE LABEL CONTAMINATION
