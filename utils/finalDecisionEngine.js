@@ -223,27 +223,21 @@ if (
 // =========================
 
 if (
-
-  authenticity_score >= 80 &&
-
-  ai_confidence >= 30 &&
-
-  unknown_probability <= 50
-
+  object_type === "herb" &&
+  ai_confidence >= 60 &&
+  unknown_probability <= 40
 ) {
 
   final_label = "HERB";
 
-  final_confidence =
-    Math.max(
-      final_confidence,
-      60
-    );
-
-  reasons.push(
-    "Recovered by high authenticity"
+  final_confidence = Math.max(
+    final_confidence,
+    ai_confidence
   );
 
+  reasons.push(
+    "Recovered by herb confidence"
+  );
 }
   
   // =========================
