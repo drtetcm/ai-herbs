@@ -218,14 +218,14 @@ if (contains_product_layout) {
 // COMMERCIAL DECISION
 // =========================
 
-const commercialIndicators =
+const commercialSignals =
   (contains_packaging ? 1 : 0) +
   (contains_price_tag ? 1 : 0) +
   (contains_product_layout ? 1 : 0);
 
 // 必须多个证据同时存在
 if (
-  commercialIndicators >= 2 ||
+  commercialSignals >= 2 ||
   contaminationScore >= 60
 ) {
   scene_interference = "commercial";
