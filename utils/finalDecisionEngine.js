@@ -189,7 +189,7 @@ if (contains_packaging) {
 }
 
 if (contains_logo) {
-  contaminationScore += 25;
+  contaminationScore += 10;
 
   reasons.push(
     "Logo detected"
@@ -218,7 +218,6 @@ if (contains_product_layout) {
 
 const commercialIndicators =
   (contains_packaging ? 1 : 0) +
-  (contains_logo ? 1 : 0) +
   (contains_price_tag ? 1 : 0) +
   (contains_product_layout ? 1 : 0);
 

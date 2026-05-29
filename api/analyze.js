@@ -1232,6 +1232,20 @@ console.log(
 );
 
 console.log(
+  "HERB NAME:",
+  parsed.herb_name
+);
+
+console.log(
+  "POSSIBLE CANDIDATES:",
+  JSON.stringify(
+    parsed.possible_candidates,
+    null,
+    2
+  )
+);
+
+console.log(
   "AUTH SCORE:",
   parsed.authenticity_score
 );
