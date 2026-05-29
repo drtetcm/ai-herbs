@@ -223,9 +223,12 @@ if (
 // =========================
 
 if (
-  ai_confidence >= 60 &&
 
-  unknown_probability <= 40
+  authenticity_score >= 80 &&
+
+  ai_confidence >= 30 &&
+
+  unknown_probability <= 50
 
 ) {
 
