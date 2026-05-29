@@ -1215,48 +1215,46 @@ parsed =
           
   try {
 
+console.log(
+    "ENGINE PAYLOAD:",
+    JSON.stringify({
+      object_type: parsed.object_type,
+      confidence: parsed.confidence,
+      unknown_probability: parsed.unknown_probability,
+      authenticity_score: parsed.authenticity_score,
+      scene_interference: parsed.scene_interference
+    }, null, 2)
+  );
+
+
             finalDecision =
   finalDecisionEngine({
-
     object_type:
       parsed.object_type || "unknown",
-
     is_herb:
       parsed.object_type === "herb",
-
     ai_confidence:
       parsed.confidence || 0,
-
     unknown_probability:
       parsed.unknown_probability || 0,
-
     authenticity_score:
       parsed.authenticity_score || 50,
-
     scene_interference:
       parsed.scene_interference || "unknown",
-
     possible_candidates:
       parsed.possible_candidates || [],
-
     ocr_text_density:
       parsed.visual_analysis?.ocr_text_density || 0,
-
     contains_chinese_text:
       parsed.visual_analysis?.contains_chinese_text || false,
-
     contains_packaging:
       parsed.visual_analysis?.contains_packaging || false,
-
     contains_logo:
       parsed.visual_analysis?.contains_logo || false,
-
     contains_product_layout:
       parsed.visual_analysis?.contains_product_layout || false,
-
     contains_price_tag:
       parsed.visual_analysis?.contains_price_tag || false
-
   });
   } catch (engineError) {
 
@@ -1265,6 +1263,13 @@ parsed =
     engineError
   );
 
+  finalDecision = {
+  final_label: "UNKNOWN",
+  final_confidence: 0,
+  reasons: [
+    "Final decision engine failed"
+  ]
+};
 }
   
   if (
