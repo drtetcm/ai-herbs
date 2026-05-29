@@ -57,47 +57,49 @@ export function finalDecisionEngine(data) {
   }
 
   // =========================
-  // COMMERCIAL CONTAMINATION
-  // =========================
+// COMMERCIAL CONTAMINATION
+// =========================
 
-  const commercialScene =
+const commercialIndicators =
+  (contains_product_layout ? 1 : 0) +
+  (contains_price_tag ? 1 : 0) +
+  (contains_packaging ? 1 : 0);
 
-    scene_interference === "herb_packaging" ||
-    scene_interference === "medicine_cabinet" ||
-    scene_interference === "product_page" ||
-    scene_interference === "advertisement" ||
+const commercialScene =
 
-    contains_product_layout === true ||
-    contains_price_tag === true ||
-    contains_logo === true;
+  scene_interference === "herb_packaging" ||
+  scene_interference === "product_page" ||
+  scene_interference === "medicine_cabinet" ||
+  scene_interference === "advertisement" ||
 
-  if (commercialScene) {
+  commercialIndicators >= 2;
 
-    final_label = "UNKNOWN";
+if (commercialScene) {
 
-    final_confidence = 0;
+  final_label = "UNKNOWN";
 
-    reasons.push(
-      "Commercial scene contamination detected"
-    );
+  final_confidence = 0;
 
-    console.log(
-      "FINAL ENGINE RESULT:",
-      {
-        final_label,
-        final_confidence,
-        reasons
-      }
-    );
+  reasons.push(
+    "Commercial scene contamination detected"
+  );
 
-    return {
+  console.log(
+    "FINAL ENGINE RESULT:",
+    {
       final_label,
       final_confidence,
-      reasons,
-      possible_candidates: []
-    };
+      reasons
+    }
+  );
 
-  }
+  return {
+    final_label,
+    final_confidence,
+    reasons,
+    possible_candidates: []
+  };
+}
 
   // =========================
   // OCR CONTAMINATION

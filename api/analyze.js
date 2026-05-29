@@ -1306,12 +1306,6 @@ console.log(
 
   parsed.is_herb = false;
 
-} {
-
-  parsed.object_type = "unknown";
-
-  parsed.is_herb = false;
-
 }
 
 console.log(
@@ -1791,10 +1785,17 @@ normalizedResult.total_risk_score =
   riskResult?.totalRisk || 100;
 
   const displayHerbName =
-  normalizedResult.herb_name ||
-  normalizedResult?.possible_candidates?.[0]
-    ?.herb_name ||
-  "UNKNOWN";
+  (
+    normalizedResult.herb_name &&
+    normalizedResult.herb_name !== "UNKNOWN"
+  )
+    ? normalizedResult.herb_name
+    : (
+        normalizedResult
+          ?.possible_candidates?.[0]
+          ?.herb_name ||
+        "UNKNOWN"
+      );
 
         // =========================
         // REPORT
