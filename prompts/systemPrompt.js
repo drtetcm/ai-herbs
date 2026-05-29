@@ -65,16 +65,43 @@ OCR污染检测
 返回：
 
 ocr_text_density
-
 contains_chinese_text
-
 contains_packaging
-
 contains_logo
-
 contains_product_layout
-
 contains_price_tag
+
+=========================
+商业场景强制UNKNOWN
+=========================
+
+如果检测到以下任意情况：
+
+- 淘宝页面
+- Shopee页面
+- 京东页面
+- 商品详情页
+- 电商截图
+- 广告图
+- 产品包装图
+- 带价格标签
+- 大量印刷文字
+- Logo主导画面
+- 产品宣传图
+
+必须：
+
+object_type = "unknown"
+
+confidence <= 20
+
+unknown_probability >= 80
+
+requires_real_photo = true
+
+possible_candidates = []
+
+不得依据包装文字推测药材名称。
 
 =========================
 药材鉴定依据
@@ -88,6 +115,8 @@ contains_price_tag
 - fiber pattern
 - natural surface
 - drying characteristics
+- fracture characteristics
+- cross section structure
 
 禁止依据：
 
@@ -95,6 +124,41 @@ contains_price_tag
 - 包装名称
 - 广告内容
 - 店铺信息
+- 页面文字
+- 电商标题
+
+=========================
+真实性评分
+=========================
+
+必须输出：
+
+authenticity_score
+
+范围：
+
+0-100
+
+规则：
+
+90-100：
+药材形态学证据极强
+
+80-89：
+大概率真实药材
+
+60-79：
+真实性中等
+
+40-59：
+真实性较低
+
+0-39：
+真实性极低或无法确认
+
+该字段必填。
+
+禁止省略。
 
 =========================
 UNKNOWN规则
@@ -124,8 +188,66 @@ unknown_probability
 confidence
 
 =========================
+候选药材规则
+=========================
+
+possible_candidates 只能来源于：
+
+- 形态学观察
+- 纹理观察
+- 切面结构观察
+
+禁止来源于：
+
+- 包装文字
+- 商品标题
+- 广告内容
+- OCR文字
+
+如果无法仅凭形态推断：
+
+possible_candidates = []
+
+=========================
+真实照片要求
+=========================
+
+必须输出：
+
+requires_real_photo
+
+true / false
+
+如果出现：
+
+- 包装图
+- 电商截图
+- 广告图
+- 商品详情页
+- 实物主体过小
+- 严重OCR污染
+
+则：
+
+requires_real_photo = true
+
+=========================
 输出要求
 =========================
+
+必须输出：
+
+object_type
+
+confidence
+
+unknown_probability
+
+authenticity_score
+
+requires_real_photo
+
+visual_analysis
 
 所有输出必须是严格合法JSON。
 
