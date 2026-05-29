@@ -1,25 +1,25 @@
 export function finalDecisionEngine(data) {
 
   console.log(
-  "FINAL ENGINE INPUT:",
-  JSON.stringify(data, null, 2)
-);
+    "FINAL ENGINE INPUT:",
+    JSON.stringify(data, null, 2)
+  );
 
   let {
-  object_type,
-  is_herb,
-  ai_confidence,
-  unknown_probability,
-  authenticity_score,
-  scene_interference,
-  possible_candidates,
-  ocr_text_density,
-  contains_chinese_text,
-  contains_packaging,
-  contains_logo,
-  contains_product_layout,
-  contains_price_tag
-} = data;
+    object_type,
+    is_herb,
+    ai_confidence,
+    unknown_probability,
+    authenticity_score,
+    scene_interference,
+    possible_candidates,
+    ocr_text_density,
+    contains_chinese_text,
+    contains_packaging,
+    contains_logo,
+    contains_product_layout,
+    contains_price_tag
+  } = data;
 
   let final_label = "UNKNOWN";
 
@@ -36,15 +36,16 @@ export function finalDecisionEngine(data) {
     return {
       final_label: "FOOD",
       final_confidence: 0,
-        reasons: [
+      reasons: [
         "Object classified as food"
       ],
       possible_candidates: []
     };
+
   }
 
-// =========================
-  // INDUSTRIAL CONTAMINATION
+  // =========================
+  // COMMERCIAL CONTAMINATION
   // =========================
 
   const commercialScene =
@@ -64,26 +65,24 @@ export function finalDecisionEngine(data) {
 
     final_confidence = 0;
 
-    possible_candidates = [];
-
     reasons.push(
       "Commercial scene contamination detected"
     );
 
     console.log(
-  "FINAL ENGINE RESULT:",
-  {
-    final_label,
-    final_confidence,
-    reasons
-  }
-);
+      "FINAL ENGINE RESULT:",
+      {
+        final_label,
+        final_confidence,
+        reasons
+      }
+    );
 
     return {
       final_label,
       final_confidence,
       reasons,
-      possible_candidates
+      possible_candidates: []
     };
 
   }
@@ -98,89 +97,76 @@ export function finalDecisionEngine(data) {
 
     final_confidence = 0;
 
-    possible_candidates = [];
-
     reasons.push(
       "Heavy OCR contamination detected"
     );
 
     console.log(
-  "FINAL ENGINE RESULT:",
-  {
-    final_label,
-    final_confidence,
-    reasons
-  }
-);
+      "FINAL ENGINE RESULT:",
+      {
+        final_label,
+        final_confidence,
+        reasons
+      }
+    );
 
     return {
       final_label,
       final_confidence,
       reasons,
-      possible_candidates
+      possible_candidates: []
     };
 
   }
 
   // =========================
-  // AUTHENTICITY LOW
+  // SCENE INTERFERENCE
   // =========================
 
   if (
-    authenticity_score <= 30
+    scene_interference &&
+    scene_interference !== "none" &&
+    scene_interference !== "clean"
   ) {
 
+    final_confidence -= 15;
+
     reasons.push(
-      "Low authenticity score"
+      `Scene interference: ${scene_interference}`
     );
+
   }
 
   // =========================
-  // HIGH UNKNOWN PROBABILITY
+  // CHINESE LABEL
   // =========================
 
-  if (
-    unknown_probability >= 70
-  ) {
+  if (contains_chinese_text) {
+
+    final_confidence -= 15;
 
     reasons.push(
-      "High unknown probability"
+      "Chinese label contamination"
     );
+
   }
 
   // =========================
-  // LOW CONFIDENCE
+  // PACKAGING
   // =========================
 
-  if (
-    ai_confidence <= 20
-  ) {
+  if (contains_packaging) {
+
+    final_confidence -= 20;
 
     reasons.push(
-      "Low AI confidence"
+      "Packaging detected"
     );
+
   }
 
   // =========================
-// SCENE INTERFERENCE
-// =========================
-
-if (
-  scene_interference &&
-  scene_interference !== "none" &&
-  scene_interference !== "clean"
-) {
-
-  final_confidence -= 15;
-
-  reasons.push(
-    `Scene interference: ${scene_interference}`
-  );
-
-}
-
-  // =========================
-  // MULTI-CANDIDATE CONFLICT
+  // CANDIDATE CONFLICT
   // =========================
 
   if (
@@ -193,10 +179,53 @@ if (
     reasons.push(
       "Candidate conflict detected"
     );
+
   }
 
   // =========================
-  // FINAL HERB DECISION
+  // AUTHENTICITY WARNING
+  // =========================
+
+  if (
+    authenticity_score <= 30
+  ) {
+
+    reasons.push(
+      "Low authenticity score"
+    );
+
+  }
+
+  // =========================
+  // UNKNOWN WARNING
+  // =========================
+
+  if (
+    unknown_probability >= 70
+  ) {
+
+    reasons.push(
+      "High unknown probability"
+    );
+
+  }
+
+  // =========================
+  // LOW CONFIDENCE WARNING
+  // =========================
+
+  if (
+    ai_confidence <= 20
+  ) {
+
+    reasons.push(
+      "Low AI confidence"
+    );
+
+  }
+
+  // =========================
+  // HERB VALIDATION
   // =========================
 
   if (
@@ -216,30 +245,36 @@ if (
     reasons.push(
       "Passed industrial herb validation"
     );
+
   }
 
-// =========================
-// HERB RECOVERY
-// =========================
+  // =========================
+  // HERB RECOVERY
+  // =========================
 
-if (
-  object_type === "herb" &&
-  ai_confidence >= 60 &&
-  unknown_probability <= 40
-) {
+  if (
 
-  final_label = "HERB";
+    object_type === "herb" &&
 
-  final_confidence = Math.max(
-    final_confidence,
-    ai_confidence
-  );
+    ai_confidence >= 60 &&
 
-  reasons.push(
-    "Recovered by herb confidence"
-  );
-}
-  
+    unknown_probability <= 40
+
+  ) {
+
+    final_label = "HERB";
+
+    final_confidence = Math.max(
+      final_confidence,
+      ai_confidence
+    );
+
+    reasons.push(
+      "Recovered by herb confidence"
+    );
+
+  }
+
   // =========================
   // FORCE UNKNOWN
   // =========================
@@ -247,7 +282,9 @@ if (
   if (
 
     authenticity_score <= 30 ||
+
     unknown_probability >= 70 ||
+
     ai_confidence <= 20
 
   ) {
@@ -271,95 +308,24 @@ if (
   }
 
   console.log(
-  "FINAL ENGINE RESULT:",
-  {
+    "FINAL ENGINE RESULT:",
+    {
+      final_label,
+      final_confidence,
+      reasons
+    }
+  );
+
+  return {
+
     final_label,
+
     final_confidence,
-    reasons
-  }
-);
 
-// ============================
-// CHINESE LABEL CONTAMINATION
-// ============================
+    reasons,
 
-if (
-  contains_chinese_text === true
-) {
+    possible_candidates
 
-  final_confidence -= 15;
+  };
 
-  reasons.push(
-    "Chinese label contamination"
-  );
-
-}
-
-
-// ============================
-// PRODUCT PAGE CONTAMINATION
-// ============================
-
-if (
-  contains_product_layout === true
-) {
-
-  final_label = "UNKNOWN";
-
-  final_confidence -= 35;
-
-  reasons.push(
-    "E-commerce layout contamination"
-  );
-
-}
-
-
-// ============================
-// PACKAGING DETECTION
-// ============================
-
-if (
-  contains_packaging === true
-) {
-
-  final_confidence -= 20;
-
-  reasons.push(
-    "Packaging detected"
-  );
-
-}
-
-
-// ============================
-// PRICE TAG DETECTION
-// ============================
-
-if (
-  contains_price_tag === true
-) {
-
-  final_label = "UNKNOWN";
-
-  final_confidence -= 30;
-
-  reasons.push(
-    "Commercial advertisement contamination"
-  );
-
-}
-// =========================
-// FINAL RETURN
-// =========================
-
-return {
-
-  final_label,
-
-  final_confidence,
-
-  reasons
-
-};
 }
