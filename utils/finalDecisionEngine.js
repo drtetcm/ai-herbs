@@ -1,5 +1,10 @@
 export function finalDecisionEngine(data) {
 
+  console.log(
+  "FINAL ENGINE INPUT:",
+  JSON.stringify(data, null, 2)
+);
+
   const {
     object_type,
     is_herb,
