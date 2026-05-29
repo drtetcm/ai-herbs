@@ -1248,6 +1248,8 @@ console.log(
       parsed.unknown_probability || 0,
     authenticity_score:
       parsed.authenticity_score || 50,
+      requires_real_photo:
+  parsed.requires_real_photo || false,
     scene_interference:
       parsed.scene_interference || "unknown",
     possible_candidates:

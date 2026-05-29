@@ -220,7 +220,7 @@ export function finalDecisionEngine(data) {
 // =========================
 
 if (
-  authenticity_score >= 80 &&
+  ai_confidence >= 60 &&
 
   unknown_probability <= 40
 
@@ -231,7 +231,7 @@ if (
   final_confidence =
     Math.max(
       final_confidence,
-      50
+      60
     );
 
   reasons.push(
