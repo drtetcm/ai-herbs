@@ -192,6 +192,34 @@ export function finalDecisionEngine(data) {
     );
   }
 
+// =========================
+// HERB RECOVERY
+// =========================
+
+if (
+
+  object_type === "herb" &&
+
+  authenticity_score >= 80 &&
+
+  unknown_probability <= 40
+
+) {
+
+  final_label = "HERB";
+
+  final_confidence =
+    Math.max(
+      final_confidence,
+      50
+    );
+
+  reasons.push(
+    "Recovered by high authenticity"
+  );
+
+}
+  
   // =========================
   // FORCE UNKNOWN
   // =========================
