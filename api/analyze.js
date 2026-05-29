@@ -1268,8 +1268,15 @@ parsed =
 }
   
   if (
+  finalDecision &&
   finalDecision.final_label === "UNKNOWN"
 ) {
+
+  parsed.object_type = "unknown";
+
+  parsed.is_herb = false;
+
+} {
 
   parsed.object_type = "unknown";
 
