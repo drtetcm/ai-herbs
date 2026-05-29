@@ -162,11 +162,11 @@ if (ocr_text_density >= 60) {
 
   }
 
-  // =========================
-  // PACKAGING
-  // =========================
+// =========================
+// PACKAGING
+// =========================
 
-  let contaminationScore = 0;
+let contaminationScore = 0;
 
 if (contains_packaging) {
   contaminationScore += 25;
@@ -197,6 +197,28 @@ if (contains_product_layout) {
 
   reasons.push(
     "Commercial layout detected"
+  );
+}
+
+// =========================
+// COMMERCIAL DECISION
+// =========================
+
+const commercialIndicators =
+  (contains_packaging ? 1 : 0) +
+  (contains_logo ? 1 : 0) +
+  (contains_price_tag ? 1 : 0) +
+  (contains_product_layout ? 1 : 0);
+
+// 必须多个证据同时存在
+if (
+  commercialIndicators >= 2 ||
+  contaminationScore >= 60
+) {
+  scene_interference = "commercial";
+
+  reasons.push(
+    "Commercial scene contamination detected"
   );
 }
 
