@@ -1860,7 +1860,31 @@ ${
 `;
 
 report = report.trim();
+let finalObjectType =
+  normalizedResult.object_type;
 
+let finalIsHerb =
+  normalizedResult.is_herb_like;
+
+if (
+  finalDecision?.final_label === "HERB"
+) {
+
+  finalObjectType = "herb";
+
+  finalIsHerb = true;
+
+}
+
+if (
+  finalDecision?.final_label === "UNKNOWN"
+) {
+
+  finalObjectType = "unknown";
+
+  finalIsHerb = false;
+
+}
         // =========================
         // RESPONSE
         // =========================
@@ -1890,10 +1914,10 @@ report = report.trim();
             normalizedResult.unknown_probability,
 
           object_type:
-            normalizedResult.object_type,
+  finalObjectType,
 
           is_herb_like:
-            normalizedResult.is_herb_like,
+  finalIsHerb,
 
           result:
             normalizedResult,
