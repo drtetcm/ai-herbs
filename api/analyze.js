@@ -1776,13 +1776,19 @@ lighting:
 normalizedResult.total_risk_score =
   riskResult?.totalRisk || 100;
 
+  const displayHerbName =
+  normalizedResult.herb_name ||
+  normalizedResult?.possible_candidates?.[0]
+    ?.herb_name ||
+  "UNKNOWN";
+
         // =========================
         // REPORT
         // =========================
 
 let report = `
 药材名称：
-${normalizedResult.herb_name}
+${displayHerbName}
 
 候选药材：
 ${

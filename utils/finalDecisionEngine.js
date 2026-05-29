@@ -21,6 +21,18 @@ export function finalDecisionEngine(data) {
     contains_price_tag
   } = data;
 
+  console.log(
+  "OCR DEBUG:",
+  {
+    ocr_text_density,
+    contains_chinese_text,
+    contains_packaging,
+    contains_logo,
+    contains_product_layout,
+    contains_price_tag
+  }
+);
+
   let final_label = "UNKNOWN";
 
   let final_confidence = ai_confidence || 0;
