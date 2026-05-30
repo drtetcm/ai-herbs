@@ -877,6 +877,9 @@ JSON schema:
 {
   "herb_name": "",
   "confidence": 0,
+
+  "observed_features": [],
+
   "risk_level": "",
   "possible_candidates": [
     {
@@ -1216,6 +1219,38 @@ if (
 
 parsed =
   JSON.parse(jsonString);
+
+// =========================
+// HERB RULE ENGINE
+// =========================
+
+try {
+
+  parsed =
+    herbRuleEngine(parsed);
+
+  console.log(
+    "HERB RULE ENGINE:",
+    {
+      herb_name:
+        parsed.herb_name,
+
+      confidence:
+        parsed.confidence,
+
+      observed_features:
+        parsed.observed_features
+    }
+  );
+
+} catch (ruleError) {
+
+  console.error(
+    "HERB RULE ENGINE ERROR:",
+    ruleError
+  );
+
+}
           
   try {
 
