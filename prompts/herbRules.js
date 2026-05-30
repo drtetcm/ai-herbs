@@ -158,6 +158,7 @@ export const herbRules = `
 木部淡黄色
 
 形态特征：
+条状
 类圆形厚片
 
 切面结构：
