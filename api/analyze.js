@@ -1233,18 +1233,21 @@ try {
     herbRuleEngine(parsed);
 
   console.log(
-    "HERB RULE ENGINE:",
-    {
-      herb_name:
-        parsed.herb_name,
+  "HERB RULE ENGINE:",
+  {
+    herb_form:
+      parsed.herb_form,
 
-      confidence:
-        parsed.confidence,
+    herb_name:
+      parsed.herb_name,
 
-      observed_features:
-        parsed.observed_features
-    }
-  );
+    confidence:
+      parsed.confidence,
+
+    observed_features:
+      parsed.observed_features
+  }
+);
 
 } catch (ruleError) {
 
