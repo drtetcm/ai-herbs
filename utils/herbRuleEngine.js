@@ -1,11 +1,11 @@
-  export function herbRuleEngine(result) {
+export function herbRuleEngine(result) {
   if (!result) return result;
 
   /*
-   ====================================
-   特征标准化层
-   ====================================
-   */
+  ====================================
+  特征标准化层
+  ====================================
+  */
 
   const normalizeFeatures = (features = []) => {
     return features.map((f) => {
@@ -103,65 +103,55 @@
       result.observed_features || []
     );
 
-    let herbForm =
-  result.herb_form || "unknown";
-
-if (
-  herbForm.includes("根条") ||
-  herbForm.includes("整根") ||
-  herbForm.includes("根茎") ||
-  herbForm.includes("长条")
-) {
-  herbForm = "whole_root";
-}
-
-console.log(
-  "HERB FORM NORMALIZED:",
-  herbForm
-);
-
-if (
-  herbForm.includes("饮片") ||
-  herbForm.includes("切片") ||
-  herbForm.includes("厚片")
-) {
-  herbForm = "slice";
-}
-
-if (
-  herbForm.includes("块状")
-) {
-  herbForm = "block";
-}
-
-if (
-  herbForm.includes("粉末") ||
-  herbForm.includes("颗粒")
-) {
-  herbForm = "powder";
-}
-
-
-
-  let herbName = result.herb_name;
-  let confidence = result.confidence || 0;
-
   /*
-====================================
-WHOLE ROOT PROTECTION
-====================================
-*/
+  ====================================
+  herb_form 标准化
+  ====================================
+  */
 
-if (
-  herbForm === "whole_root"
-) {
+  let herbForm =
+    result.herb_form || "unknown";
 
-  return {
-    ...result,
-    observed_features: features
-  };
+  if (
+    herbForm.includes("根条") ||
+    herbForm.includes("整根") ||
+    herbForm.includes("根茎") ||
+    herbForm.includes("长条")
+  ) {
+    herbForm = "whole_root";
+  }
 
-}
+  if (
+    herbForm.includes("饮片") ||
+    herbForm.includes("切片") ||
+    herbForm.includes("厚片")
+  ) {
+    herbForm = "slice";
+  }
+
+  if (
+    herbForm.includes("块状")
+  ) {
+    herbForm = "block";
+  }
+
+  if (
+    herbForm.includes("粉末") ||
+    herbForm.includes("颗粒")
+  ) {
+    herbForm = "powder";
+  }
+
+  console.log(
+    "HERB FORM NORMALIZED:",
+    herbForm
+  );
+
+  let herbName =
+    result.herb_name;
+
+  let confidence =
+    result.confidence || 0;
 
   const has = (...keywords) =>
     features.some((feature) =>
@@ -171,87 +161,95 @@ if (
     );
 
   /*
-   ====================================
-   麦冬排除
-   ====================================
-   */
+  ====================================
+  麦冬排除
+  ====================================
+  */
 
   if (
     herbName === "麦冬" &&
-    (
-      has(
-        "类圆柱形",
-        "长条根状"
-      ) ||
-      has("狮子盘头") ||
-      has("环状横纹")
-    )
+    herbForm === "whole_root"
   ) {
     herbName = "unknown";
-    confidence = Math.min(confidence, 20);
+    confidence = Math.min(
+      confidence,
+      20
+    );
   }
 
   /*
-   ====================================
-   党参增强
-   ====================================
-   */
+  ====================================
+  党参增强
+  ====================================
+  */
 
   if (
     has("狮子盘头") ||
     has("环状横纹")
   ) {
     herbName = "党参";
-    confidence = Math.max(confidence, 80);
+    confidence = Math.max(
+      confidence,
+      80
+    );
   }
 
   /*
-   ====================================
-   知母排除
-   ====================================
-   */
+  ====================================
+  知母排除
+  ====================================
+  */
 
   if (
     herbName === "知母" &&
     has("油室")
   ) {
     herbName = "unknown";
-    confidence = Math.min(confidence, 20);
+    confidence = Math.min(
+      confidence,
+      20
+    );
   }
 
   /*
-   ====================================
-   白术增强
-   ====================================
-   */
+  ====================================
+  白术增强
+  ====================================
+  */
 
   if (
     has("油室") &&
     has("放射状纹理")
   ) {
     herbName = "白术";
-    confidence = Math.max(confidence, 80);
+    confidence = Math.max(
+      confidence,
+      80
+    );
   }
 
   /*
-   ====================================
-   当归增强
-   ====================================
-   */
+  ====================================
+  当归增强
+  ====================================
+  */
 
   if (
     has("形成层环") &&
     has("油点")
   ) {
     herbName = "当归";
-    confidence = Math.max(confidence, 80);
+    confidence = Math.max(
+      confidence,
+      80
+    );
   }
 
   /*
-   ====================================
-   甘草增强
-   ====================================
-   */
+  ====================================
+  甘草增强
+  ====================================
+  */
 
   if (
     has("形成层环") &&
@@ -262,15 +260,18 @@ if (
       herbName === "unknown"
     ) {
       herbName = "甘草";
-      confidence = Math.max(confidence, 75);
+      confidence = Math.max(
+        confidence,
+        75
+      );
     }
   }
 
   return {
-  ...result,
-  herb_form: herbForm,
-  observed_features: features,
-  herb_name: herbName,
-  confidence,
-};
+    ...result,
+    herb_form: herbForm,
+    observed_features: features,
+    herb_name: herbName,
+    confidence,
+  };
 }
