@@ -103,8 +103,40 @@
       result.observed_features || []
     );
 
-    const herbForm =
+    let herbForm =
   result.herb_form || "unknown";
+
+if (
+  herbForm.includes("根条") ||
+  herbForm.includes("整根") ||
+  herbForm.includes("根茎") ||
+  herbForm.includes("长条")
+) {
+  herbForm = "whole_root";
+}
+
+if (
+  herbForm.includes("饮片") ||
+  herbForm.includes("切片") ||
+  herbForm.includes("厚片")
+) {
+  herbForm = "slice";
+}
+
+if (
+  herbForm.includes("块状")
+) {
+  herbForm = "block";
+}
+
+if (
+  herbForm.includes("粉末") ||
+  herbForm.includes("颗粒")
+) {
+  herbForm = "powder";
+}
+
+
 
   let herbName = result.herb_name;
   let confidence = result.confidence || 0;
@@ -230,9 +262,10 @@ if (
   }
 
   return {
-    ...result,
-    observed_features: features,
-    herb_name: herbName,
-    confidence,
-  };
+  ...result,
+  herb_form: herbForm,
+  observed_features: features,
+  herb_name: herbName,
+  confidence,
+};
 }
