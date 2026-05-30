@@ -1,5 +1,6 @@
 import { normalizeAI }
 from "../utils/normalizeAI.js";
+
 import Anthropic from "@anthropic-ai/sdk";
 
 import formidable from "formidable";
@@ -21,6 +22,9 @@ from "../utils/objectIsolation.js";
 
 import { finalDecisionEngine }
 from "../utils/finalDecisionEngine.js";
+
+import { herbRuleEngine }
+from "../utils/herbRuleEngine.js";
 
 export const config = {
   api: {
