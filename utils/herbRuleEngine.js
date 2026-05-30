@@ -115,6 +115,11 @@ if (
   herbForm = "whole_root";
 }
 
+console.log(
+  "HERB FORM NORMALIZED:",
+  herbForm
+);
+
 if (
   herbForm.includes("饮片") ||
   herbForm.includes("切片") ||
