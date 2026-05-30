@@ -193,6 +193,12 @@ export function normalizeAI(raw) {
 
   const normalized = {
 
+    herb_form:
+  safeString(
+    raw.herb_form,
+    "unknown"
+  ),
+
     herb_name:
       safeString(
         raw.herb_name,
