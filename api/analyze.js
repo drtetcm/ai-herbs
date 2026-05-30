@@ -875,7 +875,10 @@ No extra text.
 JSON schema:
 
 {
+  "herb_form": "",
+
   "herb_name": "",
+
   "confidence": 0,
 
   "observed_features": [],
@@ -1855,6 +1858,9 @@ ${
     )
     .join("、") || "无"
 }
+
+药材形态：
+${normalizedResult.herb_form || "unknown"}
 
 识别依据：
 ${normalizedResult.identification_reason || "暂无"}

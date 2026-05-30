@@ -194,6 +194,57 @@ observed_features 必须为 JSON Array。
 局部纹理、
 局部切面结构进行识别。
 
+=========================
+药材形态分类
+=========================
+
+必须首先判断药材形态。
+
+必须输出：
+
+herb_form
+
+允许值：
+
+- slice
+- whole_root
+- block
+- powder
+- mixed
+- unknown
+
+定义：
+
+slice：
+可见切面结构
+饮片
+圆片
+椭圆片
+厚片
+
+whole_root：
+整根药材
+条状根
+完整根茎
+未切片
+
+block：
+块状药材
+立方块
+不规则块
+
+powder：
+粉末
+颗粒
+
+mixed：
+多种形态混合
+
+unknown：
+无法判断
+
+此字段必须输出。
+
 Step 2
 
 根据 observed_features 生成 possible_candidates。
@@ -627,6 +678,8 @@ requires_real_photo = true
 必须输出：
 
 object_type
+
+herb_form
 
 herb_name
 

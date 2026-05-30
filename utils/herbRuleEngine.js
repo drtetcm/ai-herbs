@@ -1,4 +1,4 @@
-export function herbRuleEngine(result) {
+  export function herbRuleEngine(result) {
   if (!result) return result;
 
   /*
@@ -103,8 +103,28 @@ export function herbRuleEngine(result) {
       result.observed_features || []
     );
 
+    const herbForm =
+  result.herb_form || "unknown";
+
   let herbName = result.herb_name;
   let confidence = result.confidence || 0;
+
+  /*
+====================================
+WHOLE ROOT PROTECTION
+====================================
+*/
+
+if (
+  herbForm === "whole_root"
+) {
+
+  return {
+    ...result,
+    observed_features: features
+  };
+
+}
 
   const has = (...keywords) =>
     features.some((feature) =>
