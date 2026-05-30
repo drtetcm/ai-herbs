@@ -1876,17 +1876,13 @@ normalizedResult.total_risk_score =
   riskResult?.totalRisk || 100;
 
   const displayHerbName =
-  (
-    normalizedResult.herb_name &&
-    normalizedResult.herb_name !== "UNKNOWN"
-  )
-    ? normalizedResult.herb_name
-    : (
-        normalizedResult
-          ?.possible_candidates?.[0]
-          ?.herb_name ||
-        "UNKNOWN"
-      );
+(
+  normalizedResult.herb_name &&
+  normalizedResult.herb_name !== "unknown" &&
+  normalizedResult.herb_name !== "UNKNOWN"
+)
+? normalizedResult.herb_name
+: "UNKNOWN";
 
         // =========================
         // REPORT
