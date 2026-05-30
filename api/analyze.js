@@ -1233,9 +1233,18 @@ try {
     herbRuleEngine(parsed);
 
   console.log(
-    "AFTER HERB RULE ENGINE:",
-    parsed.herb_form
-  );
+  "AFTER HERB RULE ENGINE:",
+  {
+    herb_form:
+      parsed.herb_form,
+
+    herb_name:
+      parsed.herb_name,
+
+    confidence:
+      parsed.confidence
+  }
+);
 
   console.log(
     "HERB RULE ENGINE:",
@@ -1665,6 +1674,19 @@ if (forceUnknown) {
         // =========================
         // NORMALIZE
         // =========================
+console.log(
+  "BEFORE NORMALIZE:",
+  {
+    herb_name:
+      parsed.herb_name,
+
+    herb_form:
+      parsed.herb_form,
+
+    confidence:
+      parsed.confidence
+  }
+);
 
 const normalizedResult =
   normalizeAI({
@@ -1675,6 +1697,20 @@ const normalizedResult =
       forceUnknown
 
   });
+
+  console.log(
+  "AFTER NORMALIZE:",
+  {
+    herb_name:
+      normalizedResult.herb_name,
+
+    herb_form:
+      normalizedResult.herb_form,
+
+    confidence:
+      normalizedResult.confidence
+  }
+);
 
   console.log(
   "NORMALIZED HERB FORM:",
