@@ -175,7 +175,8 @@ ${aiResult.scene_interference_reasoning || ""}
     // =========================
 
     const force_unknown =
-      score < 45;
+      score < 20 &&
+      negativeHits.length >= 2;
 
     return {
       authenticity_score: score,
