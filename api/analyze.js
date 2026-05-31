@@ -1774,6 +1774,27 @@ normalizedResult.authenticity_rules =
   authenticityRulesResult.reasoning || [];
 
 // 强制 UNKNOWN
+
+console.log(
+  "AUTH RULE RESULT:",
+  authenticityRulesResult
+);
+
+console.log(
+  "OBJECT TYPE:",
+  parsed.object_type
+);
+
+console.log(
+  "VISIBILITY:",
+  parsed.visibility
+);
+
+console.log(
+  "AUTH ENGINE:",
+  authenticityResult
+);
+
 if (
   authenticityRulesResult.force_unknown
 ) {
