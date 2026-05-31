@@ -1,209 +1,352 @@
 /**
- * Herb Authenticity Engine V1
- * 工业级药材真实性评分系统
+ * Herb Authenticity Engine V1.6
+ * 去除关键词污染
+ * 仅使用 observed_features
  */
 
 export function evaluateAuthenticity(aiResult = {}) {
+
   try {
-    const reasoning = `
-${aiResult.reasoning || ""}
-${aiResult.visual_analysis || ""}
-${aiResult.color_features || ""}
-${aiResult.texture_features || ""}
-${aiResult.shape_features || ""}
-${aiResult.surface_features || ""}
-${aiResult.edge_features || ""}
-${aiResult.structure_features || ""}
-${aiResult.powder_features || ""}
-${aiResult.lighting_impact || ""}
-${aiResult.occlusion_impact || ""}
-${aiResult.scene_interference_reasoning || ""}
-`.toLowerCase();
 
-    // =========================
-    // 药材正向特征
-    // =========================
-
-    const herbSignals = [
-      "放射纹",
-      "放射纹理",
-      "纤维",
-      "纤维结构",
-      "粉性",
-      "粉质",
-      "粉末感",
-      "干燥",
-      "干片",
-      "药材纹理",
-      "孔隙",
-      "木质",
-      "断面",
-      "饮片",
-      "中药切片",
-      "药材边缘",
-      "结构致密",
-      "传统饮片",
-      "药材结构",
-      "切片结构",
-      "粗糙",
-      "不规则纹理",
-    ];
-
-    // =========================
-    // 食品负向特征
-    // =========================
-
-    const foodSignals = [
-      "湿润",
-      "半透明",
-      "新鲜",
-      "鲜食品",
-      "蔬菜",
-      "水果",
-      "食材",
-      "食品",
-      "光滑",
-      "强反光",
-      "水分",
-      "汁液",
-      "鲜切",
-      "规则切片",
-      "食品光泽",
-      "均匀水分",
-      "新鲜断面",
-      "细腻光滑",
-      "透明感",
-      "蔬菜结构",
-      "马铃薯",
-      "土豆",
-    ];
-
-    // =========================
-    // 初始化评分
-    // =========================
+    const features =
+      aiResult.observed_features || [];
 
     let score = 50;
 
     const positiveHits = [];
     const negativeHits = [];
 
-    // =========================
-    // 药材加分
-    // =========================
+    // ========================
+    // 正向证据
+    // ========================
 
-    for (const signal of herbSignals) {
-      if (reasoning.includes(signal.toLowerCase())) {
-        score += 5;
-        positiveHits.push(signal);
+    const positiveRules = [
+
+      {
+        keywords: ["放射纹", "菊花心"],
+        signal: "放射纹"
+      },
+
+      {
+        keywords: ["纤维纹理", "纤维束"],
+        signal: "纤维"
+      },
+
+      {
+        keywords: ["粉性"],
+        signal: "粉性"
+      },
+
+      {
+        keywords: ["干燥"],
+        signal: "干燥"
+      },
+
+      {
+        keywords: ["木质"],
+        signal: "木质"
+      },
+
+      {
+        keywords: ["断面结构"],
+        signal: "断面"
+      },
+
+      {
+        keywords: ["饮片"],
+        signal: "饮片"
+      },
+
+      {
+        keywords: ["纵向纹理"],
+        signal: "药材纹理"
       }
-    }
 
-    // =========================
-    // 食品减分
-    // =========================
-
-    for (const signal of foodSignals) {
-      if (reasoning.includes(signal.toLowerCase())) {
-        score -= 8;
-        negativeHits.push(signal);
-      }
-    }
-
-    // =========================
-    // 场景干扰惩罚
-    // =========================
-
-    const interference =
-      aiResult.scene_interference || "";
-
-    const heavyInterference = [
-      "mixed_scene",
-      "background_objects",
-      "packaging",
     ];
 
+    // ========================
+    // 负向证据
+    // ========================
+
+    const negativeRules = [
+
+      {
+        keywords: ["湿润"],
+        signal: "湿润"
+      },
+
+      {
+        keywords: ["新鲜"],
+        signal: "新鲜"
+      },
+
+      {
+        keywords: ["水分"],
+        signal: "水分"
+      },
+
+      {
+        keywords: ["汁液"],
+        signal: "汁液"
+      },
+
+      {
+        keywords: ["光滑"],
+        signal: "光滑"
+      },
+
+      {
+        keywords: ["蔬菜"],
+        signal: "蔬菜"
+      },
+
+      {
+        keywords: ["食品"],
+        signal: "食品"
+      },
+
+      {
+        keywords: ["食材"],
+        signal: "食材"
+      },
+
+      {
+        keywords: ["马铃薯", "土豆"],
+        signal: "土豆"
+      },
+
+      {
+        keywords: ["白萝卜"],
+        signal: "白萝卜"
+      }
+
+    ];
+
+    // ========================
+    // 特征扫描
+    // ========================
+
+    for (const feature of features) {
+
+      for (const rule of positiveRules) {
+
+        if (
+          rule.keywords.some(
+            k => feature.includes(k)
+          )
+        ) {
+
+          if (
+            !positiveHits.includes(
+              rule.signal
+            )
+          ) {
+
+            positiveHits.push(
+              rule.signal
+            );
+
+            score += 8;
+          }
+        }
+      }
+
+      for (const rule of negativeRules) {
+
+        if (
+          rule.keywords.some(
+            k => feature.includes(k)
+          )
+        ) {
+
+          if (
+            !negativeHits.includes(
+              rule.signal
+            )
+          ) {
+
+            negativeHits.push(
+              rule.signal
+            );
+
+            score -= 15;
+          }
+        }
+      }
+    }
+
+    // ========================
+    // object_type
+    // ========================
+
+    const objectType =
+      (
+        aiResult.object_type || ""
+      ).toLowerCase();
+
     if (
-      heavyInterference.includes(interference)
+      objectType === "food"
     ) {
+
+      score -= 40;
+
+      if (
+        !negativeHits.includes(
+          "food"
+        )
+      ) {
+
+        negativeHits.push(
+          "food"
+        );
+      }
+    }
+
+    // ========================
+    // UNKNOWN
+    // ========================
+
+    if (
+      aiResult.herb_name ===
+      "UNKNOWN"
+    ) {
+
       score -= 15;
     }
 
-    // =========================
-    // UNKNOWN额外惩罚
-    // =========================
+    // ========================
+    // 场景干扰
+    // ========================
+
+    const interference =
+      aiResult.scene_interference ||
+      "none";
 
     if (
-      aiResult.herb_name === "UNKNOWN"
+      [
+        "background_objects",
+        "mixed_scene",
+        "packaging"
+      ].includes(interference)
     ) {
-      score -= 20;
-    }
 
-    // =========================
-    // confidence联动
-    // =========================
-
-    const confidence =
-      Number(aiResult.confidence || 0);
-
-    if (confidence >= 80) {
-      score += 10;
-    } else if (confidence <= 40) {
       score -= 10;
     }
 
-    // =========================
-    // 边界限制
-    // =========================
+    // ========================
+    // confidence
+    // ========================
 
-    if (score > 100) score = 100;
-    if (score < 0) score = 0;
+    const confidence =
+      Number(
+        aiResult.confidence || 0
+      );
 
-    // =========================
-    // 等级
-    // =========================
+    if (confidence >= 80) {
 
-    let authenticity_level = "LOW";
+      score += 5;
 
-    if (score >= 75) {
-      authenticity_level = "HIGH";
-    } else if (score >= 45) {
-      authenticity_level = "MEDIUM";
+    } else if (
+      confidence <= 40
+    ) {
+
+      score -= 5;
     }
 
-    // =========================
-    // 是否强制UNKNOWN
-    // =========================
+    // ========================
+    // 限制
+    // ========================
+
+    score =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          score
+        )
+      );
+
+    // ========================
+    // level
+    // ========================
+
+    let authenticity_level =
+      "LOW";
+
+    if (score >= 75) {
+
+      authenticity_level =
+        "HIGH";
+
+    } else if (
+      score >= 45
+    ) {
+
+      authenticity_level =
+        "MEDIUM";
+    }
+
+    // ========================
+    // force unknown
+    // ========================
 
     const force_unknown =
-      score < 20 &&
-      negativeHits.length >= 2;
+      objectType === "food" ||
+      (
+        score < 20 &&
+        negativeHits.length >= 2
+      );
 
     return {
-      authenticity_score: score,
+
+      authenticity_score:
+        score,
+
       authenticity_level,
+
       force_unknown,
 
       authenticity_reasoning: {
-        positive_signals: positiveHits,
-        negative_signals: negativeHits,
-        scene_interference: interference,
-        confidence,
-      },
+
+        positive_signals:
+          positiveHits,
+
+        negative_signals:
+          negativeHits,
+
+        scene_interference:
+          interference,
+
+        confidence
+
+      }
+
     };
+
   } catch (error) {
+
     console.error(
       "Authenticity engine error:",
       error
     );
 
     return {
+
       authenticity_score: 0,
-      authenticity_level: "LOW",
+
+      authenticity_level:
+        "LOW",
+
       force_unknown: true,
 
       authenticity_reasoning: {
-        error: error.message,
-      },
+
+        error:
+          error.message
+
+      }
+
     };
   }
+
 }
