@@ -2056,9 +2056,7 @@ console.log(
         normalizedResult.authenticity_level,
 
       risk_level:
-        normalizedResult.risk_level,
-
-      force_unknown
+        normalizedResult.risk_level
     },
     null,
     2
