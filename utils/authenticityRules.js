@@ -1,14 +1,3 @@
-/**
- * authenticityRules.js
- *
- * 工业级真实性硬规则系统
- * 用于：
- * - 食品伪装拦截
- * - 鲜品拦截
- * - 结构真实性验证
- * - 中药饮片真实性增强
- */
-
 export function applyAuthenticityRules(
   normalizedResult
 ) {
@@ -18,7 +7,64 @@ export function applyAuthenticityRules(
 
   let forceUnknown = false;
 
-  const reasoning = [];
+  const reasoning = (
+    normalizedResult
+      ?.authenticity_reasoning
+      ?.positive_signals || []
+  ).map(signal => {
+
+    const signalMap = {
+
+      "纤维":
+        "检测到纤维结构特征",
+
+      "干燥":
+        "检测到干燥药材特征",
+
+      "木质":
+        "检测到木质化结构",
+
+      "粗糙":
+        "检测到粗糙表面纹理",
+
+      "纵向纹理":
+        "检测到纵向纹理结构",
+
+      "横切纹理":
+        "检测到横切纹理特征",
+
+      "环纹":
+        "检测到环状纹理",
+
+      "断面":
+        "检测到药材断面结构",
+
+      "粉性":
+        "检测到粉性质地",
+
+      "角质":
+        "检测到角质样结构",
+
+      "根茎":
+        "检测到根茎类药材特征",
+
+      "饮片":
+        "检测到饮片加工痕迹",
+
+      "切制":
+        "检测到切制加工特征",
+
+      "药材纹理":
+        "检测到药材纹理结构",
+
+      "药材结构":
+        "检测到药材结构特征"
+
+    };
+
+    return signalMap[signal] || `检测到${signal}特征`;
+
+  });
 
   // =========================
   // 基础字段
