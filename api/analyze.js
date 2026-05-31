@@ -2039,7 +2039,31 @@ if (
         // =========================
         // RESPONSE
         // =========================
+console.log(
+  "FINAL RESPONSE:",
+  JSON.stringify(
+    {
+      herb_name:
+        normalizedResult.herb_name,
 
+      herb_form:
+        normalizedResult.herb_form,
+
+      confidence:
+        normalizedResult.confidence,
+
+      authenticity_level:
+        normalizedResult.authenticity_level,
+
+      risk_level:
+        normalizedResult.risk_level,
+
+      force_unknown
+    },
+    null,
+    2
+  )
+);
         return res.status(200).json({
 
           status: "success",
