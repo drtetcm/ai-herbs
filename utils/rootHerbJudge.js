@@ -1,7 +1,7 @@
 // utils/rootHerbJudge.js
 
 console.log(
-  "[ROOT_HERB_JUDGE] V3 Loaded"
+  "[ROOT_HERB_JUDGE] V4 Loaded"
 );
 
 function rootHerbJudge(result) {
@@ -94,16 +94,22 @@ function rootHerbJudge(result) {
       featureText.includes("金井玉栏")
 
       && !featureText.includes("无法观察")
-
+      && !featureText.includes("无法清晰观察")
       && !featureText.includes("无法验证")
-
       && !featureText.includes("无法充分验证")
-
       && !featureText.includes("无法完整验证")
-
       && !featureText.includes("无法确认")
-
+      && !featureText.includes("无法完整确认")
       && !featureText.includes("未能清晰观察到金井玉栏");
+
+    console.log(
+      "[JINGJING_DEBUG]",
+      {
+        hasJingjing:
+          featureText.includes("金井玉栏"),
+        verifiedJingjing
+      }
+    );
 
     if (
       featureText.includes("金井玉栏") &&
@@ -132,7 +138,6 @@ function rootHerbJudge(result) {
 
     // =========================
     // DS-TYPE-A
-    // 细条型党参
     // =========================
 
     const candidateDangshen =
@@ -146,20 +151,37 @@ function rootHerbJudge(result) {
       );
 
     const thinRootCase =
+
       featureText.includes("细长") ||
       featureText.includes("长条状") ||
       featureText.includes("根段形态偏细") ||
       featureText.includes("细长圆柱形") ||
-      featureText.includes("木部较小");
+      featureText.includes("木部较小") ||
+      featureText.includes("皮宽芯小");
 
     const weakHuangqiEvidence =
+
       featureText.includes("无法观察") ||
+      featureText.includes("无法清晰观察") ||
       featureText.includes("无法验证") ||
       featureText.includes("无法充分验证") ||
       featureText.includes("无法完整验证") ||
+      featureText.includes("无法确认") ||
       featureText.includes("无法完整确认") ||
       featureText.includes("未能清晰观察到金井玉栏") ||
       featureText.includes("金井玉栏结构无法完整确认");
+
+    console.log(
+      "[DS_TYPE_A_DEBUG]",
+      {
+        herbName,
+        confidence,
+        candidateDangshen,
+        candidateHuangqi,
+        thinRootCase,
+        weakHuangqiEvidence
+      }
+    );
 
     if (
       herbName === "黄芪" &&
@@ -196,10 +218,6 @@ function rootHerbJudge(result) {
       dangshenScore,
       huangqiScore
     };
-
-    // =========================
-    // 黄芪 -> 党参
-    // =========================
 
     if (
       herbName === "黄芪" &&
