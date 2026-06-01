@@ -1,7 +1,7 @@
 // utils/rootHerbJudge.js
 
 console.log(
-  "[ROOT_HERB_JUDGE] V2 Loaded"
+  "[ROOT_HERB_JUDGE] V3 Loaded"
 );
 
 function rootHerbJudge(result) {
@@ -86,18 +86,37 @@ function rootHerbJudge(result) {
     }
 
     // =========================
-    // 黄芪特征
+    // 黄芪A级证据
     // =========================
 
     const verifiedJingjing =
-  featureText.includes("金井玉栏") &&
-  !featureText.includes("无法完整验证") &&
-  !featureText.includes("无法完整确认") &&
-  !featureText.includes("未能清晰观察到金井玉栏");
 
-if (verifiedJingjing) {
-  huangqiScore += 4;
-}
+      featureText.includes("金井玉栏")
+
+      && !featureText.includes("无法观察")
+
+      && !featureText.includes("无法验证")
+
+      && !featureText.includes("无法充分验证")
+
+      && !featureText.includes("无法完整验证")
+
+      && !featureText.includes("无法确认")
+
+      && !featureText.includes("未能清晰观察到金井玉栏");
+
+    if (
+      featureText.includes("金井玉栏") &&
+      !verifiedJingjing
+    ) {
+      console.log(
+        "[ROOT_HARD_CASE] 金井玉栏未被确认"
+      );
+    }
+
+    if (verifiedJingjing) {
+      huangqiScore += 4;
+    }
 
     if (
       featureText.includes("木部占比大")
@@ -128,11 +147,16 @@ if (verifiedJingjing) {
 
     const thinRootCase =
       featureText.includes("细长") ||
+      featureText.includes("长条状") ||
       featureText.includes("根段形态偏细") ||
       featureText.includes("细长圆柱形") ||
       featureText.includes("木部较小");
 
     const weakHuangqiEvidence =
+      featureText.includes("无法观察") ||
+      featureText.includes("无法验证") ||
+      featureText.includes("无法充分验证") ||
+      featureText.includes("无法完整验证") ||
       featureText.includes("无法完整确认") ||
       featureText.includes("未能清晰观察到金井玉栏") ||
       featureText.includes("金井玉栏结构无法完整确认");
