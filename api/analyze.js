@@ -1925,25 +1925,16 @@ if (
       35
     );
 
-} {
-
-  parsed.confidence =
-    Math.min(
-      parsed.confidence,
-      38
-    );
-
-}
+} 
 
 // =========================
 // SCENE INTERFERENCE
 // =========================
 
-const interferenceScenes = [
+const severeInterferenceScenes = [
 
   "hand",
   "packaging",
-  "background_objects",
   "shadow",
   "reflection",
   "texture_noise",
@@ -1953,7 +1944,20 @@ const interferenceScenes = [
 ];
 
 if (
-  interferenceScenes.includes(
+  parsed.scene_interference ===
+  "background_objects"
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      50
+    );
+
+}
+
+else if (
+  severeInterferenceScenes.includes(
     parsed.scene_interference
   )
 ) {
