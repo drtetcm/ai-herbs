@@ -91,7 +91,7 @@ export function herbRuleEngine(result) {
 
       /*
       ============================
-      党参
+      党参 Dangshen
       ============================
       */
 
@@ -108,20 +108,29 @@ export function herbRuleEngine(result) {
         return "环状横纹";
       }
 
-      if (
-        f.includes("中心较小") ||
-        f.includes("圆心较小") ||
-        f.includes("中心白色圆心较小")
-      ) {
-        return "中心较小";
-      }
+if (
+  f.includes("木部较小") ||
+  f.includes("中心较小") ||
+  f.includes("圆心较小") ||
+  f.includes("中心白色圆心较小")
+) {
+  return "党参核心";
+}
 
-      if (
-        f.includes("皮部较宽") ||
-        f.includes("外围皮部较宽")
-      ) {
-        return "皮部较宽";
-      }
+if (
+  f.includes("皮部较宽") ||
+  f.includes("外围皮部较宽") ||
+  f.includes("皮部宽厚")
+) {
+  return "党参核心";
+}
+
+if (
+  f.includes("边缘皱缩") ||
+  f.includes("波浪边缘")
+) {
+  return "党参核心";
+}
 
       /*
       ============================
@@ -231,6 +240,17 @@ export function herbRuleEngine(result) {
     )
   );
 
+/*
+====================================
+党参核心计分
+====================================
+*/
+
+const dangshenScore =
+  features.filter(
+    (f) => f === "党参核心"
+  ).length;
+
   /*
   ====================================
   麦冬排除
@@ -249,35 +269,26 @@ export function herbRuleEngine(result) {
   }
 
   /*
-  ====================================
-  党参增强
-  ====================================
-  */
+  
+====================================
+党参饮片增强
+====================================
+*/
 
-  if (
-    herbForm === "slice" &&
-    (
-      has("狮子盘头") ||
-      has("环状横纹") ||
-      has("中心较小") ||
-      has("皮部较宽")
-    )
-  ) {
+if (
+  herbForm === "slice" &&
+  dangshenScore >= 2 &&
+  herbName === "黄芪"
+) {
 
-    if (
-      herbName === "黄芪"
-    ) {
+  herbName = "党参";
 
-      herbName = "党参";
+  confidence = Math.max(
+    confidence,
+    78
+  );
 
-      confidence = Math.max(
-        confidence,
-        78
-      );
-
-    }
-
-  }
+}
 
   /*
   ====================================

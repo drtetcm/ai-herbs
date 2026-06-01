@@ -1075,18 +1075,65 @@ A级证据：
 
 中心较小
 皮部较宽
-花盘状中心
 边缘皱缩
-波浪边缘
+花盘状中心
+木部较小
 
-出现3项以上：
+出现2项以上：
 
 优先党参
+
+即使存在：
+
+放射纹
+黄色中心
+纤维束
+
+也不得直接判定黄芪。
+
+CRITICAL RULE
+
+Do NOT use absence reasoning.
+
+WRONG:
+"No 狮子盘头 → 排除党参"
+
+WRONG:
+"No 菊花心 → 排除防风"
+
+WRONG:
+"No 油室 → 排除木香"
+
+The model must classify by POSITIVE evidence only.
+
+Absence of a feature is NOT evidence.
 
 即使存在放射纹
 即使存在黄色中心
 
 也不得直接判定黄芪。
+
+DANGSHEN OVERRIDE RULE
+
+If image shows:
+
+- 中心较小
+- 皮部较宽
+- 边缘皱缩
+- 木部较小
+
+Any TWO features present:
+
+Increase DangShen probability.
+
+Do NOT automatically classify as HuangQi
+only because:
+
+- 放射纹
+- 纤维束
+- 黄色中心
+
+These features are shared by multiple root herbs.
 
 黄芪：
 
