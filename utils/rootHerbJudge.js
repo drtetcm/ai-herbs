@@ -1,7 +1,7 @@
 // utils/rootHerbJudge.js
 
 console.log(
-  "[ROOT_HERB_JUDGE] V1 Loaded"
+  "[ROOT_HERB_JUDGE] V2 Loaded"
 );
 
 function rootHerbJudge(result) {
@@ -12,15 +12,15 @@ function rootHerbJudge(result) {
     const herbName =
       result.herb_name || "";
 
+    const confidence =
+      result.confidence || 0;
+
     const featureText = [
 
-      // Claude主特征
       ...(result.observed_features || []),
 
-      // Claude推理
       result.reasoning || "",
 
-      // 视觉分析
       result.visual_analysis?.color || "",
       result.visual_analysis?.texture || "",
       result.visual_analysis?.shape || "",
@@ -28,7 +28,6 @@ function rootHerbJudge(result) {
       result.visual_analysis?.edges || "",
       result.visual_analysis?.structure || "",
 
-      // 候选药材理由
       ...(result.possible_candidates || []).map(
         item => item.reason || ""
       )
@@ -68,6 +67,24 @@ function rootHerbJudge(result) {
       dangshenScore += 2;
     }
 
+    if (
+      featureText.includes("木部较小")
+    ) {
+      dangshenScore += 3;
+    }
+
+    if (
+      featureText.includes("质地疏松")
+    ) {
+      dangshenScore += 2;
+    }
+
+    if (
+      featureText.includes("皮宽芯小")
+    ) {
+      dangshenScore += 4;
+    }
+
     // =========================
     // 黄芪特征
     // =========================
@@ -90,6 +107,49 @@ function rootHerbJudge(result) {
       huangqiScore += 2;
     }
 
+    // =========================
+    // DS-TYPE-A
+    // 细条型党参
+    // =========================
+
+    const candidateDangshen =
+      result.possible_candidates?.some(
+        c => c.herb_name === "党参"
+      );
+
+    const candidateHuangqi =
+      result.possible_candidates?.some(
+        c => c.herb_name === "黄芪"
+      );
+
+    const thinRootCase =
+      featureText.includes("细长") ||
+      featureText.includes("根段形态偏细") ||
+      featureText.includes("细长圆柱形") ||
+      featureText.includes("木部较小");
+
+    const weakHuangqiEvidence =
+      featureText.includes("无法完整确认") ||
+      featureText.includes("未能清晰观察到金井玉栏") ||
+      featureText.includes("金井玉栏结构无法完整确认");
+
+    if (
+      herbName === "黄芪" &&
+      confidence <= 70 &&
+      candidateDangshen &&
+      candidateHuangqi &&
+      thinRootCase &&
+      weakHuangqiEvidence
+    ) {
+
+      console.log(
+        "[DS_TYPE_A]",
+        "细条型党参补偿"
+      );
+
+      dangshenScore += 5;
+    }
+
     console.log(
       "[ROOT_HERB_SCORES]",
       {
@@ -98,10 +158,6 @@ function rootHerbJudge(result) {
         huangqiScore
       }
     );
-
-    // =========================
-    // 默认轨迹
-    // =========================
 
     let finalHerbName =
       herbName;
@@ -114,7 +170,7 @@ function rootHerbJudge(result) {
     };
 
     // =========================
-    // 黄芪 → 党参
+    // 黄芪 -> 党参
     // =========================
 
     if (
@@ -139,10 +195,6 @@ function rootHerbJudge(result) {
         huangqiScore
       };
     }
-
-    // =========================
-    // RETURN
-    // =========================
 
     return {
       ...result,
