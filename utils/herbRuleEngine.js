@@ -245,28 +245,6 @@ export function herbRuleEngine(result) {
     );
   }
 
-  /*
-  ====================================
-  甘草增强
-  ====================================
-  */
-
-  if (
-    has("形成层环") &&
-    has("放射状纹理")
-  ) {
-    if (
-      herbName === "黄芪" ||
-      herbName === "unknown"
-    ) {
-      herbName = "甘草";
-      confidence = Math.max(
-        confidence,
-        75
-      );
-    }
-  }
-
   return {
     ...result,
     herb_form: herbForm,

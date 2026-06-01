@@ -23,6 +23,9 @@ from "../utils/objectIsolation.js";
 import { finalDecisionEngine }
 from "../utils/finalDecisionEngine.js";
 
+import { herbRules }
+from "../prompts/herbRules.js";
+
 import { herbRuleEngine }
 from "../utils/herbRuleEngine.js";
 
@@ -1047,6 +1050,67 @@ Correct:
 Your response MUST be directly parsable by JSON.parse().
 `;
 
+const ROOT_HERB_DIFFERENTIATION = `
+
+=========================
+ROOT HERB DIFFERENTIATION
+=========================
+
+党参：
+
+核心特征：
+
+- 狮子盘头
+- 环状横纹
+- 中心较小
+- 皮部较宽
+- 边缘皱缩
+- 花盘状中心
+- 黄白色断面
+- 质地疏松
+
+黄芪：
+
+核心特征：
+
+- 金黄色木部
+- 木部占比大
+- 皮薄芯大
+- 金井玉栏
+- 纤维束粗直
+- 圆整切片
+- 金黄色中心
+
+防风：
+
+核心特征：
+
+- 菊花心
+- 皮厚芯小
+- 外圈棕黄
+- 深色形成层环
+- 放射纹明显
+- 中心白色
+
+重要规则：
+
+放射纹不是黄芪专属特征。
+
+党参、防风、黄芪
+均可出现放射纹。
+
+鉴别优先级：
+
+1. 中心颜色
+2. 皮木比例
+3. 中心大小
+4. 边缘形态
+5. 放射纹
+
+禁止仅依据放射纹判定黄芪。
+
+`;
+
 // =========================
 // CLAUDE REQUEST
 // =========================
@@ -1073,7 +1137,15 @@ try {
             {
               type: "text",
 
-              text: SYSTEM_PROMPT
+              text: `
+
+${SYSTEM_PROMPT}
+
+${ROOT_HERB_DIFFERENTIATION}
+
+${herbRules}
+
+`
             },
 
             {
@@ -1752,7 +1824,7 @@ if (
       35
     );
 }
-  
+
 // =========================
 // AUTHENTICITY HARD RULES
 // =========================
