@@ -199,7 +199,6 @@ if (
   if (
     herbForm.includes("根条") ||
     herbForm.includes("整根") ||
-    herbForm.includes("根茎") ||
     herbForm.includes("长条")
   ) {
     herbForm = "whole_root";
