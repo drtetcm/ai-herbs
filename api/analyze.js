@@ -26,6 +26,9 @@ from "../utils/finalDecisionEngine.js";
 import { rootSliceDifferentiation }
 from "../prompts/rootSliceDifferentiation.js";
 
+import { ROOT_SLICE_HARD_CASES }
+from "../prompts/rootSliceHardCases.js";
+
 import { herbRules }
 from "../prompts/herbRules.js";
 
@@ -1273,6 +1276,15 @@ FINAL JUDGEMENT
 
 黄芪必须满足：
 
+核心特征：
+
+- 金黄色木部
+- 木部占比明显大于皮部
+- 皮薄芯大
+- 金井玉栏
+- 圆整规则切面
+
+黄芪必须同时满足：
 1. 金井玉栏
 2. 木部明显大于皮部
 3. 中心明显大于皮部厚度
@@ -1425,11 +1437,13 @@ try {
 
 ${SYSTEM_PROMPT}
 
+${herbRules}
+
 ${ROOT_HERB_DIFFERENTIATION}
 
 ${rootSliceDifferentiation}
 
-${herbRules}
+${ROOT_SLICE_HARD_CASES}
 
 `
             },
