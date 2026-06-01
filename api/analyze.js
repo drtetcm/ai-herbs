@@ -1882,7 +1882,7 @@ if (
   parsed.confidence =
     Math.min(
       parsed.confidence,
-      42
+      55
     );
 
 }
@@ -1892,10 +1892,40 @@ if (
 // =========================
 
 if (
-  parsed.occlusion_level === "medium" ||
-  parsed.occlusion_level === "high" ||
+  parsed.occlusion_level === "medium"
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      55
+    );
+
+}
+
+if (
+  parsed.occlusion_level === "high"
+) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      45
+    );
+
+}
+
+if (
   parsed.occlusion_level === "severe"
 ) {
+
+  parsed.confidence =
+    Math.min(
+      parsed.confidence,
+      35
+    );
+
+} {
 
   parsed.confidence =
     Math.min(
