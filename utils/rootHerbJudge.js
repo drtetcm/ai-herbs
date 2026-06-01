@@ -1,7 +1,7 @@
 // utils/rootHerbJudge.js
 
 console.log(
-  "[ROOT_HERB_JUDGE] V4 Loaded"
+  "[ROOT_HERB_JUDGE] V5 Loaded"
 );
 
 function rootHerbJudge(result) {
@@ -44,96 +44,6 @@ function rootHerbJudge(result) {
     let dangshenScore = 0;
     let huangqiScore = 0;
 
-// =========================
-// 黄芪硬证据
-// =========================
-
-const strongHuangqi =
-
-  verifiedJingjing &&
-
-  (
-    featureText.includes("木部占比明显大于皮部") ||
-    featureText.includes("木部占比较大") ||
-    featureText.includes("皮部较薄") ||
-    featureText.includes("皮薄芯大")
-  );
-
-if (strongHuangqi) {
-
-  console.log(
-    "[ROOT_HARD_LOCK]",
-    "黄芪硬锁定"
-  );
-
-  return {
-    ...result,
-    herb_name: "黄芪",
-    root_scores: {
-      dangshenScore: 0,
-      huangqiScore: 999
-    },
-    decision_trace: {
-      original: herbName,
-      final: "黄芪",
-      reason: "strong_huangqi_lock"
-    }
-  };
-}
-
-    // =========================
-    // 党参特征
-    // =========================
-
-    if (
-      featureText.includes("菊花心")
-    ) {
-      dangshenScore += 4;
-    }
-
-    if (
-      featureText.includes("放射裂隙") ||
-      featureText.includes("裂隙明显")
-    ) {
-      dangshenScore += 3;
-    }
-
-    if (
-  featureText.includes("皮部较宽")
-) {
-  dangshenScore += 4;
-}
-
-if (
-  featureText.includes("木部较小")
-) {
-  dangshenScore += 4;
-}
-
-if (
-  featureText.includes("中心较小")
-) {
-  dangshenScore += 4;
-}
-
-if (
-  featureText.includes("边缘皱缩")
-) {
-  dangshenScore += 4;
-}
-
-    if (
-      featureText.includes("质地疏松")
-    ) {
-      dangshenScore += 2;
-    }
-
-    if (
-      featureText.includes("皮宽芯小")
-    ) {
-      dangshenScore += 4;
-    }
-
     // =========================
     // 黄芪A级证据
     // =========================
@@ -160,27 +70,110 @@ if (
       }
     );
 
-    if (
-      featureText.includes("金井玉栏") &&
-      !verifiedJingjing
-    ) {
-      console.log(
-        "[ROOT_HARD_CASE] 金井玉栏未被确认"
+    // =========================
+    // 黄芪硬锁定
+    // =========================
+
+    const strongHuangqi =
+
+      verifiedJingjing &&
+
+      (
+        featureText.includes("木部占比明显大于皮部") ||
+        featureText.includes("木部占比较大") ||
+        featureText.includes("木部占比大")
       );
+
+    if (strongHuangqi) {
+
+      console.log(
+        "[ROOT_HARD_LOCK]",
+        "黄芪硬锁定"
+      );
+
+      return {
+        ...result,
+        herb_name: "黄芪",
+        root_scores: {
+          dangshenScore: 0,
+          huangqiScore: 999
+        },
+        decision_trace: {
+          original: herbName,
+          final: "黄芪",
+          reason: "strong_huangqi_lock"
+        }
+      };
     }
+
+    // =========================
+    // 党参特征
+    // =========================
+
+    if (
+      featureText.includes("菊花心")
+    ) {
+      dangshenScore += 4;
+    }
+
+    if (
+      featureText.includes("放射裂隙") ||
+      featureText.includes("裂隙明显")
+    ) {
+      dangshenScore += 3;
+    }
+
+    if (
+      featureText.includes("皮部较宽")
+    ) {
+      dangshenScore += 4;
+    }
+
+    if (
+      featureText.includes("木部较小")
+    ) {
+      dangshenScore += 4;
+    }
+
+    if (
+      featureText.includes("中心较小")
+    ) {
+      dangshenScore += 4;
+    }
+
+    if (
+      featureText.includes("边缘皱缩")
+    ) {
+      dangshenScore += 4;
+    }
+
+    if (
+      featureText.includes("质地疏松")
+    ) {
+      dangshenScore += 2;
+    }
+
+    if (
+      featureText.includes("皮宽芯小")
+    ) {
+      dangshenScore += 4;
+    }
+
+    // =========================
+    // 黄芪加分
+    // =========================
 
     if (verifiedJingjing) {
       huangqiScore += 10;
     }
 
     if (
-  featureText.includes("木部占比大") ||
-  featureText.includes("木部占比较大") ||
-  featureText.includes("木部占比明显大于皮部")
-)
-{
-  huangqiScore += 8;
-}
+      featureText.includes("木部占比大") ||
+      featureText.includes("木部占比较大") ||
+      featureText.includes("木部占比明显大于皮部")
+    ) {
+      huangqiScore += 8;
+    }
 
     if (
       featureText.includes("皮部较薄")
@@ -204,14 +197,14 @@ if (
 
     const thinRootCase =
 
-  featureText.includes("细长") ||
-  featureText.includes("长条状") ||
-  featureText.includes("根段形态偏细") ||
-  featureText.includes("细长圆柱形") ||
-  featureText.includes("木部较小") ||
-  featureText.includes("中心较小") ||
-  featureText.includes("皮部较宽") ||
-  featureText.includes("皮宽芯小");
+      featureText.includes("细长") ||
+      featureText.includes("长条状") ||
+      featureText.includes("根段形态偏细") ||
+      featureText.includes("细长圆柱形") ||
+      featureText.includes("木部较小") ||
+      featureText.includes("中心较小") ||
+      featureText.includes("皮部较宽") ||
+      featureText.includes("皮宽芯小");
 
     const weakHuangqiEvidence =
 
@@ -224,18 +217,6 @@ if (
       featureText.includes("无法完整确认") ||
       featureText.includes("未能清晰观察到金井玉栏") ||
       featureText.includes("金井玉栏结构无法完整确认");
-
-    console.log(
-      "[DS_TYPE_A_DEBUG]",
-      {
-        herbName,
-        confidence,
-        candidateDangshen,
-        candidateHuangqi,
-        thinRootCase,
-        weakHuangqiEvidence
-      }
-    );
 
     if (
       herbName === "黄芪" &&
@@ -266,50 +247,26 @@ if (
     let finalHerbName =
       herbName;
 
-    let decisionTrace = {
-      original: herbName,
-      final: herbName,
-      dangshenScore,
-      huangqiScore
-    };
-
     if (
-  herbName === "黄芪" &&
-  confidence <= 70 &&
-  dangshenScore - huangqiScore >= 10
-) {
+      herbName === "黄芪" &&
+      confidence <= 70 &&
+      dangshenScore - huangqiScore >= 10
+    ) {
 
       console.log(
-        "[ROOT_JUDGE] 黄芪 -> 党参",
-        {
-          dangshenScore,
-          huangqiScore
-        }
+        "[ROOT_JUDGE] 黄芪 -> 党参"
       );
 
       finalHerbName = "党参";
-
-      decisionTrace = {
-        original: "黄芪",
-        final: "党参",
-        dangshenScore,
-        huangqiScore
-      };
     }
 
     return {
       ...result,
-
-      herb_name:
-        finalHerbName,
-
+      herb_name: finalHerbName,
       root_scores: {
         dangshenScore,
         huangqiScore
-      },
-
-      decision_trace:
-        decisionTrace
+      }
     };
 
   } catch (err) {
