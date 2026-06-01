@@ -89,11 +89,15 @@ function rootHerbJudge(result) {
     // 黄芪特征
     // =========================
 
-    if (
-      featureText.includes("金井玉栏")
-    ) {
-      huangqiScore += 4;
-    }
+    const verifiedJingjing =
+  featureText.includes("金井玉栏") &&
+  !featureText.includes("无法完整验证") &&
+  !featureText.includes("无法完整确认") &&
+  !featureText.includes("未能清晰观察到金井玉栏");
+
+if (verifiedJingjing) {
+  huangqiScore += 4;
+}
 
     if (
       featureText.includes("木部占比大")
