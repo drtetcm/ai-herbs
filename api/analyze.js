@@ -1507,7 +1507,8 @@ console.log(
   {
     herb_form: parsed.herb_form,
     herb_name: parsed.herb_name,
-    confidence: parsed.confidence
+    confidence: parsed.confidence,
+    observed_features: parsed.observed_features
   }
 );
 
