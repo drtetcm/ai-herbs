@@ -144,15 +144,31 @@ if (ocr_text_density >= 60) {
 
   }
 
-  // =========================
-  // SCENE INTERFERENCE
-  // =========================
+// =========================
+// SCENE INTERFERENCE
+// =========================
 
+if (
+  scene_interference &&
+  scene_interference !== "none" &&
+  scene_interference !== "clean"
+) {
+
+  // 中药常见场景
   if (
-    scene_interference &&
-    scene_interference !== "none" &&
-    scene_interference !== "clean"
+    scene_interference === "background_objects"
   ) {
+
+    final_confidence -= 5;
+
+    reasons.push(
+      `Minor scene interference: ${scene_interference}`
+    );
+
+  }
+
+  // 其它干扰
+  else {
 
     final_confidence -= 15;
 
@@ -161,6 +177,8 @@ if (ocr_text_density >= 60) {
     );
 
   }
+
+}
 
   // =========================
   // CHINESE LABEL
