@@ -1336,9 +1336,9 @@ ${herbRules}
 
 ${ROOT_HERB_DIFFERENTIATION}
 
-${rootSliceDifferentiation}
-
 ${ROOT_SLICE_HARD_CASES}
+
+${rootSliceDifferentiation}
 
 `
             },
