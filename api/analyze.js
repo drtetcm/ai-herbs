@@ -23,11 +23,15 @@ from "../utils/objectIsolation.js";
 import { finalDecisionEngine }
 from "../utils/finalDecisionEngine.js";
 
-import { herbRules }
-from "../prompts/herbRules.js";
+import {
+  rootSliceDifferentiation}
+from "../prompts/rootSliceDifferentiation.js";
 
 import { herbRuleEngine }
 from "../utils/herbRuleEngine.js";
+
+import { herbRules }
+from "../prompts/herbRules.js";
 
 export const config = {
   api: {
@@ -1385,6 +1389,8 @@ try {
 ${SYSTEM_PROMPT}
 
 ${ROOT_HERB_DIFFERENTIATION}
+
+${rootSliceDifferentiation}
 
 ${herbRules}
 
