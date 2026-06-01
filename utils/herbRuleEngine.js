@@ -88,13 +88,31 @@ export function herbRuleEngine(result) {
       }
 
       // 菊花心
-      if (
-        f.includes("菊花心")
-      ) {
-        return "菊花心";
-      }
+if (
+  f.includes("菊花心")
+) {
+  return "菊花心";
+}
 
-      return f;
+// 中心较小
+if (
+  f.includes("中心较小") ||
+  f.includes("圆心较小") ||
+  f.includes("中心白色圆心较小")
+) {
+  return "中心较小";
+}
+
+// 皮部较宽
+if (
+  f.includes("皮部较宽") ||
+  f.includes("外围皮部较宽") ||
+  f.includes("外围皮部")
+) {
+  return "皮部较宽";
+}
+
+return f;
     });
   };
 
@@ -193,6 +211,23 @@ export function herbRuleEngine(result) {
       80
     );
   }
+
+  /*
+====================================
+党参增强
+====================================
+*/
+
+if (
+  has("狮子盘头") ||
+  has("环状横纹")
+) {
+  herbName = "党参";
+  confidence = Math.max(
+    confidence,
+    80
+  );
+}
 
   /*
   ====================================
