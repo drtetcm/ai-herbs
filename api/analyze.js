@@ -1062,6 +1062,43 @@ const ROOT_HERB_DIFFERENTIATION = `
 ROOT HERB DIFFERENTIATION V3
 ==================================================
 
+ROOT HERB COMPARISON RULE
+
+When HuangQi and DangShen are both possible:
+
+DO NOT decide by:
+
+- 放射纹
+- 黄色中心
+- 纤维束
+
+These are shared traits.
+
+You MUST decide by:
+
+1. center size
+2. bark/core ratio
+3. edge shape
+
+Priority:
+
+center size
+>
+bark/core ratio
+>
+radial texture
+
+If center is small
+and bark is wider than core:
+
+Prefer DangShen.
+
+If core is larger than bark
+and JinJingYuLan is obvious:
+
+Prefer HuangQi.
+
+
 CRITICAL VISUAL IDENTIFICATION RULE
 
 Only use features that are clearly visible.
@@ -1234,17 +1271,15 @@ FINAL JUDGEMENT
 
 --------------------------------------------------
 
-黄芪成立条件：
+黄芪必须满足：
 
-必须同时满足：
+1. 金井玉栏
+2. 木部明显大于皮部
+3. 中心明显大于皮部厚度
 
-- 金井玉栏
-AND
-- 木部明显大于皮部
-AND
-- 中心较大
+缺少任意一项：
 
-否则不得作为第一候选。
+不得高置信度判定黄芪。
 
 --------------------------------------------------
 

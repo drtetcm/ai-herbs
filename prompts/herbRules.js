@@ -171,6 +171,111 @@ A级证据：
 即使未见狮子盘头，
 也不得降低党参概率。
 
+CRITICAL DANGSHEN RULE
+
+For DangShen slices:
+
+FIRST evaluate:
+
+1. 中心大小
+
+2. 皮木比例
+
+3. 边缘形态
+
+如果：
+
+- 中心较小
+
+且
+
+- 皮部宽于木部
+
+优先党参。
+
+这些证据强于：
+
+- 放射纹
+- 黄色中心
+- 纤维束
+
+因为这些特征在：
+
+党参
+黄芪
+防风
+
+均可出现。
+
+Do NOT reject DangShen
+only because:
+
+- 未见狮子盘头
+- 未见环状横纹
+
+Absence is NOT evidence.
+
+Use positive evidence only.
+
+党参与黄芪鉴别：
+
+党参：
+
+皮宽芯小
+中心较小
+边缘皱缩
+花盘感
+
+黄芪：
+
+皮薄芯大
+木部明显大于皮部
+金井玉栏
+中心饱满圆整
+
+鉴别优先级：
+
+1. 皮木比例
+2. 中心大小
+3. 边缘形态
+
+放射纹不是鉴别依据。
+
+黄色中心不是鉴别依据。
+
+纤维束不是鉴别依据。
+
+因为党参与黄芪均可出现上述特征。
+
+=========================
+CRITICAL VISUAL PRIORITY
+=========================
+
+For DangShen slices:
+
+FIRST evaluate:
+
+1. 中心大小
+2. 皮木比例
+3. 边缘形态
+
+If:
+
+- 中心较小
+- 皮部宽于木部
+
+Then increase DangShen confidence.
+
+These features are STRONGER than:
+
+- 放射纹
+- 黄色中心
+- 纤维束
+
+because all three herbs
+(党参、黄芪、防风)
+can share them.
+
 --------------------------------
 
 【防风】
