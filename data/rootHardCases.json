@@ -97,5 +97,53 @@
         "reason": "颜色与纤维质感有部分相似，但未见甘草典型红棕色外皮及明显形成层环，外皮颜色偏淡黄而非红棕，可能性较低。"
       }
     ]
-  }
+  },
+
+  {
+  "id": "DS003",
+  "type": "DS-TYPE-B",
+
+  "realHerb": "党参",
+  "predictedHerb": "黄芪",
+
+  "notes": "伪金井玉栏党参，木心明显，Claude稳定判黄芪",
+
+  "herb_name": "黄芪",
+
+  "confidence": 82,
+
+  "observed_features": [
+    "金井玉栏结构清晰可见",
+    "木部占比明显大于皮部",
+    "金黄色木部中心",
+    "皮部较薄呈淡黄白色",
+    "纤维束粗直明显",
+    "切面较圆整规则",
+    "类圆柱形",
+    "外表纵向纤维纹理清晰",
+    "断面质地致密",
+    "多个切面端面可见一致结构"
+  ],
+
+  "reasoning": "图像中可见大量圆柱形段片堆叠排列......",
+
+  "candidates": [
+    {
+      "herb_name": "黄芪",
+      "confidence": 82
+    },
+    {
+      "herb_name": "党参",
+      "confidence": 12
+    },
+    {
+      "herb_name": "甘草",
+      "confidence": 6
+    }
+  ],
+
+  "final_label": "党参",
+
+  "root_case": "DS-TYPE-B"
+}
 ]
