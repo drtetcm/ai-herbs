@@ -23,15 +23,17 @@ from "../utils/objectIsolation.js";
 import { finalDecisionEngine }
 from "../utils/finalDecisionEngine.js";
 
-import {
-  rootSliceDifferentiation}
+import { rootSliceDifferentiation }
 from "../prompts/rootSliceDifferentiation.js";
+
+import { herbRules }
+from "../prompts/herbRules.js";
 
 import { herbRuleEngine }
 from "../utils/herbRuleEngine.js";
 
-import { herbRules }
-from "../prompts/herbRules.js";
+import { rootSliceCorrection }
+from "../utils/rootSliceCorrection.js";
 
 export const config = {
   api: {
@@ -1554,18 +1556,41 @@ try {
     herbRuleEngine(parsed);
 
   console.log(
-  "AFTER HERB RULE ENGINE:",
-  {
-    herb_form:
-      parsed.herb_form,
+    "AFTER HERB RULE ENGINE:",
+    {
+      herb_form:
+        parsed.herb_form,
 
-    herb_name:
-      parsed.herb_name,
+      herb_name:
+        parsed.herb_name,
 
-    confidence:
-      parsed.confidence
-  }
-);
+      confidence:
+        parsed.confidence
+    }
+  );
+
+  // =========================
+  // ROOT SLICE CORRECTION
+  // =========================
+
+  parsed =
+    rootSliceCorrection(
+      parsed
+    );
+
+  console.log(
+    "AFTER ROOT SLICE CORRECTION:",
+    {
+      herb_form:
+        parsed.herb_form,
+
+      herb_name:
+        parsed.herb_name,
+
+      confidence:
+        parsed.confidence
+    }
+  );
 
   console.log(
     "HERB RULE ENGINE:",
@@ -1584,11 +1609,11 @@ try {
     }
   );
 
-} catch (ruleError) {
+} catch (error) {
 
   console.error(
     "HERB RULE ENGINE ERROR:",
-    ruleError
+    error
   );
 
 }
