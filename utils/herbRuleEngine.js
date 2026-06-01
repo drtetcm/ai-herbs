@@ -225,11 +225,11 @@ export function herbRuleEngine(result) {
     result.confidence || 0;
 
   const has = (...keywords) =>
-    features.some((feature) =>
-      keywords.some((keyword) =>
-        feature.includes(keyword)
-      )
-    );
+  features.some((feature) =>
+    keywords.some(
+      (keyword) => feature === keyword
+    )
+  );
 
   /*
   ====================================
@@ -286,18 +286,17 @@ export function herbRuleEngine(result) {
   */
 
   if (
-    has("油室") &&
-    has("放射状纹理")
-  ) {
+  has("油室") &&
+  has("放射状纹理") &&
+  !has("无油室")
+) {
+  herbName = "白术";
 
-    herbName = "白术";
-
-    confidence = Math.max(
-      confidence,
-      80
-    );
-
-  }
+  confidence = Math.max(
+    confidence,
+    80
+  );
+}
 
   /*
   ====================================
