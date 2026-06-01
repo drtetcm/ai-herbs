@@ -1513,6 +1513,40 @@ console.log(
 );
 
 // =========================
+// ROOT CASE EXPORT
+// =========================
+
+console.log(
+  "[ROOT_CASE_EXPORT]",
+  JSON.stringify(
+    {
+      herb_name:
+        parsed.herb_name,
+
+      confidence:
+        parsed.confidence,
+
+      observed_features:
+        parsed.observed_features,
+
+      reasoning:
+        parsed.reasoning,
+
+      root_scores:
+        parsed.root_scores,
+
+      decision_trace:
+        parsed.decision_trace,
+
+      candidates:
+        parsed.possible_candidates
+    },
+    null,
+    2
+  )
+);
+
+// =========================
 // ROOT HERB JUDGE
 // =========================
 

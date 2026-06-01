@@ -6,39 +6,41 @@ console.log(
 
 function rootHerbJudge(result) {
   try {
+
     if (!result) return result;
 
-    const herbName = result.herb_name || "";
+    const herbName =
+      result.herb_name || "";
 
     const featureText = [
 
-  // Claude主特征
-  ...(result.observed_features || []),
+      // Claude主特征
+      ...(result.observed_features || []),
 
-  // Claude推理
-  result.reasoning || "",
+      // Claude推理
+      result.reasoning || "",
 
-  // 视觉分析
-  result.visual_analysis?.color || "",
-  result.visual_analysis?.texture || "",
-  result.visual_analysis?.shape || "",
-  result.visual_analysis?.surface || "",
-  result.visual_analysis?.edges || "",
-  result.visual_analysis?.structure || "",
+      // 视觉分析
+      result.visual_analysis?.color || "",
+      result.visual_analysis?.texture || "",
+      result.visual_analysis?.shape || "",
+      result.visual_analysis?.surface || "",
+      result.visual_analysis?.edges || "",
+      result.visual_analysis?.structure || "",
 
-  // 候选药材理由
-  ...(result.possible_candidates || []).map(
-    item => item.reason || ""
-  )
+      // 候选药材理由
+      ...(result.possible_candidates || []).map(
+        item => item.reason || ""
+      )
 
-]
-  .join(" ")
-  .toLowerCase();
+    ]
+      .join(" ")
+      .toLowerCase();
 
-console.log(
-  "[ROOT_HERB_FEATURE_TEXT]",
-  featureText
-);
+    console.log(
+      "[ROOT_HERB_FEATURE_TEXT]",
+      featureText
+    );
 
     let dangshenScore = 0;
     let huangqiScore = 0;
@@ -47,7 +49,9 @@ console.log(
     // 党参特征
     // =========================
 
-    if (featureText.includes("菊花心")) {
+    if (
+      featureText.includes("菊花心")
+    ) {
       dangshenScore += 4;
     }
 
@@ -58,7 +62,9 @@ console.log(
       dangshenScore += 3;
     }
 
-    if (featureText.includes("皮部较宽")) {
+    if (
+      featureText.includes("皮部较宽")
+    ) {
       dangshenScore += 2;
     }
 
@@ -66,21 +72,23 @@ console.log(
     // 黄芪特征
     // =========================
 
-    if (featureText.includes("金井玉栏")) {
+    if (
+      featureText.includes("金井玉栏")
+    ) {
       huangqiScore += 4;
     }
 
-    if (featureText.includes("木部占比大")) {
+    if (
+      featureText.includes("木部占比大")
+    ) {
       huangqiScore += 3;
     }
 
-    if (featureText.includes("皮部较薄")) {
+    if (
+      featureText.includes("皮部较薄")
+    ) {
       huangqiScore += 2;
     }
-
-    // =========================
-    // LOG
-    // =========================
 
     console.log(
       "[ROOT_HERB_SCORES]",
@@ -92,7 +100,21 @@ console.log(
     );
 
     // =========================
-    // 裁决
+    // 默认轨迹
+    // =========================
+
+    let finalHerbName =
+      herbName;
+
+    let decisionTrace = {
+      original: herbName,
+      final: herbName,
+      dangshenScore,
+      huangqiScore
+    };
+
+    // =========================
+    // 黄芪 → 党参
     // =========================
 
     if (
@@ -108,21 +130,34 @@ console.log(
         }
       );
 
-      return {
-        ...result,
+      finalHerbName = "党参";
 
-        herb_name: "党参",
-
-        decision_trace: {
-          original: "黄芪",
-          final: "党参",
-          dangshenScore,
-          huangqiScore
-        }
+      decisionTrace = {
+        original: "黄芪",
+        final: "党参",
+        dangshenScore,
+        huangqiScore
       };
     }
 
-    return result;
+    // =========================
+    // RETURN
+    // =========================
+
+    return {
+      ...result,
+
+      herb_name:
+        finalHerbName,
+
+      root_scores: {
+        dangshenScore,
+        huangqiScore
+      },
+
+      decision_trace:
+        decisionTrace
+    };
 
   } catch (err) {
 
