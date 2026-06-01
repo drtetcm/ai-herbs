@@ -44,6 +44,43 @@ function rootHerbJudge(result) {
     let dangshenScore = 0;
     let huangqiScore = 0;
 
+// =========================
+// 黄芪硬证据
+// =========================
+
+const strongHuangqi =
+
+  verifiedJingjing &&
+
+  (
+    featureText.includes("木部占比明显大于皮部") ||
+    featureText.includes("木部占比较大") ||
+    featureText.includes("皮部较薄") ||
+    featureText.includes("皮薄芯大")
+  );
+
+if (strongHuangqi) {
+
+  console.log(
+    "[ROOT_HARD_LOCK]",
+    "黄芪硬锁定"
+  );
+
+  return {
+    ...result,
+    herb_name: "黄芪",
+    root_scores: {
+      dangshenScore: 0,
+      huangqiScore: 999
+    },
+    decision_trace: {
+      original: herbName,
+      final: "黄芪",
+      reason: "strong_huangqi_lock"
+    }
+  };
+}
+
     // =========================
     // 党参特征
     // =========================
@@ -133,19 +170,22 @@ if (
     }
 
     if (verifiedJingjing) {
-      huangqiScore += 4;
+      huangqiScore += 10;
     }
 
     if (
-      featureText.includes("木部占比大")
-    ) {
-      huangqiScore += 3;
-    }
+  featureText.includes("木部占比大") ||
+  featureText.includes("木部占比较大") ||
+  featureText.includes("木部占比明显大于皮部")
+)
+{
+  huangqiScore += 8;
+}
 
     if (
       featureText.includes("皮部较薄")
     ) {
-      huangqiScore += 2;
+      huangqiScore += 5;
     }
 
     // =========================
@@ -214,38 +254,6 @@ if (
       dangshenScore += 5;
     }
 
-    // =========================
-// DS-TYPE-B
-// 伪金井玉栏党参
-// =========================
-
-const fakeJingjingCase =
-
-  verifiedJingjing &&
-
-  (
-    featureText.includes("中心较小") ||
-    featureText.includes("皮部较宽") ||
-    featureText.includes("皮宽芯小") ||
-    featureText.includes("边缘皱缩")
-  );
-
-if (
-  herbName === "黄芪" &&
-  confidence <= 85 &&
-  candidateDangshen &&
-  candidateHuangqi &&
-  fakeJingjingCase
-) {
-
-  console.log(
-    "[DS_TYPE_B]",
-    "伪金井玉栏党参"
-  );
-
-  dangshenScore += 6;
-}
-
     console.log(
       "[ROOT_HERB_SCORES]",
       {
@@ -266,9 +274,10 @@ if (
     };
 
     if (
-      herbName === "黄芪" &&
-      dangshenScore - huangqiScore >= 4
-    ) {
+  herbName === "黄芪" &&
+  confidence <= 70 &&
+  dangshenScore - huangqiScore >= 10
+) {
 
       console.log(
         "[ROOT_JUDGE] 黄芪 -> 党参",
