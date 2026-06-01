@@ -62,16 +62,28 @@ function rootHerbJudge(result) {
     }
 
     if (
-      featureText.includes("皮部较宽")
-    ) {
-      dangshenScore += 2;
-    }
+  featureText.includes("皮部较宽")
+) {
+  dangshenScore += 4;
+}
 
-    if (
-      featureText.includes("木部较小")
-    ) {
-      dangshenScore += 3;
-    }
+if (
+  featureText.includes("木部较小")
+) {
+  dangshenScore += 4;
+}
+
+if (
+  featureText.includes("中心较小")
+) {
+  dangshenScore += 4;
+}
+
+if (
+  featureText.includes("边缘皱缩")
+) {
+  dangshenScore += 4;
+}
 
     if (
       featureText.includes("质地疏松")
@@ -152,12 +164,14 @@ function rootHerbJudge(result) {
 
     const thinRootCase =
 
-      featureText.includes("细长") ||
-      featureText.includes("长条状") ||
-      featureText.includes("根段形态偏细") ||
-      featureText.includes("细长圆柱形") ||
-      featureText.includes("木部较小") ||
-      featureText.includes("皮宽芯小");
+  featureText.includes("细长") ||
+  featureText.includes("长条状") ||
+  featureText.includes("根段形态偏细") ||
+  featureText.includes("细长圆柱形") ||
+  featureText.includes("木部较小") ||
+  featureText.includes("中心较小") ||
+  featureText.includes("皮部较宽") ||
+  featureText.includes("皮宽芯小");
 
     const weakHuangqiEvidence =
 
@@ -199,6 +213,38 @@ function rootHerbJudge(result) {
 
       dangshenScore += 5;
     }
+
+    // =========================
+// DS-TYPE-B
+// 伪金井玉栏党参
+// =========================
+
+const fakeJingjingCase =
+
+  verifiedJingjing &&
+
+  (
+    featureText.includes("中心较小") ||
+    featureText.includes("皮部较宽") ||
+    featureText.includes("皮宽芯小") ||
+    featureText.includes("边缘皱缩")
+  );
+
+if (
+  herbName === "黄芪" &&
+  confidence <= 85 &&
+  candidateDangshen &&
+  candidateHuangqi &&
+  fakeJingjingCase
+) {
+
+  console.log(
+    "[DS_TYPE_B]",
+    "伪金井玉栏党参"
+  );
+
+  dangshenScore += 6;
+}
 
     console.log(
       "[ROOT_HERB_SCORES]",
