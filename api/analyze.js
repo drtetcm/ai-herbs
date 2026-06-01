@@ -35,6 +35,9 @@ from "../prompts/herbRules.js";
 import { herbRuleEngine }
 from "../utils/herbRuleEngine.js";
 
+import { rootHerbJudge }
+from "../utils/rootHerbJudge.js";
+
 import { rootSliceCorrection }
 from "../utils/rootSliceCorrection.js";
 
@@ -1497,30 +1500,52 @@ parsed =
 try {
 
   parsed =
-    herbRuleEngine(parsed);
+  herbRuleEngine(parsed);
+
+console.log(
+  "AFTER HERB RULE ENGINE:",
+  {
+    herb_form: parsed.herb_form,
+    herb_name: parsed.herb_name,
+    confidence: parsed.confidence
+  }
+);
+
+// =========================
+// ROOT HERB JUDGE
+// =========================
+
+parsed =
+  rootHerbJudge(parsed);
+
+  if (parsed.decision_trace) {
 
   console.log(
-    "AFTER HERB RULE ENGINE:",
-    {
-      herb_form:
-        parsed.herb_form,
-
-      herb_name:
-        parsed.herb_name,
-
-      confidence:
-        parsed.confidence
-    }
+    "ROOT HERB DECISION:",
+    JSON.stringify(
+      parsed.decision_trace,
+      null,
+      2
+    )
   );
 
-  // =========================
-  // ROOT SLICE CORRECTION
-  // =========================
+}
 
-  parsed =
-    rootSliceCorrection(
-      parsed
-    );
+console.log(
+  "AFTER ROOT HERB JUDGE:",
+  {
+    herb_form: parsed.herb_form,
+    herb_name: parsed.herb_name,
+    confidence: parsed.confidence
+  }
+);
+
+// =========================
+// ROOT SLICE CORRECTION
+// =========================
+
+parsed =
+  rootSliceCorrection(parsed);
 
   console.log(
     "AFTER ROOT SLICE CORRECTION:",
