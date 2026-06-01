@@ -11,13 +11,34 @@ function rootHerbJudge(result) {
     const herbName = result.herb_name || "";
 
     const featureText = [
-      result.appearance || "",
-      result.characteristics || "",
-      result.description || "",
-      ...(result.key_features || [])
-    ]
-      .join(" ")
-      .toLowerCase();
+
+  // Claude主特征
+  ...(result.observed_features || []),
+
+  // Claude推理
+  result.reasoning || "",
+
+  // 视觉分析
+  result.visual_analysis?.color || "",
+  result.visual_analysis?.texture || "",
+  result.visual_analysis?.shape || "",
+  result.visual_analysis?.surface || "",
+  result.visual_analysis?.edges || "",
+  result.visual_analysis?.structure || "",
+
+  // 候选药材理由
+  ...(result.possible_candidates || []).map(
+    item => item.reason || ""
+  )
+
+]
+  .join(" ")
+  .toLowerCase();
+
+console.log(
+  "[ROOT_HERB_FEATURE_TEXT]",
+  featureText
+);
 
     let dangshenScore = 0;
     let huangqiScore = 0;
