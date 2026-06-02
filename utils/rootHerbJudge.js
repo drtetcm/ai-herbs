@@ -260,7 +260,7 @@ if (
         "细条型党参补偿"
       );
 
-      dangshenScore += 5;
+      dangshenScore += 10;
     }
 
     console.log(
