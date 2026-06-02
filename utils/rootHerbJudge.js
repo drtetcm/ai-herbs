@@ -275,6 +275,16 @@ if (
   fangfengScore += 3;
 }
 
+if (
+  featureText.includes("圆柱形段片")
+  ||
+  featureText.includes("切段长度")
+  ||
+  featureText.includes("切段")
+) {
+  fangfengScore += 3;
+}
+
 // =========================
 // FF-TYPE-C
 // 防风反向压制党参
