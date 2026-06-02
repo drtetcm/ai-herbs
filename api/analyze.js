@@ -1375,28 +1375,31 @@ FINAL PRIORITY
 // =========================
 
 let response;
+let lastError;
 
-try {
+for (let retry = 0; retry < 3; retry++) {
 
-  response =
-    await anthropic.messages.create({
+  try {
 
-      model:
-        "claude-sonnet-4-6",
+    response =
+      await anthropic.messages.create({
 
-      max_tokens: 2500,
+        model:
+          "claude-sonnet-4-6",
 
-      temperature: 0,
+        max_tokens: 2500,
 
-      messages: [
-        {
-          role: "user",
+        temperature: 0,
 
-          content: [
-            {
-              type: "text",
+        messages: [
+          {
+            role: "user",
 
-              text: `
+            content: [
+              {
+                type: "text",
+
+                text: `
 
 ${SYSTEM_PROMPT}
 
@@ -1409,33 +1412,80 @@ ${ROOT_SLICE_HARD_CASES}
 ${rootSliceDifferentiation}
 
 `
-            },
+              },
 
-            {
-              type: "image",
+              {
+                type: "image",
 
-              source: {
-                type: "base64",
+                source: {
+                  type: "base64",
 
-                media_type:
-                  "image/jpeg",
+                  media_type:
+                    "image/jpeg",
 
-                data: base64Image
+                  data: base64Image
+                }
               }
-            }
 
-          ]
-        }
+            ]
+          }
 
-      ]
+        ]
+
+      });
+
+    break;
+
+  } catch (claudeError) {
+
+    lastError = claudeError;
+
+    if (
+      claudeError?.status === 529 &&
+      retry < 2
+    ) {
+
+      console.log(
+        `[CLAUDE_RETRY] Attempt ${retry + 1}`
+      );
+
+      await new Promise(
+        resolve =>
+          setTimeout(
+            resolve,
+            3000 * (retry + 1)
+          )
+      );
+
+      continue;
+    }
+
+    console.error(
+      "CLAUDE ERROR:",
+      claudeError
+    );
+
+    return res.status(500).json({
+
+      status: "error",
+
+      message:
+        "Claude API failed",
+
+      error:
+        claudeError.message
 
     });
 
-} catch (claudeError) {
+  }
+
+}
+
+if (!response) {
 
   console.error(
     "CLAUDE ERROR:",
-    claudeError
+    lastError
   );
 
   return res.status(500).json({
@@ -1443,10 +1493,10 @@ ${rootSliceDifferentiation}
     status: "error",
 
     message:
-      "Claude API failed",
+      "Claude API failed after retries",
 
     error:
-      claudeError.message
+      lastError?.message || "Unknown error"
 
   });
 
