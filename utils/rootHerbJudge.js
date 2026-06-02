@@ -88,27 +88,33 @@ function rootHerbJudge(result) {
     featureText.includes("多个切面均清晰可见金井玉栏")
   );
 
-    if (strongHuangqi) {
+if (
 
-      console.log(
-        "[ROOT_HARD_LOCK]",
-        "黄芪硬锁定"
-      );
+  strongHuangqi &&
 
-      return {
-        ...result,
-        herb_name: "黄芪",
-        root_scores: {
-          dangshenScore: 0,
-          huangqiScore: 999
-        },
-        decision_trace: {
-          original: herbName,
-          final: "黄芪",
-          reason: "strong_huangqi_lock"
-        }
-      };
+  !featureText.includes("党参核心")
+
+) {
+
+  console.log(
+    "[ROOT_HARD_LOCK]",
+    "黄芪硬锁定"
+  );
+
+  return {
+    ...result,
+    herb_name: "黄芪",
+    root_scores: {
+      dangshenScore: 0,
+      huangqiScore: 999
+    },
+    decision_trace: {
+      original: herbName,
+      final: "黄芪",
+      reason: "strong_huangqi_lock"
     }
+  };
+}
 
     // =========================
     // 党参特征
