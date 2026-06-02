@@ -81,23 +81,23 @@ export function rootSliceCorrection(result) {
     );
 
     if (
-      dangshenScore >= 2
-    ) {
+  dangshenScore >= 4
+) {
 
-      console.log(
-        "ROOT SLICE CORRECTION: 黄芪 -> 党参"
-      );
+  console.log(
+    "ROOT SLICE CORRECTION: 黄芪 -> 党参"
+  );
 
-      result.herb_name =
-        "党参";
+  result.herb_name =
+    "党参";
 
-      result.confidence =
-        Math.max(
-          result.confidence,
-          78
-        );
+  result.confidence =
+    Math.max(
+      result.confidence,
+      78
+    );
 
-    }
+}
 
   }
 
