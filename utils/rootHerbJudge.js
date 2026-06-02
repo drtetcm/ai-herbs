@@ -306,6 +306,21 @@ if (
   dangshenScore -= 6;
 }
 
+if (
+  fangfengScore >= 8
+  &&
+  featureText.includes("菊花心")
+  &&
+  featureText.includes("形成层环")
+) {
+
+  console.log(
+    "[FANGFENG_ANTI_DANGSHEN_V2]"
+  );
+
+  dangshenScore -= 8;
+
+}
     // =========================
     // DS-TYPE-A
     // =========================
