@@ -286,6 +286,43 @@ if (
 }
 
 // =========================
+// FF-TYPE-D
+// 深色段片型防风
+// =========================
+
+if (
+
+  (
+    featureText.includes("棕褐色")
+    ||
+    featureText.includes("灰棕色")
+    ||
+    featureText.includes("灰褐色")
+  )
+
+  &&
+
+  featureText.includes("类圆柱形")
+
+  &&
+
+  (
+    featureText.includes("环状中心")
+    ||
+    featureText.includes("环状结构")
+  )
+
+) {
+
+  console.log(
+    "[FF_TYPE_D]"
+  );
+
+  fangfengScore += 3;
+
+}
+
+// =========================
 // FF-TYPE-C
 // 防风反向压制党参
 // =========================
