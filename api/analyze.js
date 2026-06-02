@@ -2040,7 +2040,7 @@ else if (
 // =========================
 
 if (
-  Number(parsed.morphology_integrity) < 60
+  Number(parsed.morphology_integrity) < 50
 ) {
 
   forceUnknown = true;
