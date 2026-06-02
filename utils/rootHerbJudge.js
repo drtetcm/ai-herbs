@@ -248,6 +248,54 @@ if (
   fangfengScore += 4;
 }
 
+// FF-TYPE-C
+// 深色短段型防风
+
+if (
+  featureText.includes("棕褐色")
+  ||
+  featureText.includes("灰棕色")
+  ||
+  featureText.includes("灰褐色")
+) {
+  fangfengScore += 4;
+}
+
+if (
+  featureText.includes("环状横纹")
+) {
+  fangfengScore += 4;
+}
+
+if (
+  featureText.includes("外皮棕褐色")
+  ||
+  featureText.includes("外皮粗糙")
+) {
+  fangfengScore += 3;
+}
+
+// =========================
+// FF-TYPE-C
+// 防风反向压制党参
+// =========================
+
+if (
+  featureText.includes("棕褐色")
+  ||
+  featureText.includes("灰棕色")
+  ||
+  featureText.includes("灰褐色")
+) {
+  dangshenScore -= 4;
+}
+
+if (
+  featureText.includes("环状横纹")
+) {
+  dangshenScore -= 6;
+}
+
     // =========================
     // DS-TYPE-A
     // =========================
