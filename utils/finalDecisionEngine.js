@@ -358,7 +358,7 @@ if (candidateCount >= 6) {
 
     object_type === "herb" &&
   ai_confidence >= 50 &&
-  unknown_probability <= 30 &&
+  unknown_probability <= 40 &&
   scene_interference !== "commercial"
 ) {
   final_label = "HERB";
