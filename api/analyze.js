@@ -2052,7 +2052,7 @@ if (
 // =========================
 
 if (
-  Number(parsed.subject_completeness) < 60
+  Number(parsed.subject_completeness) < 50
 ) {
 
   forceUnknown = true;
