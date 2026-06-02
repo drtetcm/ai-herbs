@@ -218,15 +218,19 @@ if (
 
     const weakHuangqiEvidence =
 
-      featureText.includes("无法观察") ||
-      featureText.includes("无法清晰观察") ||
-      featureText.includes("无法验证") ||
-      featureText.includes("无法充分验证") ||
-      featureText.includes("无法完整验证") ||
-      featureText.includes("无法确认") ||
-      featureText.includes("无法完整确认") ||
-      featureText.includes("未能清晰观察到金井玉栏") ||
-      featureText.includes("金井玉栏结构无法完整确认");
+  featureText.includes("无法观察") ||
+  featureText.includes("无法清晰观察") ||
+  featureText.includes("无法验证") ||
+  featureText.includes("无法充分验证") ||
+  featureText.includes("无法完整验证") ||
+  featureText.includes("无法确认") ||
+  featureText.includes("无法完整确认") ||
+
+  featureText.includes("金井玉栏无法确认") ||
+  featureText.includes("金井玉栏无法完整确认") ||
+  featureText.includes("金井玉栏结构无法完整确认") ||
+
+  featureText.includes("未能清晰观察到金井玉栏");
 
     if (
       herbName === "黄芪" &&
