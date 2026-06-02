@@ -43,6 +43,7 @@ function rootHerbJudge(result) {
 
     let dangshenScore = 0;
     let huangqiScore = 0;
+    let fangfengScore = 0;
 
     // =========================
     // 黄芪A级证据
@@ -206,6 +207,48 @@ if (
     }
 
     // =========================
+// 防风特征
+// =========================
+
+if (
+  featureText.includes("形成层环")
+) {
+  fangfengScore += 6;
+}
+
+if (
+  featureText.includes("灰黄色")
+  ||
+  featureText.includes("灰褐色")
+  ||
+  featureText.includes("棕黄色皮部")
+) {
+  fangfengScore += 3;
+}
+
+if (
+  featureText.includes("大量小切片")
+  ||
+  featureText.includes("小圆片")
+  ||
+  featureText.includes("横切片")
+) {
+  fangfengScore += 3;
+}
+
+if (
+  featureText.includes("纤维性")
+) {
+  fangfengScore += 2;
+}
+
+if (
+  featureText.includes("菊花心")
+) {
+  fangfengScore += 4;
+}
+
+    // =========================
     // DS-TYPE-A
     // =========================
 
@@ -264,16 +307,30 @@ if (
     }
 
     console.log(
-      "[ROOT_HERB_SCORES]",
-      {
-        herbName,
-        dangshenScore,
-        huangqiScore
-      }
-    );
+  "[ROOT_HERB_SCORES]",
+  {
+    herbName,
+    dangshenScore,
+    huangqiScore,
+    fangfengScore
+  }
+);
 
     let finalHerbName =
       herbName;
+
+      if (
+  herbName === "党参" &&
+  confidence <= 75 &&
+  fangfengScore >= 10
+) {
+
+  console.log(
+    "[ROOT_JUDGE] 党参 -> 防风"
+  );
+
+  finalHerbName = "防风";
+}
 
     if (
       herbName === "黄芪" &&
@@ -292,9 +349,9 @@ if (
       ...result,
       herb_name: finalHerbName,
       root_scores: {
-        dangshenScore,
-        huangqiScore
-      }
+  dangshenScore,
+  huangqiScore
+}
     };
 
   } catch (err) {
