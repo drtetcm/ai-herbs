@@ -50,16 +50,20 @@ function rootHerbJudge(result) {
 
     const verifiedJingjing =
 
-      featureText.includes("金井玉栏")
+  featureText.includes("金井玉栏")
 
-      && !featureText.includes("无法观察")
-      && !featureText.includes("无法清晰观察")
-      && !featureText.includes("无法验证")
-      && !featureText.includes("无法充分验证")
-      && !featureText.includes("无法完整验证")
-      && !featureText.includes("无法确认")
-      && !featureText.includes("无法完整确认")
-      && !featureText.includes("未能清晰观察到金井玉栏");
+  && !featureText.includes("未见金井玉栏")
+  && !featureText.includes("未见典型金井玉栏")
+  && !featureText.includes("未观察到金井玉栏")
+  && !featureText.includes("未能观察到金井玉栏")
+  && !featureText.includes("未发现金井玉栏")
+  && !featureText.includes("不具备金井玉栏")
+  && !featureText.includes("不符合金井玉栏")
+  && !featureText.includes("缺乏金井玉栏")
+  && !featureText.includes("无法观察")
+  && !featureText.includes("无法验证")
+  && !featureText.includes("无法确认")
+  && !featureText.includes("未能清晰观察到金井玉栏");
 
     console.log(
       "[JINGJING_DEBUG]",
@@ -76,13 +80,13 @@ function rootHerbJudge(result) {
 
     const strongHuangqi =
 
-      verifiedJingjing &&
+  verifiedJingjing &&
 
-      (
-        featureText.includes("木部占比明显大于皮部") ||
-        featureText.includes("木部占比较大") ||
-        featureText.includes("木部占比大")
-      );
+  (
+    featureText.includes("木部占比明显大于皮部")
+    ||
+    featureText.includes("多个切面均清晰可见金井玉栏")
+  );
 
     if (strongHuangqi) {
 
