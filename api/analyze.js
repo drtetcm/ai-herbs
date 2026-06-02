@@ -2103,6 +2103,31 @@ if (
 
 }
 
+console.log(
+  "FORCE UNKNOWN DEBUG",
+  {
+    forceUnknown,
+
+    visibility:
+      parsed.visibility,
+
+    morphology_integrity:
+      parsed.morphology_integrity,
+
+    subject_completeness:
+      parsed.subject_completeness,
+
+    texture_visibility:
+      parsed.texture_visibility,
+
+    parsed_force_unknown:
+      parsed.force_unknown,
+
+    object_type:
+      parsed.object_type
+  }
+);
+
 // =========================
 // FINAL HARD UNKNOWN
 // =========================
