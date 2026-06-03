@@ -524,47 +524,6 @@ if (
       dangshenScore += 10;
     }
 
-    // =========================
-// HQ VS FF
-// 黄芪斜切片压制防风
-// =========================
-
-const huangqiSlicePattern =
-
-(
-  featureText.includes("椭圆形")
-  ||
-  featureText.includes("长椭圆形")
-)
-
-&&
-
-(
-  featureText.includes("放射纹")
-  ||
-  featureText.includes("放射状纹理")
-)
-
-&&
-
-(
-  featureText.includes("纤维")
-  ||
-  featureText.includes("纤维束")
-);
-
-if (huangqiSlicePattern) {
-
-  console.log(
-    "[HQ_SLICE_PATTERN]"
-  );
-
-  huangqiScore += 8;
-
-  fangfengScore -= 4;
-
-}
-
     console.log(
   "[ROOT_HERB_SCORES]",
   {
@@ -643,27 +602,6 @@ if (
 
       finalHerbName = "党参";
     }
-
-    // =========================
-// 防风 -> 黄芪
-// HQ013 FIX
-// =========================
-
-if (
-  herbName === "防风"
-  &&
-  confidence <= 75
-  &&
-  huangqiScore - fangfengScore >= 4
-) {
-
-  console.log(
-    "[ROOT_JUDGE] 防风 -> 黄芪"
-  );
-
-  finalHerbName = "黄芪";
-
-}
 
     return {
   ...result,
