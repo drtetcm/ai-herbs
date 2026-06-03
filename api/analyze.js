@@ -1778,6 +1778,33 @@ console.log(
 parsed =
   rootHerbJudge(parsed);
 
+  if (
+  parsed.rule_corrected &&
+  Array.isArray(parsed.possible_candidates)
+) {
+
+  parsed.possible_candidates = [
+
+    {
+      herb_name: parsed.herb_name,
+      confidence: parsed.confidence,
+      reason: "规则引擎纠偏后的最终结果"
+    },
+
+    ...parsed.possible_candidates.filter(
+      c => c.herb_name !== parsed.herb_name
+    )
+
+  ];
+
+}
+
+  const ruleCorrected =
+  parsed.rule_corrected;
+
+const originalHerbName =
+  parsed.original_herb_name;
+
   if (parsed.decision_trace) {
 
   console.log(
@@ -2545,12 +2572,7 @@ normalizedResult.total_risk_score =
 
 let expertAnalysis = "";
 
-if (
-
-  normalizedResult.herb_name !==
-  parsed.herb_name
-
-) {
+if (ruleCorrected) {
 
   expertAnalysis = `
 系统规则引擎已对AI初始结果进行纠偏。
@@ -2559,7 +2581,7 @@ if (
 ROOT_HERB_DIFFERENTIATION V4
 
 原始判定：
-${parsed.herb_name}
+${originalHerbName}
 
 最终判定：
 ${normalizedResult.herb_name}
