@@ -2574,16 +2574,29 @@ let expertAnalysis = "";
 
 if (parsed.rule_corrected) {
 
+  const scores =
+    parsed.root_scores || {};
+
   expertAnalysis = `
 系统规则引擎已对AI初始结果进行纠偏。
 
 原始判定：
 ${parsed.original_herb_name || "未知"}
 
+规则评分：
+
+党参：${scores.dangshenScore ?? "-"}
+
+黄芪：${scores.huangqiScore ?? "-"}
+
+防风：${scores.fangfengScore ?? "-"}
+
 最终判定：
 ${normalizedResult.herb_name}
 
 --------------------------------
+
+以下为AI原始分析（仅供参考）：
 
 ${normalizedResult.reasoning || ""}
 `;
