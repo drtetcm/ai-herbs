@@ -316,7 +316,7 @@ if (
     "[HQ_OBLIQUE_SHAPE]"
   );
 
-  huangqiScore += 8;
+  huangqiScore += 5;
 }
 
 if (
@@ -338,40 +338,6 @@ if (
   );
 
   huangqiScore += 6;
-}
-
-if (
-
-  (
-    featureText.includes("中心偏白色")
-    ||
-    featureText.includes("中心偏白")
-  )
-
-  &&
-
-  (
-    featureText.includes("椭圆形")
-    ||
-    featureText.includes("长椭圆形")
-  )
-
-  &&
-
-  (
-    featureText.includes("黄白色")
-    ||
-    featureText.includes("淡黄白")
-  )
-
-) {
-
-  console.log(
-    "[HQ013_STYLE]"
-  );
-
-  huangqiScore += 8;
-
 }
 
     // =========================
