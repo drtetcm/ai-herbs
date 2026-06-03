@@ -563,13 +563,21 @@ if (
     }
 
     return {
-      ...result,
-      herb_name: finalHerbName,
-      root_scores: {
-  dangshenScore,
-  huangqiScore
-}
-    };
+  ...result,
+
+  herb_name: finalHerbName,
+
+  original_herb_name: herbName,
+
+  rule_corrected:
+    herbName !== finalHerbName,
+
+  root_scores: {
+    dangshenScore,
+    huangqiScore,
+    fangfengScore
+  }
+};
 
   } catch (err) {
 
