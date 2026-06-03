@@ -581,7 +581,7 @@ if (
 
 const strongFangfeng =
 
-fangfengScore >= 12
+fangfengScore >= 8
 
 &&
 
@@ -616,27 +616,7 @@ if (
 
       finalHerbName = "党参";
     }
-
-    // HQ013 FIX
-// 防风误判黄芪
-
-if (
-
-  herbName === "防风"
-
-  &&
-
-  confidence <= 70
-
-  &&
-
-  huangqiScore >= fangfengScore
-
-  &&
-
-  huangqiScore >= 10
-
-) {
+{
 
   console.log(
     "[ROOT_JUDGE] 防风 -> 黄芪"
