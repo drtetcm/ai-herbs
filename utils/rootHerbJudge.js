@@ -644,6 +644,27 @@ if (
       finalHerbName = "党参";
     }
 
+    // =========================
+// 防风 -> 黄芪
+// HQ013 FIX
+// =========================
+
+if (
+  herbName === "防风"
+  &&
+  confidence <= 75
+  &&
+  huangqiScore - fangfengScore >= 4
+) {
+
+  console.log(
+    "[ROOT_JUDGE] 防风 -> 黄芪"
+  );
+
+  finalHerbName = "黄芪";
+
+}
+
     return {
   ...result,
 
