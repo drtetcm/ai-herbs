@@ -2467,9 +2467,62 @@ normalizedResult.total_risk_score =
 ? normalizedResult.herb_name
 : "UNKNOWN";
 
-        // =========================
-        // REPORT
-        // =========================
+// =========================
+// EXPERT ANALYSIS FIX
+// =========================
+
+let expertAnalysis = "";
+
+if (
+
+  normalizedResult.herb_name !==
+  parsed.herb_name
+
+) {
+
+  expertAnalysis = `
+系统规则引擎已对AI初始结果进行纠偏。
+
+最终依据：
+ROOT_HERB_DIFFERENTIATION V4
+
+原始判定：
+${parsed.herb_name}
+
+最终判定：
+${normalizedResult.herb_name}
+`;
+
+} else {
+
+  expertAnalysis =
+    normalizedResult.reasoning || "暂无分析";
+
+}
+
+// =========================
+// AUTHENTICITY RULES FIX
+// =========================
+
+const authenticityRules =
+
+Array.isArray(
+  normalizedResult.authenticity_rules
+)
+
+&&
+
+normalizedResult.authenticity_rules.length > 0
+
+? normalizedResult.authenticity_rules
+    .map(rule => `• ${rule}`)
+    .join("\n")
+
+: "";
+
+// =========================
+// REPORT
+// =========================
 
 let report = `
 药材名称：
@@ -2539,15 +2592,15 @@ ${normalizedResult.authenticity_score}%
 真实性等级：
 ${normalizedResult.authenticity_level}
 
+${authenticityRules ? `
+
 真实性规则：
-${JSON.stringify(
-  normalizedResult.authenticity_rules,
-  null,
-  2
-)}
+${authenticityRules}
+
+` : ""}
 
 图片质量：
-${normalizedResult.quality_grade}
+${normalizedResult.quality_grade || "未评估"}
 
 模糊等级：
 ${normalizedResult.clarity}
@@ -2562,7 +2615,7 @@ ${normalizedResult.visibility}%
 ${normalizedResult.abnormal_issues || "未发现"}
 
 专家分析：
-${normalizedResult.reasoning || "暂无分析"}
+${expertAnalysis}
 
 AI建议：
 ${
