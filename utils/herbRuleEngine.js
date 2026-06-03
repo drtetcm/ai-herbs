@@ -315,20 +315,25 @@ if (
   */
 
   if (
-    has("形成层环") &&
-    has("油点") &&
-    !has("无形成层环") &&
-    !has("无油点")
-  ) {
 
-    herbName = "当归";
+  herbName === "当归"
 
-    confidence = Math.max(
-      confidence,
-      80
-    );
+  &&
 
-  }
+  has("形成层环")
+
+  &&
+
+  has("油点")
+
+) {
+
+  confidence = Math.max(
+    confidence,
+    80
+  );
+
+}
 
   return {
 
