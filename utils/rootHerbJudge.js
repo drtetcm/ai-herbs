@@ -463,7 +463,7 @@ if (
     "[FANGFENG_ANTI_DANGSHEN_V2]"
   );
 
-  dangshenScore -= 8;
+  dangshenScore -= 3;
 
 }
     // =========================
@@ -602,6 +602,35 @@ if (
 
       finalHerbName = "党参";
     }
+
+    // HQ013 FIX
+// 防风误判黄芪
+
+if (
+
+  herbName === "防风"
+
+  &&
+
+  confidence <= 70
+
+  &&
+
+  huangqiScore >= fangfengScore
+
+  &&
+
+  huangqiScore >= 10
+
+) {
+
+  console.log(
+    "[ROOT_JUDGE] 防风 -> 黄芪"
+  );
+
+  finalHerbName = "黄芪";
+
+}
 
     return {
   ...result,
