@@ -286,13 +286,42 @@ if (
     }
 
     // =========================
+// HQ-TYPE-E
+// 黄芪斜切片补偿
+// =========================
+
+if (
+  featureText.includes("长椭圆形")
+  ||
+  featureText.includes("椭圆形")
+  ||
+  featureText.includes("斜切片")
+) {
+  huangqiScore += 3;
+}
+
+if (
+  featureText.includes("粗直纤维束")
+  ||
+  featureText.includes("纤维外露")
+  ||
+  featureText.includes("放射纹粗长")
+  ||
+  featureText.includes("粗长放射纹")
+  ||
+  featureText.includes("纤维束明显")
+) {
+  huangqiScore += 6;
+}
+
+    // =========================
 // 防风特征
 // =========================
 
 if (
   featureText.includes("形成层环")
 ) {
-  fangfengScore += 6;
+  fangfengScore += 4;
 }
 
 if (
@@ -324,7 +353,7 @@ if (
 if (
   featureText.includes("菊花心")
 ) {
-  fangfengScore += 4;
+  fangfengScore += 3;
 }
 
 // FF-TYPE-C
@@ -495,6 +524,47 @@ if (
       dangshenScore += 10;
     }
 
+    // =========================
+// HQ VS FF
+// 黄芪斜切片压制防风
+// =========================
+
+const huangqiSlicePattern =
+
+(
+  featureText.includes("椭圆形")
+  ||
+  featureText.includes("长椭圆形")
+)
+
+&&
+
+(
+  featureText.includes("放射纹")
+  ||
+  featureText.includes("放射状纹理")
+)
+
+&&
+
+(
+  featureText.includes("纤维")
+  ||
+  featureText.includes("纤维束")
+);
+
+if (huangqiSlicePattern) {
+
+  console.log(
+    "[HQ_SLICE_PATTERN]"
+  );
+
+  huangqiScore += 8;
+
+  fangfengScore -= 4;
+
+}
+
     console.log(
   "[ROOT_HERB_SCORES]",
   {
@@ -536,10 +606,22 @@ if (
 
 }
 
-      if (
+const strongFangfeng =
+
+fangfengScore >= 12
+
+&&
+
+featureText.includes("形成层环")
+
+&&
+
+featureText.includes("菊花心");
+
+if (
   herbName === "党参" &&
   confidence <= 75 &&
-  fangfengScore >= 10
+  strongFangfeng
 ) {
 
   console.log(
