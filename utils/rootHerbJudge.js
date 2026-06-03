@@ -45,6 +45,16 @@ function rootHerbJudge(result) {
     let huangqiScore = 0;
     let fangfengScore = 0;
 
+    const notDangshenCore =
+
+  featureText.includes("木部占整体直径一半以上")
+  ||
+  featureText.includes("木质部明显发达")
+  ||
+  featureText.includes("木部占整体面积较大")
+  ||
+  featureText.includes("皮木比例接近1比1");
+  
     // =========================
     // 黄芪A级证据
     // =========================
