@@ -204,7 +204,7 @@ if (
   &&
   !notDangshenCore
 ) {
-  dangshenScore += 4;
+  dangshenScore += 1;
 }
 
     if (
@@ -492,6 +492,46 @@ if (
   dangshenScore -= 3;
 
 }
+
+// =========================
+// FF SMALL ROUND SLICE
+// 防止防风小圆片误判党参
+// =========================
+
+if (
+
+  dangshenScore > 0
+
+  &&
+
+  (
+    featureText.includes("放射纹")
+    ||
+    featureText.includes("放射状纹理")
+    ||
+    featureText.includes("菊花心")
+  )
+
+  &&
+
+  (
+    featureText.includes("小圆形")
+    ||
+    featureText.includes("大量小切片")
+    ||
+    featureText.includes("横切片")
+  )
+
+) {
+
+  console.log(
+    "[ANTI_DANGSHEN_SMALL_CENTER]"
+  );
+
+  dangshenScore -= 4;
+
+}
+
     // =========================
     // DS-TYPE-A
     // =========================
