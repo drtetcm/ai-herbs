@@ -165,12 +165,6 @@ if (
     // =========================
 
     if (
-      featureText.includes("菊花心")
-    ) {
-      dangshenScore += 4;
-    }
-
-    if (
       featureText.includes("放射裂隙") ||
       featureText.includes("裂隙明显")
     ) {
@@ -184,8 +178,22 @@ if (
     }
 
     if (
-  featureText.includes("木部较小")
+  (
+    featureText.includes("木部较小")
+    ||
+    featureText.includes("中心较小")
+  )
+
   &&
+
+  featureText.includes("皮部较宽")
+
+  &&
+
+  !featureText.includes("形成层环")
+
+  &&
+
   !notDangshenCore
 ) {
   dangshenScore += 4;
@@ -213,7 +221,13 @@ if (
 
     if (
   featureText.includes("皮宽芯小")
+
   &&
+
+  !featureText.includes("形成层环")
+
+  &&
+
   !notDangshenCore
 ) {
   dangshenScore += 4;
