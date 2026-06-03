@@ -200,6 +200,22 @@ if (
   dangshenScore += 4;
 }
 
+// =========================
+// 党参反证（木部过大）
+// =========================
+
+if (
+  featureText.includes("木部占比明显大于皮部")
+  ||
+  featureText.includes("木部占比大")
+  ||
+  featureText.includes("中心木部巨大")
+  ||
+  featureText.includes("木部发达")
+) {
+  dangshenScore -= 8;
+}
+
     // =========================
     // 黄芪加分
     // =========================
