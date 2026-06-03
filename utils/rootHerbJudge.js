@@ -579,6 +579,37 @@ if (
 
 }
 
+// =========================
+// HQ-OBLIQUE-SLICE
+// 黄芪斜片反制防风
+// =========================
+
+const huangqiObliqueSlice =
+
+(
+  featureText.includes("椭圆形")
+  ||
+  featureText.includes("长椭圆形")
+)
+
+&&
+
+featureText.includes("黄白色")
+
+&&
+
+featureText.includes("放射纹")
+
+&&
+
+(
+  featureText.includes("形成层环")
+  ||
+  featureText.includes("木部偏小")
+  ||
+  featureText.includes("中心偏白")
+);
+
 const strongFangfeng =
 
 fangfengScore >= 7
@@ -590,6 +621,37 @@ featureText.includes("形成层环")
 &&
 
 featureText.includes("菊花心");
+
+// =========================
+// HQ013 TYPE
+// 防风误判黄芪斜片
+// =========================
+
+if (
+
+  herbName === "防风"
+
+  &&
+
+  confidence <= 80
+
+  &&
+
+  huangqiObliqueSlice
+
+  &&
+
+  fangfengScore <= 18
+
+) {
+
+  console.log(
+    "[HQ_OBLIQUE_SLICE_FIX]"
+  );
+
+  finalHerbName = "黄芪";
+
+}
 
 if (
   herbName === "党参" &&
