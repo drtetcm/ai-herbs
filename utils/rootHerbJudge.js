@@ -581,7 +581,7 @@ if (
 
 const strongFangfeng =
 
-fangfengScore >= 8
+fangfengScore >= 7
 
 &&
 
