@@ -155,16 +155,20 @@ if (
     }
 
     if (
-      featureText.includes("木部较小")
-    ) {
-      dangshenScore += 4;
-    }
+  featureText.includes("木部较小")
+  &&
+  !notDangshenCore
+) {
+  dangshenScore += 4;
+}
 
     if (
-      featureText.includes("中心较小")
-    ) {
-      dangshenScore += 4;
-    }
+  featureText.includes("中心较小")
+  &&
+  !notDangshenCore
+) {
+  dangshenScore += 4;
+}
 
     if (
       featureText.includes("边缘皱缩")
@@ -179,10 +183,12 @@ if (
     }
 
     if (
-      featureText.includes("皮宽芯小")
-    ) {
-      dangshenScore += 4;
-    }
+  featureText.includes("皮宽芯小")
+  &&
+  !notDangshenCore
+) {
+  dangshenScore += 4;
+}
 
     // =========================
     // 黄芪加分
