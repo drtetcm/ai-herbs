@@ -2572,16 +2572,16 @@ normalizedResult.total_risk_score =
 
 let expertAnalysis = "";
 
-if (ruleCorrected) {
+if (parsed.rule_corrected) {
 
   expertAnalysis = `
 系统规则引擎已对AI初始结果进行纠偏。
 
 最终依据：
-ROOT_HERB_DIFFERENTIATION V4
+ROOT_HERB_DIFFERENTIATION
 
 原始判定：
-${originalHerbName}
+${parsed.original_herb_name || "未知"}
 
 最终判定：
 ${normalizedResult.herb_name}
