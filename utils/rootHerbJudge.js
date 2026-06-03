@@ -47,13 +47,32 @@ function rootHerbJudge(result) {
 
     const notDangshenCore =
 
-  featureText.includes("木部占整体直径一半以上")
+  featureText.includes("木部占比明显大于皮部")
   ||
-  featureText.includes("木质部明显发达")
+
+  featureText.includes("木部占比较大")
   ||
-  featureText.includes("木部占整体面积较大")
+
+  featureText.includes("木部发达")
   ||
-  featureText.includes("皮木比例接近1比1");
+
+  featureText.includes("中心木部巨大")
+  ||
+
+  featureText.includes("木部明显发达")
+
+  ||
+
+  featureText.includes("皮部较薄")
+
+  ||
+
+  featureText.includes("皮木比例不符合党参")
+
+  ||
+
+  featureText.includes("木部占主导");
+
   
     // =========================
     // 黄芪A级证据
@@ -214,6 +233,34 @@ if (
   featureText.includes("木部发达")
 ) {
   dangshenScore -= 8;
+}
+
+// =========================
+// DS-ANTI-LARGE-XYLEM
+// 木部过大反党参
+// =========================
+
+if (
+
+  featureText.includes("木部占比明显大于皮部")
+  ||
+
+  featureText.includes("木部占比较大")
+  ||
+
+  featureText.includes("木部占主导")
+  ||
+
+  featureText.includes("皮部较薄")
+
+) {
+
+  console.log(
+    "[DS_ANTI_LARGE_XYLEM]"
+  );
+
+  dangshenScore -= 12;
+
 }
 
     // =========================
@@ -460,6 +507,34 @@ if (
 
     let finalHerbName =
       herbName;
+
+// =========================
+// DANGSHEN HARD REJECTION
+// =========================
+
+if (
+
+  herbName === "党参"
+
+  &&
+
+  (
+    featureText.includes("木部占比明显大于皮部")
+    ||
+    featureText.includes("木部占比较大")
+    ||
+    featureText.includes("木部占主导")
+  )
+
+) {
+
+  console.log(
+    "[DANGSHEN_HARD_REJECT]"
+  );
+
+  finalHerbName = "防风";
+
+}
 
       if (
   herbName === "党参" &&
