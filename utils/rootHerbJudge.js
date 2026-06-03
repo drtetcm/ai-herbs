@@ -311,7 +311,12 @@ if (
   ||
   featureText.includes("斜切片")
 ) {
-  huangqiScore += 3;
+
+  console.log(
+    "[HQ_OBLIQUE_SHAPE]"
+  );
+
+  huangqiScore += 8;
 }
 
 if (
@@ -324,8 +329,49 @@ if (
   featureText.includes("粗长放射纹")
   ||
   featureText.includes("纤维束明显")
+  ||
+  featureText.includes("放射状纹理")
 ) {
+
+  console.log(
+    "[HQ_FIBER_BONUS]"
+  );
+
   huangqiScore += 6;
+}
+
+if (
+
+  (
+    featureText.includes("中心偏白色")
+    ||
+    featureText.includes("中心偏白")
+  )
+
+  &&
+
+  (
+    featureText.includes("椭圆形")
+    ||
+    featureText.includes("长椭圆形")
+  )
+
+  &&
+
+  (
+    featureText.includes("黄白色")
+    ||
+    featureText.includes("淡黄白")
+  )
+
+) {
+
+  console.log(
+    "[HQ013_STYLE]"
+  );
+
+  huangqiScore += 8;
+
 }
 
     // =========================
@@ -594,11 +640,19 @@ const huangqiObliqueSlice =
 
 &&
 
-featureText.includes("黄白色")
+(
+  featureText.includes("黄白色")
+  ||
+  featureText.includes("淡黄白")
+)
 
 &&
 
-featureText.includes("放射纹")
+(
+  featureText.includes("放射纹")
+  ||
+  featureText.includes("放射状纹理")
+)
 
 &&
 
@@ -608,6 +662,8 @@ featureText.includes("放射纹")
   featureText.includes("木部偏小")
   ||
   featureText.includes("中心偏白")
+  ||
+  featureText.includes("中心偏白色")
 );
 
 const strongFangfeng =
