@@ -754,7 +754,9 @@ if (
 
   &&
 
-  gancaoScore > huangqiScore
+  (
+      gancaoScore >= huangqiScore - 6
+  )
 
 ) {
 
