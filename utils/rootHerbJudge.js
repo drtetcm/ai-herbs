@@ -304,26 +304,6 @@ if (
 // 黄芪斜切片补偿
 // =========================
 
-if (
-  featureText.includes("粗直纤维束")
-  ||
-  featureText.includes("纤维外露")
-  ||
-  featureText.includes("放射纹粗长")
-  ||
-  featureText.includes("粗长放射纹")
-  ||
-  featureText.includes("纤维束明显")
-  ||
-  featureText.includes("放射状纹理")
-) {
-  console.log(
-    "[HQ_FIBER_BONUS]"
-  );
-
-  huangqiScore += 6;
-}
-
     // =========================
 // 防风特征
 // =========================
