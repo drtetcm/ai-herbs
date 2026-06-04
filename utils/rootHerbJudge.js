@@ -64,16 +64,6 @@ if (
   gancaoScore += 6;
 }
 
-// 次级颜色特征
-
-if (
-  featureText.includes("棕褐色")
-  &&
-  !featureText.includes("灰褐色")
-) {
-  gancaoScore += 2;
-}
-
 // 皮木分层
 
 if (
@@ -91,15 +81,29 @@ if (
 // 甘草典型斜切片
 
 if (
-  featureText.includes("长椭圆形")
-  ||
-  featureText.includes("斜切片")
-  ||
-  featureText.includes("斜切薄片")
-  ||
-  featureText.includes("斜切厚片")
+
+  (
+    featureText.includes("红棕色")
+    ||
+    featureText.includes("棕红色")
+  )
+
+  &&
+
+  (
+    featureText.includes("长椭圆形")
+    ||
+    featureText.includes("斜切片")
+    ||
+    featureText.includes("斜切薄片")
+    ||
+    featureText.includes("斜切厚片")
+  )
+
 ) {
-  gancaoScore += 3;
+
+  gancaoScore += 8;
+
 }
 
 // 红棕色 + 长椭圆斜切片
