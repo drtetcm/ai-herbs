@@ -305,21 +305,6 @@ if (
 // =========================
 
 if (
-  featureText.includes("长椭圆形")
-  ||
-  featureText.includes("椭圆形")
-  ||
-  featureText.includes("斜切片")
-) {
-
-  console.log(
-    "[HQ_OBLIQUE_SHAPE]"
-  );
-
-  huangqiScore += 5;
-}
-
-if (
   featureText.includes("粗直纤维束")
   ||
   featureText.includes("纤维外露")
@@ -332,7 +317,6 @@ if (
   ||
   featureText.includes("放射状纹理")
 ) {
-
   console.log(
     "[HQ_FIBER_BONUS]"
   );
