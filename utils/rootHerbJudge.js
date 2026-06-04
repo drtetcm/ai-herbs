@@ -753,7 +753,6 @@ if (
 // =========================
 // 甘草纠偏
 // =========================
-
 if (
 
   herbName === "黄芪"
@@ -764,15 +763,21 @@ if (
 
   &&
 
-  gancaoScore >= 10
+  gancaoScore >= 12
 
   &&
 
-  (
-      gancaoScore >= huangqiScore - 6
-  )
+  gancaoScore >= huangqiScore - 5
 
 ) {
+
+  console.log(
+    "[ROOT_JUDGE] 黄芪 -> 甘草"
+  );
+
+  finalHerbName = "甘草";
+
+} {
 
   console.log(
     "[ROOT_JUDGE] 黄芪 -> 甘草"
@@ -786,6 +791,8 @@ if (
       herbName === "黄芪" &&
       confidence <= 70 &&
       dangshenScore - huangqiScore >= 10
+      &&
+      gancaoScore < dangshenScore
     ) {
 
       console.log(
