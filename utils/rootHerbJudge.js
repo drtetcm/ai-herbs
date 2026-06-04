@@ -50,25 +50,31 @@ function rootHerbJudge(result) {
 // 甘草特征
 // =========================
 
+// 红棕色外皮（最强特征）
+
 if (
   featureText.includes("红棕色")
   ||
   featureText.includes("棕红色")
+  ||
+  featureText.includes("红棕色外皮")
+  ||
+  featureText.includes("棕红色外皮")
 ) {
   gancaoScore += 6;
 }
 
-if (
-  featureText.includes("棕褐色")
-) {
-  gancaoScore += 3;
-}
+// 次级颜色特征
 
 if (
-  featureText.includes("形成层环")
+  featureText.includes("棕褐色")
+  &&
+  !featureText.includes("灰褐色")
 ) {
-  gancaoScore += 4;
+  gancaoScore += 2;
 }
+
+// 皮木分层
 
 if (
   featureText.includes("皮层清晰可见")
@@ -82,6 +88,8 @@ if (
   gancaoScore += 4;
 }
 
+// 甘草典型斜切片
+
 if (
   featureText.includes("长椭圆形")
   ||
@@ -94,12 +102,41 @@ if (
   gancaoScore += 3;
 }
 
+// 红棕色 + 长椭圆斜切片
+// 强化典型甘草
+
 if (
-  featureText.includes("黄白色断面")
-  ||
-  featureText.includes("淡黄色断面")
+
+  (
+    featureText.includes("红棕色")
+    ||
+    featureText.includes("棕红色")
+    ||
+    featureText.includes("红棕色外皮")
+    ||
+    featureText.includes("棕红色外皮")
+  )
+
+  &&
+
+  (
+    featureText.includes("长椭圆形")
+    ||
+    featureText.includes("斜切片")
+    ||
+    featureText.includes("斜切薄片")
+    ||
+    featureText.includes("斜切厚片")
+  )
+
 ) {
-  gancaoScore += 2;
+
+  console.log(
+    "[GC_TYPICAL_SLICE]"
+  );
+
+  gancaoScore += 6;
+
 }
 
     const notDangshenCore =
@@ -777,15 +814,7 @@ if (
 
   finalHerbName = "甘草";
 
-} {
-
-  console.log(
-    "[ROOT_JUDGE] 黄芪 -> 甘草"
-  );
-
-  finalHerbName = "甘草";
-
-}
+} 
 
     if (
       herbName === "黄芪" &&
