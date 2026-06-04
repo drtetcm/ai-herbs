@@ -46,18 +46,22 @@ function rootHerbJudge(result) {
     let fangfengScore = 0;
     let gancaoScore = 0;
 
-    // =========================
+// =========================
 // 甘草特征
 // =========================
 
 if (
-  featureText.includes("红棕色外皮")
+  featureText.includes("红棕色")
   ||
-  featureText.includes("棕红色外皮")
-  ||
-  featureText.includes("外皮红棕色")
+  featureText.includes("棕红色")
 ) {
-  gancaoScore += 8;
+  gancaoScore += 6;
+}
+
+if (
+  featureText.includes("棕褐色")
+) {
+  gancaoScore += 3;
 }
 
 if (
@@ -67,9 +71,13 @@ if (
 }
 
 if (
-  featureText.includes("皮木分层明显")
+  featureText.includes("皮层清晰可见")
+  ||
+  featureText.includes("皮木分层")
   ||
   featureText.includes("皮层与木部界限清晰")
+  ||
+  featureText.includes("外皮与断面颜色对比明显")
 ) {
   gancaoScore += 4;
 }
@@ -77,13 +85,19 @@ if (
 if (
   featureText.includes("长椭圆形")
   ||
-  featureText.includes("长椭圆形斜切片")
+  featureText.includes("斜切片")
+  ||
+  featureText.includes("斜切薄片")
+  ||
+  featureText.includes("斜切厚片")
 ) {
   gancaoScore += 3;
 }
 
 if (
   featureText.includes("黄白色断面")
+  ||
+  featureText.includes("淡黄色断面")
 ) {
   gancaoScore += 2;
 }
@@ -792,10 +806,11 @@ if (
     herbName !== finalHerbName,
 
   root_scores: {
-    dangshenScore,
-    huangqiScore,
-    fangfengScore
-  }
+  dangshenScore,
+  huangqiScore,
+  fangfengScore,
+  gancaoScore
+}
 };
 
   } catch (err) {
