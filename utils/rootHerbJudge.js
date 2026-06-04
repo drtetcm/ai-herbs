@@ -44,6 +44,49 @@ function rootHerbJudge(result) {
     let dangshenScore = 0;
     let huangqiScore = 0;
     let fangfengScore = 0;
+    let gancaoScore = 0;
+
+    // =========================
+// 甘草特征
+// =========================
+
+if (
+  featureText.includes("红棕色外皮")
+  ||
+  featureText.includes("棕红色外皮")
+  ||
+  featureText.includes("外皮红棕色")
+) {
+  gancaoScore += 8;
+}
+
+if (
+  featureText.includes("形成层环")
+) {
+  gancaoScore += 4;
+}
+
+if (
+  featureText.includes("皮木分层明显")
+  ||
+  featureText.includes("皮层与木部界限清晰")
+) {
+  gancaoScore += 4;
+}
+
+if (
+  featureText.includes("长椭圆形")
+  ||
+  featureText.includes("长椭圆形斜切片")
+) {
+  gancaoScore += 3;
+}
+
+if (
+  featureText.includes("黄白色断面")
+) {
+  gancaoScore += 2;
+}
 
     const notDangshenCore =
 
@@ -560,7 +603,8 @@ if (
     herbName,
     dangshenScore,
     huangqiScore,
-    fangfengScore
+    fangfengScore,
+    gancaoScore
   }
 );
 
@@ -690,6 +734,36 @@ if (
   );
 
   finalHerbName = "防风";
+}
+
+// =========================
+// 甘草纠偏
+// =========================
+
+if (
+
+  herbName === "黄芪"
+
+  &&
+
+  confidence <= 85
+
+  &&
+
+  gancaoScore >= 10
+
+  &&
+
+  gancaoScore > huangqiScore
+
+) {
+
+  console.log(
+    "[ROOT_JUDGE] 黄芪 -> 甘草"
+  );
+
+  finalHerbName = "甘草";
+
 }
 
     if (
