@@ -42,7 +42,7 @@ export function herbRuleEngine(result) {
 
       if (
         f.includes("无形成层环") ||
-        f.includes("无棕褐色形成层环")
+        f.includes("未见深色形成层环")
       ) {
         return "无形成层环";
       }
