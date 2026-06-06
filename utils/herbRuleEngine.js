@@ -14,6 +14,15 @@ export function herbRuleEngine(result) {
 
     return features.map((f) => {
 
+      if (
+  f.includes("未见形成层环") ||
+  f.includes("未见明显形成层环") ||
+  f.includes("未见深色形成层环") ||
+  f.includes("未见明显深色形成层环")
+) {
+  return "无形成层环";
+}
+
       /*
       ============================
       否定特征优先
