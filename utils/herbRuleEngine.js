@@ -126,10 +126,15 @@ if (
 }
 
 if (
-  f.includes("边缘皱缩") ||
+  f.includes("边缘皱缩")
+) {
+  return "边缘皱缩";
+}
+
+if (
   f.includes("波浪边缘")
 ) {
-  return "党参核心";
+  return "波浪边缘";
 }
 
       /*
@@ -250,6 +255,13 @@ const dangshenScore =
     (f) => f === "党参核心"
   ).length;
 
+const dangshenStrongScore =
+  features.filter(
+    (f) =>
+      f === "狮子盘头" ||
+      f === "环状横纹"
+  ).length;
+
   /*
   ====================================
   麦冬排除
@@ -277,6 +289,7 @@ const dangshenScore =
 if (
   herbForm === "slice" &&
   dangshenScore >= 2 &&
+  dangshenStrongScore >= 1 &&
   herbName === "黄芪"
 ) {
 
@@ -298,7 +311,9 @@ if (
   if (
   has("油室") &&
   has("放射状纹理") &&
-  !has("无油室")
+  !has("无油室") &&
+  !has("形成层环") &&
+  !has("菊花心")
 ) {
   herbName = "白术";
 
