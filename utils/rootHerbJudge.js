@@ -666,6 +666,35 @@ if (
     let finalHerbName =
       herbName;
 
+const isJiegengCase =
+
+featureText.includes("桔梗")
+||
+featureText.includes("花瓣状波浪边缘")
+||
+featureText.includes("花朵状切面")
+||
+featureText.includes("浅棕黄色形成层环")
+||
+featureText.includes("断面致密紧实");
+
+if (isJiegengCase) {
+
+  return {
+    ...result,
+    herb_name: herbName,
+    original_herb_name: herbName,
+    rule_corrected: false,
+    root_scores: {
+      dangshenScore,
+      huangqiScore,
+      fangfengScore,
+      gancaoScore
+    }
+  };
+
+}
+
 // =========================
 // DANGSHEN HARD REJECTION
 // =========================
