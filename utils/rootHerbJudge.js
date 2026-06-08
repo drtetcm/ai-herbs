@@ -765,8 +765,38 @@ if (fakeHuangqiLongSlice) {
   }
 );
 
-    let finalHerbName =
-      herbName;
+let finalHerbName =
+  herbName;
+
+// =========================
+// JIEGENG STRONG EVIDENCE
+// =========================
+
+const jiegengStrongEvidence =
+
+featureText.includes("桔梗")
+||
+featureText.includes("花瓣状波浪边缘")
+||
+featureText.includes("花朵状切面")
+||
+featureText.includes("花瓣状")
+||
+featureText.includes("波浪边缘")
+||
+featureText.includes("断面致密")
+||
+featureText.includes("断面致密紧实")
+||
+featureText.includes("边缘呈花瓣状")
+||
+featureText.includes("浅棕黄色形成层环");
+
+if (jiegengStrongEvidence) {
+
+  jiegengLongSliceScore += 4;
+
+}
 
 // =========================
 // JIEGENG LONG SLICE FIX
@@ -788,6 +818,32 @@ if (
 
   console.log(
     "[JIEGENG_LONG_SLICE_FIX]"
+  );
+
+  finalHerbName = "桔梗";
+
+}
+
+// =========================
+// FANGFENG -> JIEGENG FIX
+// =========================
+
+if (
+
+  herbName === "防风"
+
+  &&
+
+  confidence <= 70
+
+  &&
+
+  jiegengLongSliceScore >= 5
+
+) {
+
+  console.log(
+    "[JIEGENG_ANTI_FANGFENG]"
   );
 
   finalHerbName = "桔梗";
@@ -823,7 +879,6 @@ if (isJiegengCase) {
   };
 
 }
-
 // =========================
 // DANGSHEN HARD REJECTION
 // =========================
