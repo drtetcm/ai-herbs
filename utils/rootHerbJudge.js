@@ -4,6 +4,115 @@ console.log(
   "[ROOT_HERB_JUDGE] V5 Loaded"
 );
 
+function buildCorrectionReason(
+  originalHerb,
+  finalHerb,
+  featureText
+) {
+
+  const reasons = [];
+
+  // 黄芪 -> 党参
+
+  if (
+    originalHerb === "黄芪" &&
+    finalHerb === "党参"
+  ) {
+
+    if (
+      featureText.includes("皮部较宽")
+    ) {
+      reasons.push(
+        "发现皮部较宽特征"
+      );
+    }
+
+    if (
+      featureText.includes("木部较小")
+      ||
+      featureText.includes("中心较小")
+    ) {
+      reasons.push(
+        "发现木部较小特征"
+      );
+    }
+
+    if (
+      featureText.includes("皮宽芯小")
+    ) {
+      reasons.push(
+        "发现皮宽芯小结构"
+      );
+    }
+
+    reasons.push(
+      "整体特征更符合党参"
+    );
+  }
+
+  // 黄芪 -> 甘草
+
+  if (
+    originalHerb === "黄芪" &&
+    finalHerb === "甘草"
+  ) {
+
+    reasons.push(
+      "发现红棕色外皮"
+    );
+
+    reasons.push(
+      "发现典型甘草斜切片"
+    );
+
+    reasons.push(
+      "整体特征更符合甘草"
+    );
+  }
+
+  // 党参 -> 防风
+
+  if (
+    originalHerb === "党参" &&
+    finalHerb === "防风"
+  ) {
+
+    reasons.push(
+      "发现形成层环"
+    );
+
+    reasons.push(
+      "发现菊花心结构"
+    );
+
+    reasons.push(
+      "整体特征更符合防风"
+    );
+  }
+
+  // 黄芪 -> 桔梗
+
+  if (
+    originalHerb === "黄芪" &&
+    finalHerb === "桔梗"
+  ) {
+
+    reasons.push(
+      "发现纵切片特征"
+    );
+
+    reasons.push(
+      "发现空洞或裂隙结构"
+    );
+
+    reasons.push(
+      "整体特征更符合桔梗"
+    );
+  }
+
+  return reasons;
+}
+
 function rootHerbJudge(result) {
   try {
 
@@ -865,18 +974,29 @@ featureText.includes("断面致密紧实");
 if (isJiegengCase) {
 
   return {
-    ...result,
-    herb_name: finalHerbName,
-    original_herb_name: herbName,
-    rule_corrected:
-      herbName !== finalHerbName,
-    root_scores: {
-      dangshenScore,
-      huangqiScore,
-      fangfengScore,
-      gancaoScore
-    }
-  };
+  ...result,
+
+  herb_name: finalHerbName,
+
+  original_herb_name: herbName,
+
+  rule_corrected:
+    herbName !== finalHerbName,
+
+  correction_reason:
+    buildCorrectionReason(
+      herbName,
+      finalHerbName,
+      featureText
+    ),
+
+  root_scores: {
+    dangshenScore,
+    huangqiScore,
+    fangfengScore,
+    gancaoScore
+  }
+};
 
 }
 // =========================
@@ -1048,7 +1168,7 @@ if (
       finalHerbName = "党参";
     }
 
-    return {
+return {
   ...result,
 
   herb_name: finalHerbName,
@@ -1058,12 +1178,19 @@ if (
   rule_corrected:
     herbName !== finalHerbName,
 
+  correction_reason:
+    buildCorrectionReason(
+      herbName,
+      finalHerbName,
+      featureText
+    ),
+
   root_scores: {
-  dangshenScore,
-  huangqiScore,
-  fangfengScore,
-  gancaoScore
-}
+    dangshenScore,
+    huangqiScore,
+    fangfengScore,
+    gancaoScore
+  }
 };
 
   } catch (err) {
