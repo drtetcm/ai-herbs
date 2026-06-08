@@ -884,7 +884,11 @@ if (
 
   &&
 
-  jiegengLongSliceScore >= 6
+  jiegengLongSliceScore >= 10
+
+  &&
+
+  featureText.includes("纵切")
 
 ) {
 
