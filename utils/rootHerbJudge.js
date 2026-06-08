@@ -810,9 +810,10 @@ if (isJiegengCase) {
 
   return {
     ...result,
-    herb_name: herbName,
+    herb_name: finalHerbName,
     original_herb_name: herbName,
-    rule_corrected: false,
+    rule_corrected:
+      herbName !== finalHerbName,
     root_scores: {
       dangshenScore,
       huangqiScore,
