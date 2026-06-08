@@ -652,19 +652,147 @@ if (
       dangshenScore += 10;
     }
 
-    console.log(
+    // =========================
+// JIEGENG LONG SLICE V1
+// 桔梗纵切片识别
+// =========================
+
+let jiegengLongSliceScore = 0;
+
+// 长条纵切
+
+if (
+  featureText.includes("纵切")
+  ||
+  featureText.includes("纵切片")
+  ||
+  featureText.includes("长条形")
+  ||
+  featureText.includes("长条状")
+) {
+  jiegengLongSliceScore += 2;
+}
+
+// 空洞
+
+if (
+  featureText.includes("空洞")
+  ||
+  featureText.includes("中空")
+  ||
+  featureText.includes("髓部")
+  ||
+  featureText.includes("疏松结构")
+) {
+  jiegengLongSliceScore += 4;
+}
+
+// 裂隙
+
+if (
+  featureText.includes("裂隙")
+  ||
+  featureText.includes("放射裂隙")
+  ||
+  featureText.includes("裂纹")
+) {
+  jiegengLongSliceScore += 3;
+}
+
+// 卷曲
+
+if (
+  featureText.includes("边缘卷曲")
+  ||
+  featureText.includes("卷曲")
+) {
+  jiegengLongSliceScore += 2;
+}
+
+// 纵切桔梗常见关键词
+
+if (
+  featureText.includes("桔梗纵切片")
+  ||
+  featureText.includes("桔梗纵切")
+) {
+  jiegengLongSliceScore += 8;
+}
+
+// 黄芪幻觉特征压制
+
+const fakeHuangqiLongSlice =
+
+(
+  featureText.includes("木部连续致密")
+  ||
+  featureText.includes("整体结构紧实")
+  ||
+  featureText.includes("纤维束粗直连续")
+)
+
+&&
+
+(
+  featureText.includes("无法完整验证")
+  ||
+  featureText.includes("无法直接观察")
+  ||
+  featureText.includes("横截面内部结构不可见")
+  ||
+  featureText.includes("纵切片形态")
+);
+
+if (fakeHuangqiLongSlice) {
+
+  console.log(
+    "[FAKE_HUANGQI_LONG_SLICE]"
+  );
+
+  huangqiScore -= 8;
+
+}
+
+  console.log(
   "[ROOT_HERB_SCORES]",
   {
     herbName,
     dangshenScore,
     huangqiScore,
     fangfengScore,
-    gancaoScore
+    gancaoScore,
+    jiegengLongSliceScore
   }
 );
 
     let finalHerbName =
       herbName;
+
+// =========================
+// JIEGENG LONG SLICE FIX
+// =========================
+
+if (
+
+  herbName === "黄芪"
+
+  &&
+
+  confidence <= 70
+
+  &&
+
+  jiegengLongSliceScore >= 6
+
+) {
+
+  console.log(
+    "[JIEGENG_LONG_SLICE_FIX]"
+  );
+
+  finalHerbName = "桔梗";
+
+}
 
 const isJiegengCase =
 
