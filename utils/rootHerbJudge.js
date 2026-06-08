@@ -791,6 +791,16 @@ if (
   jiegengLongSliceScore += 2;
 }
 
+if (
+ featureText.includes("波浪状")
+ ||
+ featureText.includes("波浪边缘")
+ ||
+ featureText.includes("边缘不规则")
+) {
+  jiegengLongSliceScore += 3;
+}
+
 // 纵切桔梗常见关键词
 
 if (
@@ -799,6 +809,14 @@ if (
   featureText.includes("桔梗纵切")
 ) {
   jiegengLongSliceScore += 8;
+}
+
+if (
+ featureText.includes("条片状纵切")
+ ||
+ featureText.includes("纵切长条片")
+) {
+  jiegengLongSliceScore += 4;
 }
 
 // 黄芪幻觉特征压制
