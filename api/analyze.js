@@ -3005,6 +3005,19 @@ if (parsed.rule_corrected) {
   const scores =
     parsed.root_scores || {};
 
+  const correctionReasons =
+    parsed.correction_reason || [];
+
+  const correctionText =
+    correctionReasons.length > 0
+      ? correctionReasons
+          .map(
+            (reason, index) =>
+              `${index + 1}. ${reason}`
+          )
+          .join("\n")
+      : "暂无纠偏依据";
+
   expertAnalysis = `
 系统规则引擎已对AI初始结果进行纠偏。
 
@@ -3021,6 +3034,12 @@ ${parsed.original_herb_name || "未知"}
 
 最终判定：
 ${normalizedResult.herb_name}
+
+--------------------------------
+
+规则纠偏依据：
+
+${correctionText}
 
 --------------------------------
 
