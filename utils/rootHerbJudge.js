@@ -711,6 +711,27 @@ if (
       dangshenScore += 10;
     }
 
+    if (
+
+ herbName === "黄芪"
+
+ && confidence <= 70
+
+ && candidateDangshen
+
+ && candidateHuangqi
+
+ && featureText.includes("纵向纹理")
+
+ && featureText.includes("类圆柱形")
+
+ && weakHuangqiEvidence
+
+) {
+
+ dangshenScore += 8;
+
+}
     // =========================
 // JIEGENG LONG SLICE V1
 // 桔梗纵切片识别
@@ -1087,7 +1108,7 @@ if (
 
   &&
 
-  gancaoScore >= 14
+  gancaoScore >= 10
 
   &&
 
