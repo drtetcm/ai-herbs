@@ -3034,6 +3034,8 @@ ${parsed.original_herb_name || "未知"}
 
 防风：${scores.fangfengScore ?? "-"}
 
+甘草：${scores.gancaoScore ?? "-"}
+
 最终判定：
 ${normalizedResult.herb_name}
 
@@ -3045,8 +3047,8 @@ ${correctionText}
 
 --------------------------------
 
-以下内容为AI初始分析，
-最终结果已由规则引擎综合修正：
+AI视觉模型原始分析
+（仅供参考）：
 
 ${normalizedResult.reasoning || ""}
 `;

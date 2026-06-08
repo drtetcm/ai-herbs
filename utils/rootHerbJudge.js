@@ -46,7 +46,7 @@ function buildCorrectionReason(
     }
 
     reasons.push(
-      "整体特征更符合党参"
+      "皮宽芯小结构更符合党参"
     );
   }
 
@@ -66,8 +66,8 @@ function buildCorrectionReason(
     );
 
     reasons.push(
-      "整体特征更符合甘草"
-    );
+  "皮木分层及断面结构符合甘草特征"
+);
   }
 
   // 党参 -> 防风
@@ -86,7 +86,7 @@ function buildCorrectionReason(
     );
 
     reasons.push(
-      "整体特征更符合防风"
+      "形成层环与菊花心更符合防风"
     );
   }
 
@@ -106,7 +106,7 @@ function buildCorrectionReason(
     );
 
     reasons.push(
-      "整体特征更符合桔梗"
+      "裂隙与髓部结构更符合桔梗"
     );
   }
 
