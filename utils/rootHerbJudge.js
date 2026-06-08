@@ -211,44 +211,7 @@ if (
 
 ) {
 
-  gancaoScore += 8;
-
-}
-
-// 红棕色 + 长椭圆斜切片
-// 强化典型甘草
-
-if (
-
-  (
-    featureText.includes("红棕色")
-    ||
-    featureText.includes("棕红色")
-    ||
-    featureText.includes("红棕色外皮")
-    ||
-    featureText.includes("棕红色外皮")
-  )
-
-  &&
-
-  (
-    featureText.includes("长椭圆形")
-    ||
-    featureText.includes("斜切片")
-    ||
-    featureText.includes("斜切薄片")
-    ||
-    featureText.includes("斜切厚片")
-  )
-
-) {
-
-  console.log(
-    "[GC_TYPICAL_SLICE]"
-  );
-
-  gancaoScore += 6;
+  gancaoScore += 3;
 
 }
 
