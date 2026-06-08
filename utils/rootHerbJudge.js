@@ -180,8 +180,10 @@ if (
 
   (
     featureText.includes("红棕色")
-    ||
-    featureText.includes("棕红色")
+||
+featureText.includes("棕红色")
+||
+featureText.includes("棕褐色")
   )
 
   &&
