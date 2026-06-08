@@ -128,19 +128,6 @@ function rootHerbJudge(result) {
 
       ...(result.observed_features || []),
 
-      result.reasoning || "",
-
-      result.visual_analysis?.color || "",
-      result.visual_analysis?.texture || "",
-      result.visual_analysis?.shape || "",
-      result.visual_analysis?.surface || "",
-      result.visual_analysis?.edges || "",
-      result.visual_analysis?.structure || "",
-
-      ...(result.possible_candidates || []).map(
-        item => item.reason || ""
-      )
-
     ]
       .join(" ")
       .toLowerCase();
@@ -380,7 +367,7 @@ if (
     if (
       featureText.includes("边缘皱缩")
     ) {
-      dangshenScore += 4;
+      dangshenScore += 2;
     }
 
     if (
@@ -884,7 +871,7 @@ if (
 
   &&
 
-  jiegengLongSliceScore >= 10
+  jiegengLongSliceScore >= 14
 
   &&
 
@@ -1062,7 +1049,7 @@ if (
 
   &&
 
-  fangfengScore <= 18
+  fangfengScore <= 8
 
 ) {
 
@@ -1096,11 +1083,11 @@ if (
 
   &&
 
-  confidence <= 85
+  confidence <= 70
 
   &&
 
-  gancaoScore >= 12
+  gancaoScore >= 14
 
   &&
 
