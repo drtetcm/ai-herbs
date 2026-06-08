@@ -2249,7 +2249,9 @@ console.log(
   {
     herb_form: parsed.herb_form,
     herb_name: parsed.herb_name,
-    confidence: parsed.confidence
+    confidence: parsed.confidence,
+    rule_corrected: parsed.rule_corrected,
+    correction_reason: parsed.correction_reason
   }
 );
 
