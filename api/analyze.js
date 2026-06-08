@@ -3024,7 +3024,8 @@ ${normalizedResult.herb_name}
 
 --------------------------------
 
-以下为AI原始分析（仅供参考）：
+以下内容为AI初始分析，
+最终结果已由规则引擎综合修正：
 
 ${normalizedResult.reasoning || ""}
 `;
