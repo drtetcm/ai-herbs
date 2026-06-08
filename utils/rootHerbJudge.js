@@ -812,6 +812,12 @@ if (
 }
 
 if (
+  featureText.includes("长条形纵切片")
+) {
+  jiegengLongSliceScore += 4;
+}
+
+if (
  featureText.includes("条片状纵切")
  ||
  featureText.includes("纵切长条片")
@@ -920,7 +926,7 @@ if (
 
   &&
 
-  jiegengLongSliceScore >= 14
+  jiegengLongSliceScore >= 10
 
   &&
 
