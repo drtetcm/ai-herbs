@@ -2649,23 +2649,25 @@ else if (
 }
 
 // =========================
-// MORPHOLOGY FAILURE
+// INDUSTRIAL UNKNOWN V2
 // =========================
+
+const severeMorphologyFailure =
+
+  Number(parsed.morphology_integrity) < 35
+
+  &&
+
+  Number(parsed.subject_completeness) < 35
+
+  &&
+
+  Number(parsed.visibility) < 40;
 
 if (
-  Number(parsed.morphology_integrity) < 50
-) {
 
-  forceUnknown = true;
+  severeMorphologyFailure
 
-}
-
-// =========================
-// SUBJECT INCOMPLETE
-// =========================
-
-if (
-  Number(parsed.subject_completeness) < 50
 ) {
 
   forceUnknown = true;
