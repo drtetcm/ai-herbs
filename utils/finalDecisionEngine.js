@@ -156,8 +156,14 @@ if (
 
   // 中药常见场景
   if (
-    scene_interference === "background_objects"
-  ) {
+
+  scene_interference === "background_objects"
+
+  ||
+
+  scene_interference === "mixed_objects"
+
+) {
 
     final_confidence -= 5;
 
@@ -260,7 +266,24 @@ if (
 const candidateCount =
   possible_candidates?.length || 0;
 
-if (candidateCount >= 4) {
+const top1 =
+  possible_candidates?.[0]?.confidence || 0;
+
+const top2 =
+  possible_candidates?.[1]?.confidence || 0;
+
+const confidenceGap =
+  top1 - top2;
+
+if (
+
+  candidateCount >= 4
+
+  &&
+
+  confidenceGap < 10
+
+) {
 
   unknown_probability += 15;
 
