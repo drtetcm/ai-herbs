@@ -819,6 +819,14 @@ if (
   jiegengLongSliceScore += 4;
 }
 
+if (
+ featureText.includes("条片状纵切")
+ ||
+ featureText.includes("纵切条")
+) {
+  jiegengLongSliceScore += 4;
+}
+
 // 黄芪幻觉特征压制
 
 const fakeHuangqiLongSlice =
