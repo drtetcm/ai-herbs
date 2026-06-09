@@ -1015,7 +1015,7 @@ featureText.includes("花瓣样轮廓");
 
 if (jiegengStrongEvidence) {
 
-  jiegengLongSliceScore += 4;
+  jiegengLongSliceScore += 8;
 
 }
 
@@ -1051,6 +1051,24 @@ if (
   );
 
   jiegengLongSliceScore += 4;
+
+}
+
+if (
+
+ featureText.includes("花瓣状波浪形皱缩")
+
+ ||
+
+ featureText.includes("花盘状中心结构")
+
+) {
+
+ console.log(
+   "[JIEGENG_HARD_EVIDENCE]"
+ );
+
+ jiegengLongSliceScore += 4;
 
 }
 
