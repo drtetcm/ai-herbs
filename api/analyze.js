@@ -3055,9 +3055,19 @@ ${correctionText}
 AI视觉模型原始分析
 （仅供参考）：
 
-规则引擎已根据中药鉴定学规则完成最终判定。
+该部分为视觉模型初步判断，
+已被规则引擎重新审核。
 
-${normalizedResult.reasoning || ""}
+最终结果以规则引擎判定为准。
+
+原始AI候选：
+${
+  (
+    normalizedResult.possible_candidates || []
+  )
+    .map(c => c.herb_name)
+    .join("、") || "无"
+}
 `;
 
 } else {
