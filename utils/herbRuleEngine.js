@@ -84,13 +84,22 @@ export function herbRuleEngine(result) {
       }
 
       if (
-        f.includes("纵向皱纹") ||
-        f.includes("纵向沟纹") ||
-        f.includes("纵纹") ||
-        f.includes("纵向纹理")
-      ) {
-        return "纵向纹理";
-      }
+  f.includes("纵向皱纹")
+  ||
+  f.includes("纵皱纹")
+) {
+  return "纵皱纹";
+}
+
+if (
+  f.includes("纵向沟纹")
+  ||
+  f.includes("纵纹")
+  ||
+  f.includes("纵向纹理")
+) {
+  return "纵向纹理";
+}
 
       if (
         f.includes("节状突起")
