@@ -1034,6 +1034,41 @@ if (jiegengStrongEvidence) {
 
 }
 
+if (
+
+  featureText.includes("粉性质感明显")
+  ||
+  featureText.includes("粉性强")
+  ||
+  featureText.includes("致密白色断面")
+) {
+
+  console.log(
+    "[JIEGENG_POWDER_SLICE]"
+  );
+
+  jiegengLongSliceScore += 4;
+
+}
+
+if (
+
+  featureText.includes("浅棕黄色")
+  &&
+  featureText.includes("皮薄")
+  &&
+  featureText.includes("粉性")
+
+) {
+
+  console.log(
+    "[JIEGENG_LIGHT_BROWN_SLICE]"
+  );
+
+  jiegengLongSliceScore += 4;
+
+}
+
 // =========================
 // JIEGENG LONG SLICE FIX
 // =========================
