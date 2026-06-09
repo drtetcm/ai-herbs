@@ -487,20 +487,31 @@ if (
 
 if (
 
-  featureText.includes("木部与皮部分层")
-  ||
-  featureText.includes("皮木分层")
-  ||
-  featureText.includes("皮部与木部界限")
-  ||
-  featureText.includes("木部与皮部结构")
+  (
+    featureText.includes("木部与皮部分层")
+    ||
+    featureText.includes("皮木分层")
+    ||
+    featureText.includes("皮部与木部界限")
+  )
+
+  &&
+
+  (
+    featureText.includes("皮部较宽")
+    ||
+    featureText.includes("皮宽芯小")
+    ||
+    featureText.includes("木部较小")
+  )
+
 ) {
 
   console.log(
     "[DANGSHEN_LAYER]"
   );
 
-  dangshenScore += 10;
+  dangshenScore += 6;
 
 }
 
@@ -989,18 +1000,6 @@ if (fakeHuangqiLongSlice) {
 
 }
 
-  console.log(
-  "[ROOT_HERB_SCORES]",
-  {
-    herbName,
-    dangshenScore,
-    huangqiScore,
-    fangfengScore,
-    gancaoScore,
-    jiegengLongSliceScore
-  }
-);
-
 let finalHerbName =
   herbName;
 
@@ -1026,7 +1025,15 @@ featureText.includes("断面致密紧实")
 ||
 featureText.includes("边缘呈花瓣状")
 ||
-featureText.includes("浅棕黄色形成层环");
+featureText.includes("浅棕黄色形成层环")
+||
+featureText.includes("花瓣状")
+||
+featureText.includes("花瓣状轮廓")
+||
+featureText.includes("花瓣样")
+||
+featureText.includes("花瓣样轮廓");
 
 if (jiegengStrongEvidence) {
 
@@ -1069,6 +1076,47 @@ if (
 
 }
 
+console.log(
+  "[ROOT_HERB_SCORES]",
+  {
+    herbName,
+    dangshenScore,
+    huangqiScore,
+    fangfengScore,
+    gancaoScore,
+    jiegengLongSliceScore
+  }
+);
+
+// =========================
+// JG TYPE B
+// 桔梗横切片
+// =========================
+
+if (
+
+  featureText.includes("粉性质感")
+
+  &&
+
+  (
+    featureText.includes("波浪状")
+    ||
+    featureText.includes("边缘不规则")
+    ||
+    featureText.includes("花瓣状")
+  )
+
+) {
+
+  console.log(
+    "[JG_TYPE_B]"
+  );
+
+  jiegengLongSliceScore += 6;
+
+}
+
 // =========================
 // JIEGENG LONG SLICE FIX
 // =========================
@@ -1083,7 +1131,7 @@ if (
 
   &&
 
-  jiegengLongSliceScore >= 10
+  jiegengLongSliceScore >= 8
 
   &&
 
