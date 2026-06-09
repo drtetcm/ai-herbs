@@ -429,6 +429,28 @@ if (
 
 if (
 
+  featureText.includes("中心区域与外圈皮部分界")
+
+  ||
+
+  featureText.includes("中心区域与外圈界限")
+
+  ||
+
+  featureText.includes("中心区域与皮部分界")
+
+) {
+
+  console.log(
+    "[DANGSHEN_CORE_RING]"
+  );
+
+  dangshenScore += 6;
+
+}
+
+if (
+
   featureText.includes("木部与皮部分层")
 
   ||
