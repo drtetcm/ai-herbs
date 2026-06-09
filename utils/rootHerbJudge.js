@@ -493,7 +493,7 @@ if (
 
 // =========================
 // DS-ANTI-LARGE-XYLEM
-// 木部过大反党参
+// 木部明显大于皮部才反党参
 // =========================
 
 if (
@@ -501,21 +501,15 @@ if (
   featureText.includes("木部占比明显大于皮部")
   ||
 
-  featureText.includes("木部占比较大")
-  ||
-
   featureText.includes("木部占主导")
-  ||
-
-  featureText.includes("皮部较薄")
 
 ) {
 
   console.log(
-    "[DS_ANTI_LARGE_XYLEM]"
+    "[DS_ANTI_LARGE_XYLEM_STRONG]"
   );
 
-  dangshenScore -= 12;
+  dangshenScore -= 8;
 
 }
 
