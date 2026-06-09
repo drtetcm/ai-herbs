@@ -156,6 +156,9 @@ if (
   featureText.includes("红棕色外皮")
   ||
   featureText.includes("棕红色外皮")
+  ||
+  featureText.includes("外皮棕褐色至深棕色")
+  
 ) {
   gancaoScore += 6;
 }
@@ -183,6 +186,8 @@ if (
 ||
 featureText.includes("棕红色")
 ||
+featureText.includes("深棕色")
+||
 featureText.includes("棕褐色")
   )
 
@@ -200,7 +205,7 @@ featureText.includes("棕褐色")
 
 ) {
 
-  gancaoScore += 3;
+  gancaoScore += 8;
 
 }
 
