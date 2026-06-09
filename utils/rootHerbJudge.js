@@ -158,6 +158,10 @@ if (
   featureText.includes("棕红色外皮")
   ||
   featureText.includes("外皮棕褐色至深棕色")
+  ||
+  featureText.includes("外皮深棕褐色")
+  ||
+  featureText.includes("深棕褐色")
   
 ) {
   gancaoScore += 6;
