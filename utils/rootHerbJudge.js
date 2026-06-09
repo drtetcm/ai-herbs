@@ -1153,7 +1153,7 @@ if (
 
   &&
 
-  confidence <= 70
+  confidence <= 80
 
   &&
 
