@@ -209,6 +209,32 @@ featureText.includes("棕褐色")
 
 }
 
+if (
+  featureText.includes("木部区域较宽")
+) {
+
+  console.log(
+    "[GANCAO_WIDE_WOOD]"
+  );
+
+  gancaoScore += 4;
+
+}
+
+if (
+  featureText.includes("皮部棕褐色明显")
+  ||
+  featureText.includes("外皮棕褐色明显")
+) {
+
+  console.log(
+    "[GANCAO_BROWN_CORTEX]"
+  );
+
+  gancaoScore += 4;
+
+}
+
     const notDangshenCore =
 
   featureText.includes("木部占比明显大于皮部")
