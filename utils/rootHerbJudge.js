@@ -1137,6 +1137,16 @@ if (
 // =========================
 // 甘草纠偏
 // =========================
+console.log(
+  "[GANCAO_FIX_CHECK]",
+  {
+    herbName,
+    confidence,
+    gancaoScore,
+    huangqiScore
+  }
+);
+
 if (
 
   herbName === "黄芪"
@@ -1159,6 +1169,10 @@ if (
     "[ROOT_JUDGE] 黄芪 -> 甘草"
   );
 
+  console.log(
+  "[GANCAO_FIX_TRIGGERED]"
+);
+
   finalHerbName = "甘草";
 
 } 
@@ -1177,6 +1191,11 @@ if (
 
       finalHerbName = "党参";
     }
+
+    console.log(
+  "[ROOT_FINAL_HERB]",
+  finalHerbName
+);
 
 return {
   ...result,

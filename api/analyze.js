@@ -2204,6 +2204,11 @@ console.log(
 parsed =
   rootHerbJudge(parsed);
 
+  console.log(
+  "[AFTER_ROOT_JUDGE]",
+  parsed.herb_name
+);
+
   if (
   parsed.rule_corrected &&
   Array.isArray(parsed.possible_candidates)
@@ -3049,6 +3054,8 @@ ${correctionText}
 
 AI视觉模型原始分析
 （仅供参考）：
+
+规则引擎已根据中药鉴定学规则完成最终判定。
 
 ${normalizedResult.reasoning || ""}
 `;
