@@ -488,26 +488,19 @@ if (
 if (
 
   featureText.includes("木部与皮部分层")
-
   ||
-
   featureText.includes("皮木分层")
-
   ||
-
   featureText.includes("皮部与木部界限")
-
   ||
-
   featureText.includes("木部与皮部结构")
-
 ) {
 
   console.log(
     "[DANGSHEN_LAYER]"
   );
 
-  dangshenScore += 6;
+  dangshenScore += 10;
 
 }
 
