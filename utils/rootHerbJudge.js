@@ -142,6 +142,42 @@ function rootHerbJudge(result) {
     let fangfengScore = 0;
     let gancaoScore = 0;
 
+
+// =========================
+// DS TYPE A
+// 党参纵切根段
+// =========================
+
+if (
+
+  herbName === "黄芪"
+
+  &&
+
+  confidence <= 70
+
+  &&
+
+  featureText.includes("长条圆柱状")
+
+  &&
+
+  featureText.includes("纵皱纹")
+
+  &&
+
+  featureText.includes("皮木分界")
+
+) {
+
+  console.log(
+    "[DS_TYPE_A]"
+  );
+
+  dangshenScore += 8;
+
+}
+
 // =========================
 // 甘草特征
 // =========================
