@@ -547,28 +547,6 @@ if (
   dangshenScore -= 8;
 }
 
-// =========================
-// DS-ANTI-LARGE-XYLEM
-// 木部明显大于皮部才反党参
-// =========================
-
-if (
-
-  featureText.includes("木部占比明显大于皮部")
-  ||
-
-  featureText.includes("木部占主导")
-
-) {
-
-  console.log(
-    "[DS_ANTI_LARGE_XYLEM_STRONG]"
-  );
-
-  dangshenScore -= 8;
-
-}
-
     // =========================
     // 黄芪加分
     // =========================
@@ -1173,42 +1151,6 @@ if (
 
 }
 
-const isJiegengCase =
-
-featureText.includes("桔梗")
-||
-featureText.includes("花瓣状波浪边缘")
-||
-featureText.includes("花朵状切面");
-
-if (isJiegengCase) {
-
-  return {
-  ...result,
-
-  herb_name: finalHerbName,
-
-  original_herb_name: herbName,
-
-  rule_corrected:
-    herbName !== finalHerbName,
-
-  correction_reason:
-    buildCorrectionReason(
-      herbName,
-      finalHerbName,
-      featureText
-    ),
-
-  root_scores: {
-    dangshenScore,
-    huangqiScore,
-    fangfengScore,
-    gancaoScore
-  }
-};
-
-}
 // =========================
 // DANGSHEN HARD REJECTION
 // =========================
