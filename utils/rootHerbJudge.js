@@ -1021,11 +1021,26 @@ if (jiegengStrongEvidence) {
 
 if (
 
-  featureText.includes("粉性质感明显")
-  ||
-  featureText.includes("粉性强")
-  ||
-  featureText.includes("致密白色断面")
+  (
+    featureText.includes("粉性质感明显")
+    ||
+    featureText.includes("粉性强")
+    ||
+    featureText.includes("致密白色断面")
+  )
+
+  &&
+
+  (
+    featureText.includes("花瓣状")
+    ||
+    featureText.includes("波浪边缘")
+    ||
+    featureText.includes("花瓣样轮廓")
+    ||
+    featureText.includes("花盘状中心")
+  )
+
 ) {
 
   console.log(
