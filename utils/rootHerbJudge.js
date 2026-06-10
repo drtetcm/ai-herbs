@@ -520,7 +520,21 @@ if (
 // =========================
 
 if (
+
   featureText.includes("纵皱纹")
+
+  &&
+
+  (
+    featureText.includes("党参核心")
+    ||
+    featureText.includes("质地疏松")
+    ||
+    featureText.includes("皮宽芯小")
+    ||
+    featureText.includes("皮部较宽")
+  )
+
 ) {
 
   console.log(
