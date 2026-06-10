@@ -1,234 +1,276 @@
 [
   {
+    "id": "HQ001",
+    "type": "HQ-TYPE-A",
+    "realHerb": "黄芪",
+    "status": "PASS",
+    "failureStage": null,
+    "notes": "典型横切片，金井玉栏清晰可见，木部占比大",
+    "knownFeatures": [
+      "金井玉栏",
+      "木部占比明显大于皮部",
+      "皮部较薄",
+      "纤维束粗直明显",
+      "断面黄白色",
+      "圆整切片"
+    ],
+    "knownPitfalls": [],
+    "expectedTop1": "黄芪",
+    "expectedTop3": ["黄芪", "党参", "甘草"],
+    "judgeStage": "rootHerbJudge",
+    "lastVerified": "2025-01"
+  },
+
+  {
     "id": "DS001",
     "type": "DS-TYPE-A",
-
     "realHerb": "党参",
-
-    "predictedHerb": "黄芪",
-
-    "finalLabel": "黄芪",
-
-    "failureStage": "vision",
-
-    "confidence": 62,
-
-    "notes": "细条型党参，木心明显",
-
-    "herb_name": "黄芪",
-
-    "observed_features": [
+    "status": "PASS",
+    "failureStage": null,
+    "notes": "细条型党参，AI 初判黄芪，rootHerbJudge 纠偏",
+    "knownFeatures": [
       "类圆柱形",
       "纵向纹理",
+      "皮木分界",
+      "纵皱纹",
       "外皮淡黄棕色至米黄色",
-      "切面可见黄白色断面，部分段片端面可见",
-      "纤维束粗直，质地较致密",
-      "多根堆叠，整体形态较规则",
-      "干燥程度高，表面无光泽",
-      "部分端面可见木部与皮部分层"
+      "多根堆叠",
+      "金井玉栏结构无法完整确认"
     ],
-
-    "reasoning": "图像整体清晰度良好，光线均匀，主体为多根圆柱形干燥根段，堆放于青花瓷盘中。外表面纵皱纹粗直规则，颜色淡黄棕色，质地致密，纤维束粗直，整体形态符合黄芪根段特征。部分端面可见皮木分层结构，但因多根堆叠，金井玉栏结构无法在所有根段上完整确认，形态完整性受到一定限制。党参亦为圆柱形根段，但其纵皱纹通常更细密不规则，质地更疏松，本图特征更偏向黄芪。甘草外皮颜色偏深红棕，与本图不符。综合可见形态证据，黄芪为第一候选，但因堆叠遮挡导致内部结构验证不完整，置信度保守设定为62。",
-
-    "candidates": [
-      {
-        "herb_name": "黄芪",
-        "confidence": 62,
-        "reason": "外表面纵皱纹粗直、形态规则、圆柱形根段、淡黄棕色外皮、质地致密，符合黄芪根段典型特征。部分端面可见皮木分层，纤维束粗直。但因多根堆叠，金井玉栏结构无法完整确认，置信度受限。"
-      },
-      {
-        "herb_name": "党参",
-        "confidence": 28,
-        "reason": "党参亦呈圆柱形根段，外表面有纵皱纹，颜色相近。但党参外皮通常更松软，纵皱纹更细密不规则，且质地较疏松。本图纵皱纹较粗直规则，更偏向黄芪特征，但不能完全排除党参可能。"
-      },
-      {
-        "herb_name": "甘草",
-        "confidence": 10,
-        "reason": "甘草亦为圆柱形根段，但外皮通常呈红棕色至棕褐色，颜色明显偏深，与本图淡黄棕色不符，可能性较低。"
-      }
-    ]
+    "knownPitfalls": [
+      "AI 初判黄芪 confidence=62",
+      "金井玉栏未验证但 AI 倾向黄芪",
+      "weakHuangqiEvidence 触发 dangshenScore+10"
+    ],
+    "expectedTop1": "党参",
+    "expectedTop3": ["党参", "黄芪", "甘草"],
+    "judgeStage": "rootHerbJudge",
+    "lastVerified": "2025-01"
   },
 
   {
     "id": "DS002",
     "type": "DS-TYPE-A",
-
     "realHerb": "党参",
-
-    "predictedHerb": "党参",
-
-    "finalLabel": "UNKNOWN",
-
+    "status": "PARTIAL",
     "failureStage": "finalDecision",
-
-    "confidence": 52,
-
-    "notes": "细条型党参，木心明显",
-
-    "herb_name": "党参",
-
-    "observed_features": [
+    "notes": "AI 判党参正确，但 finalDecision 输出 UNKNOWN（confidence=52 被拦截）",
+    "knownFeatures": [
       "类圆柱形",
-      "外表面可见明显纵皱纹",
+      "外表面明显纵皱纹",
       "党参核心",
-      "质地疏松，断面不均匀",
-      "颜色呈淡黄棕色至黄白色",
-      "部分段片端面可见较小中心木部",
-      "表面纤维感明显，质地较松软",
-      "多根堆叠，存在遮挡"
+      "质地疏松",
+      "皮宽芯小",
+      "多根堆叠",
+      "暖色调光线"
     ],
-
-    "reasoning": "图像显示多根细长圆柱形干燥根段，堆放于竹制蒸笼容器中。从可见断面观察，皮部较宽、木部较小，外表面具有明显纵向皱纹，质地疏松，颜色呈淡黄棕色。这些特征与党参根段饮片的典型形态较为吻合。党参饮片常见形态为圆柱形段片，外皮具纵皱纹，断面皮宽芯小，质地较松。黄芪虽有相似颜色，但其典型特征为木部占比明显大于皮部（金井玉栏），且切面较圆整规则，与本图所见不完全符合。由于多根堆叠遮挡，断面细节无法逐一验证，暖色调光线影响颜色可靠性，整体置信度保守设定为52分。",
-
-    "candidates": [
-      {
-        "herb_name": "党参",
-        "confidence": 52,
-        "reason": "外表面纵皱纹明显，符合党参根段特征；断面可见皮部较宽、木部较小，与党参皮宽芯小结构吻合；质地疏松，颜色淡黄棕色，整体形态为细长圆柱形根段，符合党参饮片常见形态。但因多根堆叠遮挡，断面细节无法完整验证，置信度受限。"
-      },
-      {
-        "herb_name": "黄芪",
-        "confidence": 28,
-        "reason": "外观颜色与纤维质感与黄芪有一定相似性，但未能清晰观察到金井玉栏结构，木部占比大于皮部的特征亦不明确，且根段形态偏细，不符合黄芪典型粗壮圆整特征，故置信度较低。"
-      },
-      {
-        "herb_name": "甘草",
-        "confidence": 15,
-        "reason": "颜色与纤维质感有部分相似，但未见甘草典型红棕色外皮及明显形成层环，外皮颜色偏淡黄而非红棕，可能性较低。"
-      }
-    ]
+    "knownPitfalls": [
+      "confidence=52 低于 finalDecisionEngine HERB 门槛（authenticity_score 不足）",
+      "暖色调导致颜色可靠性下降",
+      "堆叠导致 morphology_integrity 下降"
+    ],
+    "expectedTop1": "党参",
+    "expectedTop3": ["党参", "黄芪", "甘草"],
+    "judgeStage": "finalDecisionEngine",
+    "lastVerified": "2025-01",
+    "knownIssue": "DS002 属于 finalDecision 拦截问题，非 rootHerbJudge 问题，需单独处理"
   },
 
   {
-  "id": "DS003",
-  "type": "DS-TYPE-B",
+    "id": "DS003",
+    "type": "DS-TYPE-B",
+    "realHerb": "党参",
+    "status": "KNOWN_FAIL",
+    "failureStage": "vision",
+    "notes": "伪金井玉栏党参，Claude 视觉模型稳定判黄芪 confidence=82，strongHuangqi 硬锁定触发",
+    "knownFeatures": [
+      "金井玉栏结构清晰可见（实为视觉幻觉）",
+      "木部占比明显大于皮部",
+      "金黄色木部中心",
+      "皮部较薄",
+      "纤维束粗直明显",
+      "多个切面结构一致"
+    ],
+    "knownPitfalls": [
+      "strongHuangqi 硬锁定：verifiedJingjing=true + 木部占比明显大于皮部",
+      "confidence=82 高于所有纠偏阈值",
+      "AI 幻觉无法被规则引擎纠偏"
+    ],
+    "expectedTop1": "党参",
+    "expectedTop3": ["党参", "黄芪", "甘草"],
+    "judgeStage": "vision",
+    "lastVerified": "2025-01",
+    "knownIssue": "DS003 属于 vision 幻觉 case，rootHerbJudge 无法处理。需要异常样本数据库才能覆盖。"
+  },
 
-  "realHerb": "党参",
-  "predictedHerb": "黄芪",
+  {
+    "id": "HQ004",
+    "type": "HQ-TYPE-B",
+    "realHerb": "黄芪",
+    "status": "KNOWN_FAIL",
+    "failureStage": "vision",
+    "notes": "黄芪斜切厚片被误判党参，皮宽芯小视觉错觉",
+    "knownFeatures": [
+      "切片呈椭圆形斜切片",
+      "中心木部较小",
+      "皮部明显宽于木部",
+      "边缘皱缩波浪状",
+      "外皮棕黄色",
+      "质地疏松"
+    ],
+    "knownPitfalls": [
+      "黄芪斜切厚片在特定角度皮宽芯小视觉失真",
+      "AI 判党参 confidence=72 超过纠偏阈值"
+    ],
+    "expectedTop1": "黄芪",
+    "expectedTop3": ["黄芪", "党参", "防风"],
+    "judgeStage": "vision",
+    "lastVerified": "2025-01",
+    "knownIssue": "斜切失真 case，需要斜切片专项规则或异常数据库覆盖"
+  },
 
-  "notes": "伪金井玉栏党参，木心明显，Claude稳定判黄芪",
+  {
+    "id": "CG009",
+    "type": "CG-TYPE-A",
+    "realHerb": "甘草",
+    "status": "PASS",
+    "failureStage": null,
+    "notes": "典型甘草斜切片，红棕色外皮 + 皮木分层",
+    "knownFeatures": [
+      "红棕色外皮",
+      "棕红色外皮",
+      "长椭圆形斜切片",
+      "皮木分界清晰",
+      "外皮与断面颜色对比明显"
+    ],
+    "knownPitfalls": [
+      "AI 初判黄芪（颜色相近）",
+      "CG_TYPE_A 规则触发纠偏"
+    ],
+    "expectedTop1": "甘草",
+    "expectedTop3": ["甘草", "黄芪", "党参"],
+    "judgeStage": "rootHerbJudge",
+    "lastVerified": "2025-01"
+  },
 
-  "herb_name": "黄芪",
+  {
+    "id": "JG005",
+    "type": "JG-TYPE-A",
+    "realHerb": "桔梗",
+    "status": "PASS",
+    "failureStage": null,
+    "notes": "典型桔梗圆形厚片，花瓣状边缘 + 菊花心",
+    "knownFeatures": [
+      "花瓣状波浪边缘",
+      "菊花心",
+      "浅棕黄色形成层环",
+      "断面致密紧实",
+      "中心放射纹明显"
+    ],
+    "knownPitfalls": [],
+    "expectedTop1": "桔梗",
+    "expectedTop3": ["桔梗", "防风", "党参"],
+    "judgeStage": "vision",
+    "lastVerified": "2025-01"
+  },
 
-  "confidence": 82,
-
-  "observed_features": [
-    "金井玉栏结构清晰可见",
-    "木部占比明显大于皮部",
-    "金黄色木部中心",
-    "皮部较薄呈淡黄白色",
-    "纤维束粗直明显",
-    "切面较圆整规则",
-    "类圆柱形",
-    "外表纵向纤维纹理清晰",
-    "断面质地致密",
-    "多个切面端面可见一致结构"
-  ],
-
-  "reasoning": "图像中可见大量圆柱形段片堆叠排列......",
-
-  "candidates": [
-    {
-      "herb_name": "黄芪",
-      "confidence": 82
-    },
-    {
-      "herb_name": "党参",
-      "confidence": 12
-    },
-    {
-      "herb_name": "甘草",
-      "confidence": 6
+  {
+    "id": "JG006",
+    "type": "JG-TYPE-C",
+    "realHerb": "桔梗",
+    "status": "FAIL",
+    "failureStage": "vision",
+    "notes": "大量堆叠圆形切片，粉性质感，AI 判山药，rootHerbJudge 未介入",
+    "knownFeatures": [
+      "大量薄切片堆叠",
+      "圆形横切面",
+      "粉性质感明显",
+      "黄白色至类白色",
+      "无明显花瓣状边缘（堆叠遮挡）",
+      "无油点",
+      "无多孔海绵状结构"
+    ],
+    "knownPitfalls": [
+      "山药与桔梗均为白色粉性圆片，堆叠后难以区分",
+      "AI 判山药 confidence 较高（精确值待补录）",
+      "rootHerbJudge 仅覆盖黄芪/党参/防风/甘草，未覆盖山药→桔梗纠偏",
+      "花瓣状边缘被堆叠遮挡，最强桔梗证据缺失"
+    ],
+    "expectedTop1": "桔梗",
+    "expectedTop3": ["桔梗", "山药", "白术"],
+    "judgeStage": "vision",
+    "lastVerified": "2025-01",
+    "knownIssue": "JG006 核心问题是 vision 幻觉，非规则引擎问题。根本解法：① 增加拍摄指导（单片展开）② 异常样本数据库 ③ 堆叠场景强制降信心",
+    "proposedFix": {
+      "shortTerm": "堆叠场景（candidateCount>=3 且 subject_completeness<50）触发 jiegeng 候选保护，强制进入 Top3",
+      "longTerm": "桔梗粉性圆片异常样本入库，建立视觉指纹"
     }
-  ],
+  },
 
-  "final_label": "党参",
+  {
+    "id": "JG009",
+    "type": "JG-TYPE-B",
+    "realHerb": "桔梗",
+    "status": "PASS",
+    "failureStage": null,
+    "notes": "桔梗纵切长条片，AI 初判黄芪，JIEGENG_LONG_SLICE_FIX 触发",
+    "knownFeatures": [
+      "纵切片",
+      "长条形",
+      "裂隙明显",
+      "空洞感",
+      "边缘波浪状"
+    ],
+    "knownPitfalls": [
+      "纵切长条形态与黄芪相近",
+      "jiegengLongSliceScore 触发 JIEGENG_LONG_SLICE_FIX"
+    ],
+    "expectedTop1": "桔梗",
+    "expectedTop3": ["桔梗", "黄芪", "党参"],
+    "judgeStage": "rootHerbJudge",
+    "lastVerified": "2025-01"
+  },
 
-  "root_case": "DS-TYPE-B"
-},
+  {
+    "id": "JG010",
+    "type": "JG-TYPE-B",
+    "realHerb": "桔梗",
+    "status": "PASS",
+    "failureStage": null,
+    "notes": "桔梗纵切片变体",
+    "knownFeatures": [
+      "纵切片",
+      "放射裂隙",
+      "中央髓部疏松",
+      "边缘花瓣状轮廓残留"
+    ],
+    "knownPitfalls": [],
+    "expectedTop1": "桔梗",
+    "expectedTop3": ["桔梗", "黄芪", "党参"],
+    "judgeStage": "rootHerbJudge",
+    "lastVerified": "2025-01"
+  },
 
-{
-  "id": "HQ004",
-  "type": "HQ-TYPE-B",
-  "realHerb": "黄芪",
-  "predictedHerb": "党参",
-  "notes": "黄芪斜切厚片被误判为皮宽芯小党参",
-
-  "herb_name": "党参",
-  "confidence": 72,
-
-  "observed_features": [
-    "切片呈椭圆形斜切片",
-    "中心木部较小",
-    "皮部明显宽于木部",
-    "纵向纹理",
-    "边缘不规则",
-    "皱缩波浪状",
-    "断面黄白色",
-    "质地疏松",
-    "外皮棕黄色",
-    "整体形态一致"
-  ],
-
-  "reasoning": "图像整体清晰度良好。主体为多枚椭圆形斜切饮片。Claude根据皮部明显宽于木部、中心木部较小、边缘皱缩等特征判定党参。但真实药材为黄芪。该案例表明黄芪斜切厚片在特定角度下可能出现皮宽芯小视觉错觉，仅凭边缘皱缩、放射纹、外皮纵纹及斜切形态不能直接判定党参。",
-
-  "candidates": [
-    {
-      "herb_name": "党参",
-      "confidence": 72,
-      "reason": "误判原因：皮宽芯小、边缘皱缩、外皮纵纹"
-    },
-    {
-      "herb_name": "黄芪",
-      "confidence": 18,
-      "reason": "真实药材"
-    }
-  ]
-},
-
-{
-  "id": "JG006",
-  "type": "JG-TYPE-B",
-  "realHerb": "桔梗",
-  "predictedHerb": "黄芪",
-  "finalLabel": "黄芪",
-  "failureStage": "vision",
-  "notes": "严重堆叠遮挡，AI未提取桔梗核心特征",
-
-  "herb_name": "黄芪",
-  "confidence": 52,
-
-  "observed_features": [
-    "大量薄切片堆叠，整体呈黄白色至淡黄色",
-    "部分切片可见圆形或椭圆形横切面",
-    "切面中心区域可见淡黄色木部，部分切片木部区域较宽",
-    "纵皱纹",
-    "部分切片边缘较规则，切面较圆整",
-    "断面质感较致密，粉性质感可见",
-    "纤维束方向可见于部分纵切片",
-    "无油点",
-    "无明显多孔海绵状结构",
-    "堆叠严重，单片形态难以完整评估"
-  ],
-
-  "reasoning": "图像显示大量中药薄切片堆叠于金属盆中，切片数量极多且相互叠压，导致单片形态完整性严重不足。从可见的少数较完整切片观察：整体颜色为黄白色至淡黄色，部分切片外皮呈浅棕色并可见纵向皱纹，切面较致密，部分切片木部区域可见且相对较宽。综合以上特征，黄芪薄片的可能性最高，但由于堆叠遮挡严重，金井玉栏结构无法在多个切片上清晰确认，皮木比例亦难以精确判断。党参因部分切片中心偏小、皮部较宽而列为次要候选。根据保守识别原则，置信度压低至52分，不触发force_unknown但标注为中高风险。",
-  "candidates": [
-    {
-      "herb_name": "黄芪",
-      "confidence": 52,
-      "reason": "部分可见切片显示木部区域较宽、断面较致密、外皮浅棕色纵皱纹，整体颜色黄白色，与黄芪薄片特征相符。但因大量切片堆叠，无法清晰确认金井玉栏结构，木部与皮部比例难以精确判断，置信度受限。"
-    },
-    {
-      "herb_name": "党参",
-      "confidence": 35,
-      "reason": "部分切片中心区域偏小、皮部相对较宽，边缘略有不规则，与党参皮宽芯小特征有一定吻合。但未见明显狮子盘头或花盘状中心，且整体断面质感偏致密，与党参疏松断面有差异，故列为次要候选。"
-    },
-    {
-      "herb_name": "桔梗",
-      "confidence": 20,
-      "reason": "少数切片边缘略呈波浪状，但未见明显花瓣状轮廓、菊花心或浅棕黄色形成层环，桔梗可能性较低，但因堆叠遮挡无法完全排除。"
-    }
-  ]
-}
-
+  {
+    "id": "JG012",
+    "type": "JG-TYPE-B",
+    "realHerb": "桔梗",
+    "status": "PASS",
+    "failureStage": null,
+    "notes": "桔梗纵切片，FANGFENG_ANTI_FANGFENG 触发",
+    "knownFeatures": [
+      "纵切片",
+      "空洞感",
+      "裂隙",
+      "防风候选混入"
+    ],
+    "knownPitfalls": [
+      "AI 初判防风",
+      "JIEGENG_ANTI_FANGFENG 触发纠偏"
+    ],
+    "expectedTop1": "桔梗",
+    "expectedTop3": ["桔梗", "防风", "党参"],
+    "judgeStage": "rootHerbJudge",
+    "lastVerified": "2025-01"
+  }
 ]
