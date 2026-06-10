@@ -1355,9 +1355,9 @@ if (
     if (
       herbName === "黄芪" &&
       confidence <= 70 &&
-      dangshenScore - huangqiScore >= 10
-      &&
-      gancaoScore < dangshenScore
+      dangshenScore >= 6 &&
+  dangshenScore > huangqiScore &&
+  gancaoScore < dangshenScore
     ) {
 
       console.log(
