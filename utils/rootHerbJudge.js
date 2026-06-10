@@ -1310,6 +1310,63 @@ if (
 }
 
 // =========================
+// CG TYPE A
+// 甘草典型斜切片
+// =========================
+
+const cgTypeA =
+
+(
+  featureText.includes("棕褐色")
+  ||
+  featureText.includes("深棕褐色")
+  ||
+  featureText.includes("红棕色")
+)
+
+&&
+
+(
+  featureText.includes("椭圆形")
+  ||
+  featureText.includes("长椭圆形")
+  ||
+  featureText.includes("斜切片")
+)
+
+&&
+
+(
+  featureText.includes("皮木分界")
+  ||
+  featureText.includes("皮木分层")
+  ||
+  featureText.includes("外皮与断面颜色对比明显")
+);
+
+if (
+
+  herbName === "黄芪"
+
+  &&
+
+  confidence <= 80
+
+  &&
+
+  cgTypeA
+
+) {
+
+  console.log(
+    "[CG_TYPE_A]"
+  );
+
+  finalHerbName = "甘草";
+
+}
+
+// =========================
 // 甘草纠偏
 // =========================
 console.log(
