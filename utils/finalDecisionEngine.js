@@ -105,9 +105,17 @@ if (commercialScene) {
   // OCR CONTAMINATION
   // =========================
 
-  if (ocr_text_density >= 40) {
+  let contaminationScore = 0;
   
-    if (ocr_text_density >= 20) {
+  if (ocr_text_density >= 20) {
+  contaminationScore += 20;
+}
+
+if (ocr_text_density >= 40) {
+  contaminationScore += 20;
+}
+
+if (ocr_text_density >= 60) {
   contaminationScore += 20;
 }
 
@@ -141,8 +149,6 @@ if (ocr_text_density >= 60) {
       reasons,
       possible_candidates: []
     };
-
-  }
 
 // =========================
 // SCENE INTERFERENCE
@@ -203,8 +209,6 @@ if (
 // =========================
 // PACKAGING
 // =========================
-
-let contaminationScore = 0;
 
 if (contains_packaging) {
   contaminationScore += 25;
