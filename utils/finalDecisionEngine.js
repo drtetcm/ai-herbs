@@ -101,13 +101,13 @@ if (commercialScene) {
   };
 }
 
-  // =========================
-  // OCR CONTAMINATION
-  // =========================
+// =========================
+// OCR CONTAMINATION
+// =========================
 
-  let contaminationScore = 0;
-  
-  if (ocr_text_density >= 20) {
+let contaminationScore = 0;
+
+if (ocr_text_density >= 20) {
   contaminationScore += 20;
 }
 
@@ -119,36 +119,35 @@ if (ocr_text_density >= 60) {
   contaminationScore += 20;
 }
 
-if (ocr_text_density >= 40) {
-  contaminationScore += 40;
-}
+// 只有严重OCR污染才直接拒绝
 
 if (ocr_text_density >= 60) {
-  contaminationScore += 60;
-}
-    final_label = "UNKNOWN";
 
-    final_confidence = 0;
+  final_label = "UNKNOWN";
 
-    reasons.push(
-      "Heavy OCR contamination detected"
-    );
+  final_confidence = 0;
 
-    console.log(
-      "FINAL ENGINE RESULT:",
-      {
-        final_label,
-        final_confidence,
-        reasons
-      }
-    );
+  reasons.push(
+    "Heavy OCR contamination detected"
+  );
 
-    return {
+  console.log(
+    "FINAL ENGINE RESULT:",
+    {
       final_label,
       final_confidence,
-      reasons,
-      possible_candidates: []
-    };
+      reasons
+    }
+  );
+
+  return {
+    final_label,
+    final_confidence,
+    reasons,
+    possible_candidates: []
+  };
+
+}
 
 // =========================
 // SCENE INTERFERENCE
